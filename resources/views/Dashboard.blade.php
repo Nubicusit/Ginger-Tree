@@ -6,7 +6,7 @@
 
 @section('content')
 <div class="bg-[#F3F4F6]">
-  
+  <!-- Dashboard -->
 <div class="max-w-full mx-auto">
         <!-- Top Cards Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -184,7 +184,7 @@
                         </div>
                         <!-- Vertical Separator -->
                         <div class="hidden sm:block w-px h-48 sm:h-56 bg-gray-300"></div>
-                        
+
                         <div class="space-y-3 sm:space-y-4 min-w-max sm:min-w-[160px] text-xs sm:text-sm">
                             <div class="flex items-center justify-end gap-3 mb-2 sm:mb-3">
                                 <span class="text-xs sm:text-sm text-gray-500">Lead Source</span>
