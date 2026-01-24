@@ -51,8 +51,8 @@
         </video>
     </div>
     <!-- Main Wrapper -->
-    <div id="main-content" class="hidden flex flex-col md:flex-row h-full 
-              py-6 sm:py-8 md:py-[10rem] lg:py-16 xl:py-[10rem] 
+    <div id="main-content" class="hidden flex flex-col md:flex-row h-full
+              py-6 sm:py-8 md:py-[10rem] lg:py-16 xl:py-[10rem]
               px-4 sm:px-6 md:px-8 lg:px-12 xl:px-[20rem] 2xl:px-[30rem]">
 
         <!-- Left Side -->
@@ -85,8 +85,8 @@
                     Login Account
                 </h1>
 
-                <form class="space-y-4 sm:space-y-6">
-
+                <form method="POST" action="{{ url('/login') }}" class="space-y-4 sm:space-y-6">
+                @csrf
                     <!-- Email -->
                     <div class="relative">
                         <div class="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4">
@@ -94,6 +94,7 @@
                         </div>
                         <input
                             type="text"
+                            name="email"
                             placeholder="Email/ID"
                             class="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 bg-gray-50 border-0 focus:outline-none focus:ring-2 focus:ring-red-600 rounded-md text-gray-700 text-sm sm:text-base">
                     </div>
@@ -105,16 +106,15 @@
                         </div>
                         <input
                             type="password"
+                            name="password"
                             placeholder="Password"
                             class="w-full pl-7 sm:pl-8 pr-3 sm:pr-4 py-2 sm:py-3 bg-gray-50 border-0 focus:outline-none focus:ring-2 focus:ring-red-600 rounded-md text-gray-700 text-sm sm:text-base">
                     </div>
 
-                    
-
                     <!-- Remember -->
                     <div class="flex items-center justify-between text-xs sm:text-sm">
                         <label class="flex items-center space-x-2 cursor-pointer">
-                            <input type="checkbox" class="w-3 h-3 sm:w-4 sm:h-4 text-red-600 border-gray-300 rounded focus:ring-red-600">
+                            <input type="checkbox" name="remember" class="w-3 h-3 sm:w-4 sm:h-4 text-red-600 border-gray-300 rounded focus:ring-red-600">
                             <span class="text-gray-600">Remember me</span>
                         </label>
                         <a href="#" class="text-red-600 hover:text-red-700 font-medium">Forgot a number?</a>
@@ -126,7 +126,6 @@
                         class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 sm:py-3 rounded-full transition-colors duration-200 uppercase tracking-wide text-sm sm:text-base">
                         LOGIN
                     </button>
-
                 </form>
             </div>
         </div>

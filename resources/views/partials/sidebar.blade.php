@@ -114,7 +114,7 @@
             Clear Cache
           </button>
 
-          <form method="POST" action="">
+          <form method="POST" action="{{ route('logout') }}">
             @csrf
             <button type="submit"
               class="w-full text-center px-4 py-2 text-xs font-bold text-red-600 border border-red-600 rounded-full hover:bg-red-50 uppercase transition-colors">
