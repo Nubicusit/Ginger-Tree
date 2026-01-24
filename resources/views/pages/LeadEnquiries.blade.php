@@ -5,10 +5,10 @@
 @section('page-title', 'Leads and Inquiries')
 
 @section('content')
-  
+
   <!-- Top Stats Section -->
   <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
-    
+
     <!-- Total Leads Card -->
     <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
       <div class="flex justify-between items-center mb-4">

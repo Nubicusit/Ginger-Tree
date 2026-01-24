@@ -7,11 +7,11 @@
 @section('content')
   <!-- Main Card Container -->
   <div class="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden">
-    
+
     <!-- Card Header Section -->
     <div class="p-6">
       <h1 class="text-2xl font-bold text-gray-800 mb-6">Customer Data</h1>
-      
+
       <!-- Filter / Checkbox Row -->
       <div class="flex items-center mb-6">
         <label class="flex items-center space-x-2 cursor-pointer">
@@ -33,7 +33,7 @@
             Total Payment Balance : 30
           </div>
         </div>
-        
+
         <!-- Add/Update Button -->
         <a href="{{ url('customers/create') }}" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-md font-bold uppercase tracking-wider transition-colors shadow-md text-center">
           ADD AND UPDATE CUSTOMER
@@ -63,17 +63,57 @@
                 Project Type
               </div>
             </th>
-            <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Location</th>
+            <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Contact NO</th>
+            <!-- <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Location</th> -->
+            <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Company</th>
+
             <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Payment Status</th>
             <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">GST number</th>
           </tr>
         </thead>
-        
+
         <tbody class="divide-y divide-gray-100">
-          
+          @foreach($customers as $customer)
+            <tr class="hover:bg-gray-50">
+                <td class="p-4">
+                    <input type="checkbox">
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    {{ $customer->customer_id }}
+                </td>
+
+                <td class="p-4 font-medium text-gray-800">
+                    {{ $customer->name }}
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    {{ $customer->project_type }}
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    {{ $customer->contact_no }}
+                </td>
+
+                <td class="p-4 text-gray-600">
+                    {{ $customer->company }}
+                </td>
+
+                <td class="p-4">
+                    <span class="px-3 py-1 rounded text-white
+                        {{ $customer->payment_status == 'paid' ? 'bg-green-600' : 'bg-red-600' }}">
+                        {{ strtoupper($customer->payment_status) }}
+                    </span>
+                </td>
+
+                <td class="p-4 font-mono text-sm">
+                    {{ $customer->gst_number }}
+                </td>
+            </tr>
+          @endforeach
 
           <!-- Row 1 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#15624</td>
             <td class="p-4 font-medium text-gray-800">Priya Sharma</td>
@@ -83,10 +123,10 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
 
           <!-- Row 2 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#14589</td>
             <td class="p-4 font-medium text-gray-800">Anish & Rupa</td>
@@ -96,10 +136,10 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">Payment Completed</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
 
           <!-- Row 3 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#14301</td>
             <td class="p-4 font-medium text-gray-800">Kamal Mehta</td>
@@ -109,10 +149,10 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
 
           <!-- Row 4 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#13987</td>
             <td class="p-4 font-medium text-gray-800">Elger Family</td>
@@ -122,10 +162,10 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
 
           <!-- Row 5 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#13052</td>
             <td class="p-4 font-medium text-gray-800">Tina Kapoor</td>
@@ -135,10 +175,10 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
 
           <!-- Row 6 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#13209</td>
             <td class="p-4 font-medium text-gray-800">Lisa Patel</td>
@@ -148,10 +188,10 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
 
           <!-- Row 7 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#13187</td>
             <td class="p-4 font-medium text-gray-800">Zhang Li</td>
@@ -161,10 +201,10 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
 
           <!-- Row 8 -->
-          <tr class="hover:bg-gray-50 transition-colors">
+          <!-- <tr class="hover:bg-gray-50 transition-colors">
             <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
             <td class="p-4 text-gray-600">#12642</td>
             <td class="p-4 font-medium text-gray-800">Shoalb Khan</td>
@@ -174,7 +214,7 @@
               <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
             </td>
             <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr>
+          </tr> -->
         </tbody>
       </table>
     </div>
