@@ -1,5 +1,7 @@
 @extends('layout.app')
 
+<!-- Dashboard -->
+
 @section('title', 'Dashboard')
 
 @section('page-title', 'Welcome, Admin')
