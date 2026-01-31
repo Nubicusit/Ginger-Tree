@@ -63,20 +63,20 @@
     <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-40 md:hidden"></div>
 
     <!-- Sidebar Include -->
-    @include('partials.sidebar')
+    @include('sale_executive.partials.sidebar')
 
     <!-- Main Content Wrapper -->
     <!-- Added md:ml-64 to push content right on desktop so it doesn't sit under the fixed sidebar -->
     <div class="md:ml-64 flex flex-col min-h-screen transition-all duration-300">
 
         <!-- Navbar Include -->
-        @include('partials.navbar')
+        @include('sale_executive.partials.navbar')
 
         <!-- Dynamic Page Content -->
         <main class="flex-1 p-4 sm:p-6 lg:p-8 bg-gray-200 overflow-y-auto">
             @yield('content')
         </main>
-        
+
     </div>
 
     <!-- Optional Global Scripts -->
