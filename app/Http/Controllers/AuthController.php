@@ -15,38 +15,42 @@ class AuthController extends Controller
         return view('welcome');
     }
 
-public function login(Request $request)
-{
-    $request->validate([
-        'email' => ['required', 'email'],
-        'password' => ['required'],
-    ]);
+    public function login(Request $request)
+    {
+        $request->validate([
+            'email' => ['required', 'email'],
+            'password' => ['required'],
+        ]);
 
-    $user = User::where('email', $request->email)->first();
+        $user = User::where('email', $request->email)->first();
 
-    if (!$user) {
-        return back()->withErrors(['email' => 'Invalid email or password.'])
-                     ->onlyInput('email');
+        if (!$user) {
+            return back()->withErrors(['email' => 'Invalid email or password.'])
+                ->onlyInput('email');
+        }
+
+        if ($user->status != 1) {
+            return back()->withErrors(['email' => 'Your account is inactive.'])
+                ->onlyInput('email');
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
+            return back()->withErrors(['email' => 'Invalid email or password.'])
+                ->onlyInput('email');
+        }
+
+        Auth::login($user, $request->filled('remember'));
+
+        if ($user->role === 'admin') {
+            return redirect()->route('admin.dashboard');
+        }
+
+        if ($user->role === 'sales_executive') {
+        return redirect()->route('sales.dashboard');
+        }
+
+        return redirect('/');
     }
-
-    if ($user->status != 1) {
-        return back()->withErrors(['email' => 'Your account is inactive.'])
-                     ->onlyInput('email');
-    }
-
-    if (!Hash::check($request->password, $user->password)) {
-        return back()->withErrors(['email' => 'Invalid email or password.'])
-                     ->onlyInput('email');
-    }
-
-    Auth::login($user, $request->filled('remember'));
-
-    if ($user->role === 'admin') {
-        return redirect()->route('admin.dashboard');
-    }
-
-    return redirect('/');
-}
 
     public function logout(Request $request)
     {

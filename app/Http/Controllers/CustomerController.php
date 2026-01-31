@@ -19,24 +19,43 @@ public function create()
 }
 public function store(Request $request)
 {
-    $request->validate([
-        'name' => 'required',
-        'contact_no' => 'nullable|digits:10',
-
+    $data = $request->validate([
+        'name'           => 'required|string',
+        'project_type'   => 'nullable|string',
+        'contact_no'     => 'required|string',
+        'email'          => 'nullable|email',
+        'address'        => 'nullable|string',
+        'customer_type'  => 'nullable|string',
+        'industry'       => 'nullable|string',
+        'website'        => 'nullable|string',
+        'company'        => 'nullable|string',
+        'gst_number'     => 'nullable|string',
+        'notes'          => 'nullable|string',
+        'payment_status' => 'required|in:paid,pending,balance',
     ]);
 
-    Customer::create([
-        'customer_id' => 'CUST' . rand(1000,9999),
-        'name' => $request->name,
-        'project_type' => $request->project_type,
-        'contact_no' => $request->contact_no,
-        'company' => $request->company,
-        'payment_status' => $request->payment_status,
-        'gst_number' => $request->gst_number,
-    ]);
+    // Auto project status from payment status
+    $data['project_status'] = match ($request->payment_status) {
+        'paid'    => 'completed',
+        'balance' => 'in_progress',
+        default   => 'pending',
+    };
 
-    return redirect()->route('customers.index')->with('success','Customer added');
+    if ($request->customer_id) {
+     
+        Customer::where('id', $request->customer_id)->update($data);
+    } else {
+
+        $data['customer_id'] = '#' . rand(1000, 9999);
+        Customer::create($data);
+    }
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Customer saved successfully'
+    ]);
 }
+
 
 
 }
