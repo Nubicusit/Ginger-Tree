@@ -3,17 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="csrf-token" content="{{ csrf_token() }}">
   <title>@yield('title', 'Steels & SheetMart')</title>
 
   <!-- Tailwind CSS -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
-
 
   <!-- Custom Styles for Sidebar Transitions & Scrollbar -->
   <style>
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-track {
       background: #f1f1f1;
     }

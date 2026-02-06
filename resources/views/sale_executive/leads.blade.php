@@ -161,11 +161,13 @@
     bg-red-500 text-white
 @elseif($lead->status == 'Contacted')
     bg-yellow-400 text-white
+    @elseif($lead->status == 'Site Visit')
+    bg-blue-400 text-white
 @else
     bg-orange-500 text-white
 @endif">
-    {{ $lead->status }}
-</span>
+                                {{ $lead->status }}
+                            </span>
 
                         </td>
 
@@ -273,7 +275,7 @@
 
             <input type="hidden" id="current_lead_id">
             <input type="hidden" id="assigned_designer" value="{{ $lead->designer_id ?? '' }}">
-<input type="hidden" id="assigned_sales" value="{{ $lead->sales_executive_id ?? '' }}">
+            <input type="hidden" id="assigned_sales" value="{{ $lead->sales_executive_id ?? '' }}">
             <h3 class="font-semibold mb-4">Project Information</h3>
 
             <!-- Project Type -->
@@ -304,6 +306,14 @@
             <div class="mt-2">
                 <label class="label font-semibold text-sm">Notes</label>
                 <textarea id="lead_notes" class="input w-full h-24 resize-none" placeholder="Add notes here..."></textarea>
+            </div>
+
+            <div class="mt-3 flex items-center gap-2">
+                <input type="checkbox" id="site_visit" class="w-4 h-4" onchange="handleSiteVisitCheck(this)">
+
+                <label for="site_visit" class="text-sm font-medium text-gray-700">
+                    Site Visit Required
+                </label>
             </div>
 
             <div class="bottom-0 pb-6
@@ -340,6 +350,35 @@
         </div>
     </div>
 </div>
+<!-- SITE VISIT MODAL -->
+<div id="siteVisitModal"
+    class="fixed inset-0 bg-black/40 hidden z-60 flex items-center justify-center">
+
+    <div class="bg-white w-[400px] rounded-lg shadow-xl p-5">
+
+        <h3 class="font-bold mb-4">Schedule Site Visit</h3>
+
+        <!-- Visit Date -->
+        <div class="mb-3">
+            <label class="text-sm font-medium">Select Date</label>
+            <input type="date" id="site_visit_date" class="input w-full mt-1">
+        </div>
+
+        <!-- Visit Time -->
+        <div class="mb-4">
+            <label class="text-sm font-medium">Select Time</label>
+            <input type="time" id="site_visit_time" class="input w-full mt-1">
+        </div>
+
+        <div class="flex justify-end gap-2">
+            <button onclick="closeSiteVisitModal()">Cancel</button>
+            <button onclick="saveSiteVisitSchedule()"
+                class="bg-blue-600 text-white px-4 py-2 rounded">
+                Save
+            </button>
+        </div>
+    </div>
+</div>
 
 <script>
     function openLeadDrawer(leadId) {
@@ -367,6 +406,8 @@
                 document.getElementById('expected_start_date').value = lead.expected_start_date;
 
                 document.getElementById('lead_notes').value = lead.notes || '';
+                document.getElementById('site_visit').checked = lead.site_visit == 1;
+
 
                 renderTasks(lead.tasks);
             })
@@ -386,35 +427,38 @@
     }
 
     function saveLeadAssignment() {
-    const leadId = document.getElementById('current_lead_id').value;
-    const designerId = document.getElementById('assigned_designer')?.value || null;
-    const salesId = document.getElementById('assigned_sales')?.value || null;
-    const notes = document.getElementById('lead_notes').value;
+        const leadId = document.getElementById('current_lead_id').value;
+        const designerId = document.getElementById('assigned_designer')?.value || null;
+        const salesId = document.getElementById('assigned_sales')?.value || null;
+        const notes = document.getElementById('lead_notes').value;
+        const siteVisit = document.getElementById('site_visit').checked ? 1 : 0;
 
-    fetch(`/leads/${leadId}/update`, {
-        method: 'PUT',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            designer_id: designerId,
-            sales_executive_id: salesId,
-            notes: notes
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert('Lead updated successfully!');
-            closeLeadDrawer();
-            location.reload();
-        } else {
-            alert('Something went wrong.');
-        }
-    })
-    .catch(err => console.error(err));
-}
+
+        fetch(`/leads/${leadId}/update`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    designer_id: designerId,
+                    sales_executive_id: salesId,
+                    notes: notes,
+                    site_visit: siteVisit
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Lead updated successfully!');
+                    closeLeadDrawer();
+                    location.reload();
+                } else {
+                    alert('Something went wrong.');
+                }
+            })
+            .catch(err => console.error(err));
+    }
 
     function saveTask() {
         const leadId = document.getElementById('current_lead_id').value;
@@ -464,49 +508,49 @@
         openTaskModal();
     }
 
-function renderTasks(tasks) {
-    const taskList = document.getElementById('task_list');
-    taskList.innerHTML = '';
+    function renderTasks(tasks) {
+        const taskList = document.getElementById('task_list');
+        taskList.innerHTML = '';
 
-    if (!tasks || tasks.length === 0) {
-        taskList.innerHTML = '<p class="text-xs text-gray-400">No follow-ups yet</p>';
-        return;
-    }
+        if (!tasks || tasks.length === 0) {
+            taskList.innerHTML = '<p class="text-xs text-gray-400">No follow-ups yet</p>';
+            return;
+        }
 
-    let today = new Date().toISOString().split('T')[0];
-    let grouped = {};
+        let today = new Date().toISOString().split('T')[0];
+        let grouped = {};
 
-    // Group by CREATED DATE
-    tasks.forEach(task => {
-        let createdDate = task.created_at.split('T')[0];
+        // Group by CREATED DATE
+        tasks.forEach(task => {
+            let createdDate = task.created_at.split('T')[0];
 
-        if (!grouped[createdDate]) grouped[createdDate] = [];
-        grouped[createdDate].push(task);
-    });
+            if (!grouped[createdDate]) grouped[createdDate] = [];
+            grouped[createdDate].push(task);
+        });
 
-    Object.keys(grouped).sort().reverse().forEach(date => {
-        let formattedDate = formatDate(date);
-        let label = (date === today)
-            ? `Today, ${formattedDate}`
-            : formattedDate;
+        Object.keys(grouped).sort().reverse().forEach(date => {
+            let formattedDate = formatDate(date);
+            let label = (date === today) ?
+                `Today, ${formattedDate}` :
+                formattedDate;
 
-        taskList.innerHTML += `
+            taskList.innerHTML += `
             <div class="text-xs text-gray-400 mt-3 mb-1 font-semibold">
                 ${label}
             </div>
         `;
 
-        grouped[date].forEach(task => {
-            let followUp = new Date(task.followup_date);
+            grouped[date].forEach(task => {
+                let followUp = new Date(task.followup_date);
 
-    let formattedFollowUp = followUp.toLocaleDateString('en-US', {
-        weekday: 'short',
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    });
+                let formattedFollowUp = followUp.toLocaleDateString('en-US', {
+                    weekday: 'short',
+                    day: '2-digit',
+                    month: 'short',
+                    year: 'numeric'
+                });
 
-            taskList.innerHTML += `
+                taskList.innerHTML += `
                 <div class="flex justify-between items-start mb-2">
                     <div>
                         <div class="font-semibold text-sm">${task.title}</div>
@@ -519,29 +563,29 @@ function renderTasks(tasks) {
                     </div>
                 </div>
             `;
+            });
         });
-    });
-}
+    }
 
-function formatDate(dateString) {
-    let date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    });
-}
+    function formatDate(dateString) {
+        let date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
 
-function formatDate(dateString) {
-    let date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-    });
-}
+    function formatDate(dateString) {
+        let date = new Date(dateString);
+        return date.toLocaleDateString('en-US', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+    }
 
-function deleteTask(id) {
+    function deleteTask(id) {
         if (!confirm('Delete this task?')) return;
 
         fetch(`/tasks/${id}`, {
@@ -556,7 +600,7 @@ function deleteTask(id) {
             });
     }
 
-function editTask(id) {
+    function editTask(id) {
         let newTitle = prompt("Edit task title:");
         if (!newTitle) return;
 
@@ -573,6 +617,52 @@ function editTask(id) {
             .then(res => res.json())
             .then(() => {
                 openLeadDrawer(document.getElementById('current_lead_id').value);
+            });
+    }
+
+    function handleSiteVisitCheck(checkbox) {
+        if (checkbox.checked) {
+            document.getElementById('siteVisitModal').classList.remove('hidden');
+        }
+    }
+
+    function closeSiteVisitModal() {
+        document.getElementById('siteVisitModal').classList.add('hidden');
+
+        // Optional: uncheck if cancelled
+        document.getElementById('site_visit').checked = false;
+    }
+
+    function saveSiteVisitSchedule() {
+        const leadId = document.getElementById('current_lead_id').value;
+        const date = document.getElementById('site_visit_date').value;
+        const time = document.getElementById('site_visit_time').value;
+
+        if (!date || !time) {
+            alert("Please select both date and time");
+            return;
+        }
+
+        fetch(`/leads/${leadId}/site-visit`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
+                body: JSON.stringify({
+                    date: date,
+                    time: time
+                })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Site visit scheduled successfully");
+
+                    document.getElementById('site_visit').checked = true;
+                    closeSiteVisitModal();
+                    location.reload();
+                }
             });
     }
 </script>

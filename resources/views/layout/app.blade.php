@@ -54,8 +54,7 @@
 .input:read-only {
     background-color: #f9fafb;
 }
-
-  </style>
+</style>
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
@@ -76,9 +75,7 @@
         <main class="flex-1 p-4 sm:p-6 lg:p-8 bg-gray-200 overflow-y-auto">
             @yield('content')
         </main>
-        
     </div>
-
     <!-- Optional Global Scripts -->
     <script>
         // Toggle Sidebar Logic
