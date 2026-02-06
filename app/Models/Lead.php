@@ -23,7 +23,8 @@ class Lead extends Model
         'status',
         'lost_reason',
         'next_followup_date',
-        'notes'
+        'notes',
+        'site_visit'
     ];
 
     public function designer()
@@ -40,5 +41,10 @@ class Lead extends Model
 {
     return $this->hasMany(Task::class);
 }
+public function siteVisit()
+{
+    return $this->hasOne(SiteVisit::class);
+}
+
 }
 
