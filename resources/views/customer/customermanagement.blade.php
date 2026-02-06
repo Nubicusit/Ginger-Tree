@@ -151,7 +151,6 @@
                         </span>
                         @endif
                     </td>
-
                 </tr>
                 @endforeach
 
@@ -426,7 +425,6 @@
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none bg-gray-50 cursor-not-allowed" />
                     </div>
                 </div>
-
             </form>
         </div>
 
@@ -531,13 +529,11 @@
         clickedBtn.classList.remove('border-transparent', 'text-gray-500');
         clickedBtn.classList.add('border-blue-600', 'text-blue-600');
 
-        // 3. Hide all tab contents
         const tabContents = document.querySelectorAll('.tab-content');
         tabContents.forEach(content => {
             content.classList.add('hidden');
         });
 
-        // 4. Show the specific tab content
         const targetContent = document.getElementById(tabId);
         if (targetContent) {
             targetContent.classList.remove('hidden');
@@ -571,7 +567,7 @@
                 if (data.success) {
                     alert("Customer saved successfully ✅");
                     closeCustomerModal();
-                    location.reload(); // refresh table
+                    location.reload();
                 }
             })
             .catch(err => {

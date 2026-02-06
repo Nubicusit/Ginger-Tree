@@ -51,6 +51,7 @@ class SalesController extends Controller
         'budget_range' => $lead->budget_range,
         'lead_source' => $lead->lead_source,
         'notes' => $lead->notes,
+        'site_visit' => $lead->site_visit,
         'expected_start_date' => $lead->expected_start_date,
         'tasks' => $lead->tasks
     ]);
@@ -126,17 +127,42 @@ public function update(Request $request, Lead $lead)
     if ($request->has('notes')) {
         $data['notes'] = $request->notes;
 
-        
+
         if ($lead->status === 'New') {
             $data['status'] = 'Contacted';
         }
     }
+
+    if ($request->has('site_visit')) {
+        $data['site_visit'] = $request->site_visit;
+
+        // If site visit = 1 → move to Site Visit
+        if ($request->site_visit == 1) {
+            $data['status'] = 'Site Visit';
+        }
+
+        // If site visit = 0 AND current status is Site Visit → revert to Contacted
+        if ($request->site_visit == 0 && $lead->status === 'Site Visit') {
+            $data['status'] = 'Contacted';
+        }
+    }
+
 
     if (!empty($data)) {
         $lead->update($data);
     }
 
     return response()->json(['success' => true]);
+}
+
+public function sitevisit()
+{
+    $leads = Lead::with('siteVisit')
+        ->whereHas('siteVisit')
+        ->latest()
+        ->get();
+
+    return view('sale_executive.Sitevisit', compact('leads'));
 }
 
 }

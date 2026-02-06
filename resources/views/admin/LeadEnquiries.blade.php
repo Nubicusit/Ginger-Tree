@@ -148,6 +148,8 @@
     bg-red-500 text-white
 @elseif($lead->status == 'Contacted')
     bg-yellow-400 text-white
+@elseif($lead->status == 'Site Visit')
+    bg-blue-400 text-white
 @else
     bg-orange-500 text-white
 @endif">
@@ -167,7 +169,6 @@
                             Assign Lead
                             @endif
                         </button>
-
                     </td>
                 </tr>
                 @endforeach
@@ -326,24 +327,18 @@
         </div>
     </div>
 </div>
-<div id="taskModal"
-    class="fixed inset-0 bg-black/40 hidden z-60 flex items-center justify-center">
-
+<div id="taskModal" class="fixed inset-0 bg-black/40 hidden z-60 flex items-center justify-center">
     <div class="bg-white w-[400px] rounded-lg shadow-xl p-4">
 
         <h3 class="font-bold mb-3">Add New Task</h3>
-        <input class="input" placeholder="Task Title">
-        <select class="input">
-            <option>Call</option>
-            <option>Meeting</option>
-        </select>
 
-        <input type="date" class="input">
-        <textarea class="input" placeholder="Notes"></textarea>
+        <input id="task_title" class="input mb-2" placeholder="Task Title">
+
+        <input type="date" id="task_date" class="input mb-2">
 
         <div class="flex justify-end gap-2 mt-3">
             <button onclick="closeTaskModal()">Cancel</button>
-            <button class="bg-blue-600 text-white px-3 py-1 rounded">
+            <button onclick="saveTask()" class="bg-blue-600 text-white px-3 py-1 rounded">
                 ADD TO TASK
             </button>
         </div>
@@ -764,8 +759,7 @@
         });
 }
 
-
-    function setAvatarInitials(name) {
+function setAvatarInitials(name) {
         const initials = name
             .split(' ')
             .map(n => n[0])
@@ -787,6 +781,38 @@
     function closeTaskModal() {
         document.getElementById('taskModal').classList.add('hidden');
     }
-</script>
+    function saveTask() {
+    const leadId = document.getElementById('current_lead_id').value;
+    const title = document.getElementById('task_title').value;
+    const date = document.getElementById('task_date').value;
 
+    fetch('/tasks/store', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({
+            lead_id: leadId,
+            title: title,
+            followup_date: date,
+
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Task added successfully');
+            closeTaskModal();
+
+            document.getElementById('task_title').value = '';
+            document.getElementById('task_type').value = '';
+            document.getElementById('task_date').value = '';
+            document.getElementById('task_notes').value = '';
+
+            openLeadDrawer(leadId);
+        }
+    });
+}
+</script>
 @endsection

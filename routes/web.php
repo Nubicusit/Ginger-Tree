@@ -6,6 +6,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\SalesController;
+use App\Http\Controllers\SiteVisitController;
 Route::get('/', [AuthController::class, 'showLogin'])
     ->name('login')
     ->middleware('guest');
@@ -25,12 +26,13 @@ Route::get('/sales/leads', [SalesController::class, 'leads'])
     ->name('sales.leads')
     ->middleware('auth');
 
+Route::get('/sales/sitevisits', [SalesController::class, 'sitevisit'])
+    ->name('sales.sitevisit')
+    ->middleware('auth');
 
 Route::get('/customers', [CustomerController::class, 'index'])->name('customers.index');
 Route::get('/customers/create', [CustomerController::class, 'create']);
 Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
-
-
 
 // Route::get('/customers', function () {
 //     return view('pages.CustomerManagement');
@@ -76,6 +78,22 @@ Route::get('/leads/{lead}/tasks', [SalesController::class, 'leadTasks']);
 Route::delete('/tasks/{id}', [SalesController::class, 'deleteTask']);
 Route::put('/tasks/{id}', [SalesController::class, 'updateTask']);
 Route::put('/leads/{lead}/update', [SalesController::class, 'update']);
+Route::post('/leads/{lead}/site-visit', [SiteVisitController::class, 'saveSiteVisit']);
+
+
+Route::post(
+    '/sale-executive/site-visit/update',
+    [SiteVisitController::class, 'storeOrUpdate']
+)->name('sitevisit.update');
+
+Route::get(
+    '/sale-executive/site-visit/{lead}',
+    [SiteVisitController::class, 'show']
+)->name('sitevisit.show');
+Route::post('/sale-executive/site-visit/delete-file',
+    [SiteVisitController::class, 'deleteMeasurementFile']);
+
+// Route::post('/sitevisit/{lead}', [SiteVisitController::class, 'update']);
 
 // Route::get('/leads', function () {
 //     return view('pages.LeadEnquiries');
