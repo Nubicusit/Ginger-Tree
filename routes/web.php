@@ -7,6 +7,9 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SiteVisitController;
+use App\Http\Controllers\HRController;
+
+
 Route::get('/', [AuthController::class, 'showLogin'])
     ->name('login')
     ->middleware('guest');
@@ -98,4 +101,32 @@ Route::post('/sale-executive/site-visit/delete-file',
 // Route::get('/leads', function () {
 //     return view('pages.LeadEnquiries');
 // })->name('leads');
+/*
+|--------------------------------------------------------------------------
+| HR ROUTES
+|--------------------------------------------------------------------------
+*/
 
+Route::get('/hr/dashboard', [HRController::class, 'dashboard'])
+    ->middleware(['auth', 'hr'])
+    ->name('hr.dashboard');
+
+Route::get('/hr/employees', [HRController::class, 'employees'])
+    ->middleware(['auth', 'hr'])
+    ->name('hr.employees');
+
+Route::post('/hr/employees', [HRController::class, 'storeEmployee'])
+    ->middleware(['auth', 'hr'])
+    ->name('hr.employees.store');
+
+Route::get('/hr/attendance', [HRController::class, 'attendance'])
+    ->middleware(['auth', 'hr'])
+    ->name('hr.attendance');
+
+Route::get('/hr/salary/create', [HRController::class, 'createSalary'])
+    ->middleware(['auth', 'hr'])
+    ->name('hr.salary.create');
+
+Route::get('/hr/payroll', [HRController::class, 'payroll'])
+    ->middleware(['auth', 'hr'])
+    ->name('hr.payroll');
