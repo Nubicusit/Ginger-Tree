@@ -15,7 +15,6 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 // sales executive
 Route::get('/sales/dashboard', [SalesController::class, 'dashboard'])->middleware('auth')->name('sales_executive.dashboard');
 Route::get('/sales/leads', [SalesController::class, 'leads'])->name('sales.leads')->middleware('auth');
-Route::get('/sales/sitevisits', [SalesController::class, 'sitevisit'])->name('sales.sitevisit')->middleware('auth');
 Route::get('/leads/{lead}', [SalesController::class, 'showJson']);
 Route::post('/tasks/store', [SalesController::class, 'store'])->name('tasks.store');
 Route::post('/tasks/{id}/update', [SalesController::class, 'updateTask']);
@@ -52,6 +51,8 @@ Route::post('/leads/{lead}/assign', [AdminController::class, 'assign'])->middlew
 Route::post('/marketing-store', [AdminController::class, 'storeMarketing'])->name('admin.marketing.store');
 
 //sitevisit
+Route::get('/sales/sitevisits', [SiteVisitController::class, 'sitevisit'])->name('sales.sitevisit')->middleware('auth');
+
 Route::post('/leads/{lead}/site-visit', [SiteVisitController::class, 'saveSiteVisit']);
 Route::post('/sale-executive/site-visit/update',[SiteVisitController::class, 'storeOrUpdate'])->name('sitevisit.update');
 Route::get('/sale-executive/site-visit/{lead}',[SiteVisitController::class, 'show'])->name('sitevisit.show');

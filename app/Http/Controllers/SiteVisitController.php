@@ -6,21 +6,24 @@ use Illuminate\Http\Request;
 use App\Models\Lead;
 use Carbon\Carbon;
 use App\Models\SiteVisit;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class SiteVisitController extends Controller
 {
 
 
-    // public function sitevisit()
-    // {
-    //     $leads = Lead::with('siteVisit')
-    //         ->whereHas('siteVisit')
-    //         ->latest()
-    //         ->get();
+  public function sitevisit()
+    {
+        $userId = Auth::id();
+        $leads = Lead::with('siteVisit')
+        ->where('sales_executive_id', $userId)
+        ->whereHas('siteVisit')
+        ->latest()
+        ->get();
 
-    //     return view('sale_executive.Sitevisit', compact('leads'));
-    // }
+        return view('sale_executive.Sitevisit', compact('leads'));
+    }
 
     public function store(Request $request)
     {

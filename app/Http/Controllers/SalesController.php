@@ -159,16 +159,4 @@ class SalesController extends Controller
 
         return response()->json(['success' => true]);
     }
-
-    public function sitevisit()
-    {
-        $userId = Auth::id();
-        $leads = Lead::with('siteVisit')
-        ->where('sales_executive_id', $userId)
-        ->whereHas('siteVisit')
-        ->latest()
-        ->get();
-
-        return view('sale_executive.Sitevisit', compact('leads'));
-    }
 }

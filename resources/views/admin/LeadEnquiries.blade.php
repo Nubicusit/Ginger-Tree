@@ -314,15 +314,13 @@
                 </select>
             </div>
 
-            <div class="bottom-0 pb-6
-            flex justify-end">
+            <div class="bottom-0 pb-6 flex justify-end">
                 <button
                     onclick="saveLeadAssignment()"
                     class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded">
                     SAVE
                 </button>
             </div>
-
         </div>
     </div>
 </div>
@@ -485,7 +483,6 @@
 <!-- Add Lead Modal -->
 <div id="leadModal"
     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
-
     <div class="relative w-full max-w-xl bg-white rounded-lg shadow-2xl z-10 flex flex-col max-h-[90vh]">
 
         <!-- Header -->
@@ -493,6 +490,7 @@
             <h2 class="text-white font-semibold text-lg tracking-wide">
                 Add New Lead
             </h2>
+
             <button onclick="closeModal()"
                 class="text-white/80 hover:text-white text-xl leading-none">
                 &times;
