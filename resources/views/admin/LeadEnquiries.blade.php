@@ -89,11 +89,10 @@
         <button onclick="openModal()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md text-sm">
             + ADD LEAD
         </button>
-        <button
-            onclick="openMarketingModal()"
+        <a href="{{ route('useraccounts') }}"
             class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-md text-sm transition-colors shadow-sm">
             ADD MARKETING / DESIGNER
-        </button>
+        </a>
     </div>
 </div>
 
@@ -153,8 +152,8 @@
 @else
     bg-orange-500 text-white
 @endif">
-    {{ $lead->status }}
-</span>
+                            {{ $lead->status }}
+                        </span>
 
                     </td>
 
@@ -295,7 +294,7 @@
 
                     @foreach($designers as $designer)
                     <option value="{{ $designer->id }}">
-                        {{ $designer->designer_name }}
+                        {{ $designer->name }}
                     </option>
                     @endforeach
                 </select>
@@ -346,21 +345,21 @@
 </div>
 
 <!-- Marketing / Designer Modal -->
-<div id="marketingModal"
+<!-- <div id="marketingModal"
     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
-    <div class="relative w-full max-w-md bg-white rounded-lg shadow-2xl z-10 flex flex-col max-h-[90vh]">
+    <div class="relative w-full max-w-md bg-white rounded-lg shadow-2xl z-10 flex flex-col max-h-[90vh]"> -->
 
         <!-- Header -->
-        <div class="flex items-center justify-between px-6 py-4 bg-blue-600 rounded-t-lg shrink-0">
+        <!-- <div class="flex items-center justify-between px-6 py-4 bg-blue-600 rounded-t-lg shrink-0">
             <h2 class="text-white font-semibold text-lg tracking-wide">
                 Add Marketing/Designer
             </h2>
             <button onclick="closeMarketingModal()" class="text-white/80 hover:text-white text-xl leading-none transition-colors focus:outline-none" aria-label="Close modal">
                 &times;
             </button>
-        </div>
+        </div> -->
         <!-- Tabs Navigation -->
-        <div class="flex border-b text-sm bg-gray-50 shrink-0 overflow-x-auto">
+        <!-- <div class="flex border-b text-sm bg-gray-50 shrink-0 overflow-x-auto">
             <button
                 onclick="switchTab(event, 'marketing-info')"
                 class="tab-btn px-6 py-3 border-b-2 border-blue-600 text-blue-600 font-medium hover:bg-gray-100 transition-colors whitespace-nowrap"
@@ -373,89 +372,106 @@
                 data-target="designer-profile">
                 Designer
             </button>
-        </div>
+        </div> -->
 
         <!-- Scrollable Content Area -->
-        <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
+        <!-- <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
             <form id="marketingForm">
                 @csrf
-                <input type="hidden" name="sales_executive_id">
+                <input type="hidden" name="sales_executive_id"> -->
 
                 <!-- TAB 1: Customer Information -->
-                <div id="marketing-info" class="tab-content space-y-4 fade-in">
+                <!-- <div id="marketing-info" class="tab-content space-y-4 fade-in"> -->
 
                     <!-- Name -->
-                    <div>
+                    <!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Executive Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="name" placeholder="e.g. John Doe" required
+                        <input type="text" name="marketing_name" required
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow" />
-                    </div>
-
+                    </div> -->
 
                     <!-- Phone -->
-                    <div>
+                    <!-- <div>
                         <div class="flex items-center justify-between mb-1">
                             <label class="text-gray-700 font-medium text-sm">Phone Number</label>
                             <span class="text-xs text-gray-400">(Optional)</span>
                         </div>
                         <input type="number" name="contact_no" value=""
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
-                    </div>
+                    </div> -->
 
                     <!-- Email -->
-                    <div>
+                    <!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Email Address <span class="text-red-500">*</span></label>
-                        <input type="email" name="email" placeholder="marketingexecutive@example.com" required
+                        <input type="email" name="email" required
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div>
+
+                    <div>
+                        <label class="block text-gray-700 font-medium mb-1 text-sm">
+                            Password <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" name="password" required
+                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+               focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
+                    </div> -->
 
                     <!-- Address -->
-                    <div>
+                    <!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Address</label>
-                        <input type="text" name="address" placeholder="123 Main St"
+                        <input type="text" name="address"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div>
-                </div>
+                </div> -->
 
                 <!-- TAB 2: Designer Profile -->
-                <div id="designer-profile" class="tab-content space-y-4 hidden fade-in">
+                <!-- <div id="designer-profile" class="tab-content space-y-4 hidden fade-in"> -->
 
                     <!-- Designer Name -->
-                    <div>
+                    <!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Designer Name <span class="text-red-500">*</span></label>
-                        <input type="text" name="designer_name" placeholder="e.g. john"
+                        <input type="text" name="designer_name"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
-                    </div>
+                    </div> -->
 
                     <!-- Phone -->
-                    <div>
+                    <!-- <div>
                         <div class="flex items-center justify-between mb-1">
                             <label class="text-gray-700 font-medium text-sm">Phone Number</label>
                             <span class="text-xs text-gray-400">(Optional)</span>
                         </div>
-                        <input type="number" name="designer_no" value=""
+                        <input type="number" name="contact_no" value=""
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
-                    </div>
+                    </div> -->
 
                     <!-- Email -->
-                    <div>
+                    <!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Email Address <span class="text-red-500">*</span></label>
-                        <input type="email" name="designer_email" placeholder="designer@example.com" required
+                        <input type="email" name="email" required
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div>
 
-                    <!-- Address -->
                     <div>
+                        <label class="block text-gray-700 font-medium mb-1 text-sm">
+                            Password <span class="text-red-500">*</span>
+                        </label>
+                        <input type="password" name="password" required
+                            class="w-full rounded border border-gray-300 px-3 py-2 text-sm
+               focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    </div> -->
+
+                    <!-- Address -->
+                    <!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Address</label>
-                        <input type="text" name="designer_address" placeholder="123 Main St"
+                        <input type="text" name="address"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div>
                 </div>
             </form>
-        </div>
+        </div> -->
 
         <!-- Footer -->
-        <div class="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-lg shrink-0">
+        <!-- <div class="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-lg shrink-0">
             <button onclick="closeMarketingModal()" class="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-200 transition-all">
                 Cancel
             </button>
@@ -464,7 +480,7 @@
             </button>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Add Lead Modal -->
 <div id="leadModal"
@@ -566,7 +582,6 @@
                             <option>Piece Rate</option>
                         </select>
                     </div>
-
                 </div>
             </form>
         </div>
@@ -627,7 +642,6 @@
             });
     }
 </script>
-
 <script>
     function openMarketingModal() {
         const modal = document.getElementById('marketingModal');
@@ -638,7 +652,6 @@
         // Reset form
         form.reset();
         form.querySelector('[name="sales_executive_id"]').value = '';
-
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -679,14 +692,21 @@
 
         // Detect active tab
         const activeTabBtn = document.querySelector('.tab-btn.border-blue-600');
-        const type = activeTabBtn.dataset.target === 'designer-profile' ?
-            'designer' :
-            'marketing';
+        const activeTabId = activeTabBtn.dataset.target;
+        const type = activeTabId === 'designer-profile' ? 'designer' : 'marketing';
 
-        const formData = new FormData(form);
+        // Get only inputs from the active tab
+        const activeTab = document.getElementById(activeTabId);
+        const formData = new FormData();
         formData.append('type', type);
 
-        fetch("{{ route('marketing.store') }}", {
+        activeTab.querySelectorAll('input, select, textarea').forEach(input => {
+            if (input.name) {
+                formData.append(input.name, input.value);
+            }
+        });
+
+        fetch("{{ route('admin.marketing.store') }}", {
                 method: "POST",
                 headers: {
                     'X-CSRF-TOKEN': "{{ csrf_token() }}"
@@ -696,14 +716,15 @@
 
             .then(res => res.json())
             .then(data => {
-        if (data.success) {
-            alert('Saved successfully');
-            closeMarketingModal();
-            location.reload();
-        } else {
-            alert('Validation error');
-        }
-    })
+                if (data.success) {
+                    alert('User created successfully');
+                    closeMarketingModal();
+                    location.reload();
+                } else {
+                    alert(data.message ?? 'Validation error');
+                }
+            })
+
             .catch(err => {
                 console.error(err);
                 alert('Something went wrong');
@@ -718,48 +739,47 @@
 </script>
 <script>
     function openLeadDrawer(id) {
+        document.getElementById('current_lead_id').value = id;
 
-    document.getElementById('current_lead_id').value = id;
+        fetch(`/lead/${id}`)
+            .then(res => res.json())
+            .then(data => {
 
-    fetch(`/lead/${id}`)
-        .then(res => res.json())
-        .then(data => {
+                if (!data) {
+                    alert('Lead not found');
+                    return;
+                }
 
-            if (!data) {
-                alert('Lead not found');
-                return;
-            }
+                document.getElementById('client_name').innerText = data.client_name;
+                document.getElementById('email').innerText = data.email ?? '—';
 
-            document.getElementById('client_name').innerText = data.client_name;
-            document.getElementById('email').innerText = data.email ?? '—';
+                const nameParts = data.client_name.trim().split(' ');
+                document.getElementById('first_name').value = nameParts[0] ?? '';
+                document.getElementById('last_name').value = nameParts.slice(1).join(' ') ?? '';
 
-            const nameParts = data.client_name.trim().split(' ');
-            document.getElementById('first_name').value = nameParts[0] ?? '';
-            document.getElementById('last_name').value = nameParts.slice(1).join(' ') ?? '';
+                document.getElementById('phone').value = data.phone ?? '';
+                document.getElementById('email_input').value = data.email ?? '';
+                document.getElementById('address').value = data.location ?? '';
 
-            document.getElementById('phone').value = data.phone ?? '';
-            document.getElementById('email_input').value = data.email ?? '';
-            document.getElementById('address').value = data.location ?? '';
+                document.getElementById('project_type').value = data.project_type ?? '';
+                document.getElementById('lead_source').value = data.lead_source ?? '';
+                document.getElementById('budget_range').value = data.budget_range ?? '';
+                document.getElementById('expected_start_date').value = data.expected_start_date ?? '';
 
-            document.getElementById('project_type').value = data.project_type ?? '';
-            document.getElementById('lead_source').value = data.lead_source ?? '';
-            document.getElementById('budget_range').value = data.budget_range ?? '';
-            document.getElementById('expected_start_date').value = data.expected_start_date ?? '';
+                document.getElementById('assigned_designer').value = data.designer_id ?? '';
+                document.getElementById('assigned_sales').value = data.sales_executive_id ?? '';
 
-            document.getElementById('assigned_designer').value = data.designer_id ?? '';
-            document.getElementById('assigned_sales').value = data.sales_executive_id ?? '';
+                setAvatarInitials(data.client_name);
 
-            setAvatarInitials(data.client_name);
+                document.getElementById('leadDrawer').classList.remove('hidden');
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error loading lead data');
+            });
+    }
 
-            document.getElementById('leadDrawer').classList.remove('hidden');
-        })
-        .catch(err => {
-            console.error(err);
-            alert('Error loading lead data');
-        });
-}
-
-function setAvatarInitials(name) {
+    function setAvatarInitials(name) {
         const initials = name
             .split(' ')
             .map(n => n[0])
@@ -781,38 +801,41 @@ function setAvatarInitials(name) {
     function closeTaskModal() {
         document.getElementById('taskModal').classList.add('hidden');
     }
+
     function saveTask() {
-    const leadId = document.getElementById('current_lead_id').value;
-    const title = document.getElementById('task_title').value;
-    const date = document.getElementById('task_date').value;
+        const leadId = document.getElementById('current_lead_id').value;
+        const title = document.getElementById('task_title').value;
+        const date = document.getElementById('task_date').value;
 
-    fetch('/tasks/store', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
-        },
-        body: JSON.stringify({
-            lead_id: leadId,
-            title: title,
-            followup_date: date,
+        fetch('/tasks/store', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}'
+                },
 
-        })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.success) {
-            alert('Task added successfully');
-            closeTaskModal();
+                body: JSON.stringify({
+                    lead_id: leadId,
+                    title: title,
+                    followup_date: date,
 
-            document.getElementById('task_title').value = '';
-            document.getElementById('task_type').value = '';
-            document.getElementById('task_date').value = '';
-            document.getElementById('task_notes').value = '';
+                })
+            })
 
-            openLeadDrawer(leadId);
-        }
-    });
-}
+            .then(res => res.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Task added successfully');
+                    closeTaskModal();
+
+                    document.getElementById('task_title').value = '';
+                    document.getElementById('task_type').value = '';
+                    document.getElementById('task_date').value = '';
+                    document.getElementById('task_notes').value = '';
+
+                    openLeadDrawer(leadId);
+                }
+            });
+    }
 </script>
 @endsection

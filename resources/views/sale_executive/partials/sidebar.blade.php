@@ -100,12 +100,8 @@
               <span>HR & Payroll</span>
             </a>
           </li> -->
-
-
-
         </ul>
       </div>
-
       <!-- Settings -->
       <div class="pt-4 mt-4 border-t border-gray-100">
         <h3 class="text-gray-600 font-bold text-xs uppercase tracking-wider mb-2 px-4">Settings</h3>
@@ -122,10 +118,8 @@
               Logout
             </button>
           </form>
-
         </div>
       </div>
-
     </nav>
   </div>
 </aside>

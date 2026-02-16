@@ -15,7 +15,6 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
 </head>
-
 <style>
   .video-screen {
       position: fixed;
@@ -39,7 +38,6 @@
 </style>
 
 <body class="h-full font-sans bg-black">
-
     <div id="video-screen" class="video-screen">
         <video autoplay muted playsinline id="intro-video">
             <source
@@ -48,6 +46,7 @@
             Your browser does not support video.
         </video>
     </div>
+
     <!-- Main Wrapper -->
     <div id="main-content" class="hidden flex flex-col md:flex-row h-full
               py-6 sm:py-8 md:py-[10rem] lg:py-16 xl:py-[10rem]
@@ -127,7 +126,6 @@
                 </form>
             </div>
         </div>
-
     </div>
 <script src="{{asset('js/main.js')}}"></script>
 </body>

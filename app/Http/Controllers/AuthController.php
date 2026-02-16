@@ -17,10 +17,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+
 
         $user = User::where('email', $request->email)->first();
 
@@ -45,9 +47,15 @@ class AuthController extends Controller
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->role === 'sales_executive') {
-        return redirect()->route('sales.dashboard');
-        }
+  if ($user->department && $user->department->slug) {
+    return redirect()->route($user->department->slug . '.dashboard');
+}
+
+
+
+        // if ($user->role === 'sales_executive') {
+        // return redirect()->route('sales.dashboard');
+        // }
 
         return redirect('/');
     }
@@ -59,4 +67,5 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect('/');
     }
+
 }

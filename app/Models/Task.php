@@ -17,8 +17,8 @@ class Task extends Model
         return $this->belongsTo(Lead::class);
     }
 
-    public function salesExecutive()
-    {
-        return $this->belongsTo(SalesExecutive::class);
-    }
+    // public function salesExecutive()
+    // {
+    //     return $this->belongsTo(SalesExecutive::class);
+    // }
 }
