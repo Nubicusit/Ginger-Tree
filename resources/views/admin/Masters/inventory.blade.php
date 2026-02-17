@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('layout.app')
 
 @section('title', 'Inventory Stocks')
 
@@ -32,38 +32,38 @@
             </thead>
 
             <tbody class="divide-y">
-                <!-- @forelse($stocks as $stock) -->
+
                     <tr class="hover:bg-gray-50">
                         <td class="px-6 py-3 font-medium text-gray-800">
-                            <!-- {{ $stock->item_name }} -->
+
                         </td>
 
                         <td class="px-6 py-3">
-                            <!-- {{ $stock->category }} -->
+
                         </td>
 
                         <td class="px-6 py-3 text-center">
-                            <!-- {{ $stock->unit }} -->
+
                         </td>
 
                         <td class="px-6 py-3 text-right">
-                            <!-- {{ $stock->quantity }} -->
+
                         </td>
 
                         <td class="px-6 py-3 text-right">
-                            <!-- {{ $stock->reorder_level }} -->
+
                         </td>
 
                         <td class="px-6 py-3 text-center">
-                            <!-- @if($stock->quantity <= $stock->reorder_level) -->
+
                                 <span class="px-2 py-1 text-xs font-semibold text-red-700 bg-red-100 rounded-full">
                                     Low Stock
                                 </span>
-                            <!-- @else -->
+
                                 <span class="px-2 py-1 text-xs font-semibold text-green-700 bg-green-100 rounded-full">
                                     In Stock
                                 </span>
-                            <!-- @endif -->
+
                         </td>
 
                         <td class="px-6 py-3 text-center space-x-2">
@@ -78,13 +78,13 @@
                             </a>
                         </td>
                     </tr>
-                <!-- @empty -->
+
                     <tr>
                         <td colspan="7" class="px-6 py-6 text-center text-gray-500">
                             No inventory records found
                         </td>
                     </tr>
-                <!-- @endforelse -->
+
             </tbody>
         </table>
     </div>
