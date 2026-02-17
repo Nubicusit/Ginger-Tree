@@ -7,10 +7,10 @@ use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\MarketingController;
 use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SiteVisitController;
+use App\Http\Controllers\Sales\QuotationController;
 Route::get('/', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
 
 // sales executive
 Route::get('/sales/dashboard', [SalesController::class, 'dashboard'])->middleware('auth')->name('sales_executive.dashboard');
@@ -24,12 +24,12 @@ Route::put('/tasks/{id}', [SalesController::class, 'updateTask']);
 Route::put('/leads/{lead}/update', [SalesController::class, 'update']);
 Route::get('/users/create', [SalesController::class, 'create'])->name('users.create');
 
-//customer-admin
+// customer-admin
 Route::get('/customers', [CustomerController::class, 'index'])->middleware(['auth', 'admin'])->name('customers.index');
 Route::get('/customers/create', [CustomerController::class, 'create']);
 Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
 
-//admin dashboard
+// admin dashboard
 Route::get('/dashboard', [AdminController::class, 'index'])->middleware(['auth', 'admin'])->name('admin.dashboard');
 Route::get('/leads', [AdminController::class, 'leads'])->middleware(['auth', 'admin'])->name('leads');
 Route::get('/leads/create', [AdminController::class, 'create'])->middleware(['auth', 'admin'])->name('leads.create');
@@ -38,6 +38,7 @@ Route::get('/leads/{lead}/edit', [AdminController::class, 'edit'])->name('leads.
 Route::put('/leads/{lead}', [AdminController::class, 'update'])->name('leads.update');
 Route::delete('/leads/{lead}', [AdminController::class, 'destroy'])->name('leads.destroy');
 Route::post('/users/{user}/toggle-status', [AdminController::class, 'toggleUserStatus']);
+Route::get('/inventory', [AdminController::class, 'stocks'])->name('inventory.index');
 
 Route::get('/useraccounts', [AdminController::class, 'useraccounts'])->middleware(['auth', 'admin'])->name('useraccounts');
 Route::post('/useraccounts/store', [AdminController::class, 'storeUser'])->middleware(['auth', 'admin'])->name('users.store');
@@ -50,7 +51,7 @@ Route::get('/lead/{id}', [AdminController::class, 'getLead']);
 Route::post('/leads/{lead}/assign', [AdminController::class, 'assign'])->middleware(['auth', 'admin'])->name('leads.assign');
 Route::post('/marketing-store', [AdminController::class, 'storeMarketing'])->name('admin.marketing.store');
 
-//sitevisit
+// sitevisit
 Route::get('/sales/sitevisits', [SiteVisitController::class, 'sitevisit'])->name('sales.sitevisit')->middleware('auth');
 
 Route::post('/leads/{lead}/site-visit', [SiteVisitController::class, 'saveSiteVisit']);
@@ -58,20 +59,23 @@ Route::post('/sale-executive/site-visit/update',[SiteVisitController::class, 'st
 Route::get('/sale-executive/site-visit/{lead}',[SiteVisitController::class, 'show'])->name('sitevisit.show');
 Route::post('/sale-executive/site-visit/delete-file',[SiteVisitController::class, 'deleteMeasurementFile']);
 
+Route::get('/sale-executive/quotations/{lead}', [QuotationController::class, 'index'])->name('sale.quotations.index');
+
+Route::post('quotations/store', [QuotationController::class, 'store'])->name('sale.quotations.store');
 
 // Route::post('/sitevisit/{lead}', [SiteVisitController::class, 'update']);
 
-//hr dashboard
+// hr dashboard
 // Route::get('/hr/dashboard', function () {
 //     return view('dashboards.hr');
 // })->name('hr.dashboard');
 
-//designer dashboard
+// designer dashboard
 // Route::get('/designer/dashboard', function () {
 //     return view('dashboards.designer');
 // })->name('designer.dashboard');
 
-//accounts dashboard
+// accounts dashboard
 // Route::get('/accounts/dashboard', function () {
 //     return view('dashboards.accounts');
 // })->name('accounts.dashboard');

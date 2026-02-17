@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>@yield('title', 'Steels & SheetMart')</title>
 
+   <link rel="icon" type="image/x-icon" href="{{ asset('img/Boltoni-Favicon.png') }}">
+
   <!-- Tailwind CSS -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -13,6 +15,7 @@
     .custom-scrollbar::-webkit-scrollbar {
       width: 6px;
     }
+
     .custom-scrollbar::-webkit-scrollbar-track {
       background: #f1f1f1;
     }
@@ -54,7 +57,6 @@
     background-color: #f9fafb;
 }
 </style>
-
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
