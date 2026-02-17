@@ -79,7 +79,7 @@
     <th class="px-6 py-4">Employee ID</th>
     <th class="px-6 py-4">Name</th>
     <th class="px-6 py-4">Department</th>
-    <th class="px-6 py-4">Designation</th>
+    <!-- <th class="px-6 py-4">Designation</th> -->
     <th class="px-6 py-4">Email</th>
     <th class="px-6 py-4">Phone</th>
     <th class="px-6 py-4">Joining Date</th>
@@ -102,7 +102,7 @@
     <td class="px-6 py-4">{{ $employee->employee_id }}</td>
     <td class="px-6 py-4">{{ $employee->first_name }} {{ $employee->last_name }}</td>
     <td class="px-6 py-4">{{ $employee->department->name ?? '-' }}</td>
-    <td class="px-6 py-4">{{ $employee->designation->name ?? '-' }}</td>
+    <!-- <td class="px-6 py-4">{{ $employee->designation->name ?? '-' }}</td> -->
     <td class="px-6 py-4">{{ $employee->email }}</td>
     <td class="px-6 py-4">{{ $employee->phone ?? '-' }}</td>
     <td class="px-6 py-4">{{ $employee->joining_date }}</td>

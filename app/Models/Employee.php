@@ -83,4 +83,20 @@ class Employee extends Model
     {
         return str($this->first_name)->substr(0, 1) . '. ' . $this->last_name;
     }
+     public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+    
+public function hasEmployee()
+{
+    return $this->employee() ? true : false;
+}
+   
+// app/Models/User.php - ADD THIS
+public function employee()
+{
+    return $this->hasOne(Employee::class, 'user_id');
+}
+
 }

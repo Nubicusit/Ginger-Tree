@@ -10,15 +10,13 @@ class Attendance extends Model
 {
     use HasFactory;
 
+    // ✅ CRITICAL: Your table is 'attendance' (singular)
+    protected $table = 'attendance';  // ← ADD THIS LINE
+
     protected $fillable = [
-        'employee_id',
-        'date',
-        'status',
-        'check_in',
-        'check_out',
-        'late_minutes',
-        'notes'
+        'employee_id', 'date', 'status', 'check_in', 'check_out', 'late_minutes', 'notes'
     ];
+
 
     protected $casts = [
         'date' => 'date',
