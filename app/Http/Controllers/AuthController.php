@@ -9,7 +9,6 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-
     public function showLogin()
     {
         return view('welcome');
@@ -43,21 +42,20 @@ class AuthController extends Controller
 
         Auth::login($user, $request->filled('remember'));
 
+        // ===== HR REDIRECT ADDED =====
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
 
-  if ($user->department && $user->department->slug) {
-    return redirect()->route($user->department->slug . '.dashboard');
-}
+        if ($user->role === 'hr') {  // ← ADD THIS
+            return redirect()->route('hr.dashboard');
+        }
 
+        if ($user->role === 'sales_executive') {
+        return redirect()->route('sales.dashboard');
+        }
 
-
-        // if ($user->role === 'sales_executive') {
-        // return redirect()->route('sales.dashboard');
-        // }
-
-        return redirect('/');
+        return redirect('/');  // Default fallback
     }
 
     public function logout(Request $request)

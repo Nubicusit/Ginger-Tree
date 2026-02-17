@@ -1,19 +1,20 @@
 <?php
-// app/Models/Department.php
+// app/Models/Designation.php
 
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model
+class Designation extends Model
 {
     use HasFactory;
 
     protected $fillable = [
         'name',
         'description',
-        'head_employee_id'
+        'min_salary',
+        'max_salary'
     ];
 
     public function employees()
@@ -21,8 +22,8 @@ class Department extends Model
         return $this->hasMany(Employee::class);
     }
 
-    public function head()
+    public function department()
     {
-        return $this->belongsTo(Employee::class, 'head_employee_id');
+        return $this->belongsTo(Department::class);
     }
 }
