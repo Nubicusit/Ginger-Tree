@@ -1,3 +1,4 @@
+
 <!-- Sidebar Component -->
 <aside id="sidebar"
        class="fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-xl
