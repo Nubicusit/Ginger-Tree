@@ -15,7 +15,7 @@ class QuotationController extends Controller
         abort(403);
     }
 
-    $pdf = Pdf::loadView('sale_executive.pdf.quotation', [
+    $pdf = Pdf::loadView('sales_executive.pdf.quotation', [
         'lead' => $lead
     ])->setPaper('a4');
 

@@ -11,7 +11,7 @@ class SalesController extends Controller
 {
     public function dashboard()
     {
-        return view('sale_executive.Dashboard');
+        return view('sales_executive.dashboard');
     }
 
     public function leads()
@@ -31,7 +31,7 @@ class SalesController extends Controller
         $failedLeads = Lead::where('status', 'Lost')->count();
         $totalarrivedLeads = Lead::where('sales_executive_id', $user->id)->count();
 
-        return view('sale_executive.leads', compact(
+        return view('sales_executive.leads', compact(
             'leads',
             'failedLeads',
             'convertedLeads',
@@ -159,4 +159,7 @@ class SalesController extends Controller
 
         return response()->json(['success' => true]);
     }
+
+    
+
 }

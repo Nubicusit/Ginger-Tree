@@ -1,4 +1,4 @@
-@extends('sale_executive.layout.app')
+@extends('sales_executive.layout.app')
 
 @section('title', 'Sales Dashboard')
 

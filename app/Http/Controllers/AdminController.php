@@ -230,9 +230,10 @@ public function storeDepartment(Request $request)
     return back()->with('success', 'Department added');
 }
 
+
+
 public function stocks()
     {
-
         // Return inventory view
         return view('admin.Masters.inventory');
     }
