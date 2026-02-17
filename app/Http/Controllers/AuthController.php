@@ -16,10 +16,12 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
+
 
         $user = User::where('email', $request->email)->first();
 
@@ -50,7 +52,7 @@ class AuthController extends Controller
         }
 
         if ($user->role === 'sales_executive') {
-            return redirect()->route('sales.dashboard');
+        return redirect()->route('sales.dashboard');
         }
 
         return redirect('/');  // Default fallback
@@ -63,4 +65,5 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect('/');
     }
+
 }
