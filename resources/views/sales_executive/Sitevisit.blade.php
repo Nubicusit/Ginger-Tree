@@ -1,4 +1,4 @@
-@extends('sale_executive.layout.app')
+@extends('sales_executive.layout.app')
 
 @section('title', 'Sales Dashboard')
 
@@ -251,7 +251,17 @@
                         <option value="Yes">Approved</option>
                         <option value="Hold">Hold</option>
                     </select>
+
                 </div>
+
+                <!-- Quotation Action (JS controlled) -->
+<div id="quotationAction" class="mt-3 hidden">
+    <a id="manageQuotationBtn"
+       href="#"
+       class="inline-block bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+         Quotation
+    </a>
+</div>
 
                 <div class="mt-4 flex justify-end">
                     <button
@@ -317,6 +327,16 @@
                         document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
                         document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
                         document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
+                        const quotationBox = document.getElementById('quotationAction');
+const quotationBtn = document.getElementById('manageQuotationBtn');
+
+if (data.site_visit && data.site_visit.approval_status === 'Yes') {
+    quotationBtn.href = `/sale-executive/quotations/${leadId}`;
+    quotationBtn.target = "_blank"; // optional: open PDF in new tab
+    quotationBox.classList.remove('hidden');
+} else {
+    quotationBox.classList.add('hidden');
+}
 
                         // ✅ Measurement preview
                         const preview = document.getElementById('measurement_preview');
@@ -395,6 +415,8 @@
             formData.append('budget_sensitivity', document.getElementById('budget_sensitivity').value);
             formData.append('initial_cost_estimate', document.getElementById('initial_cost_estimate').value);
             formData.append('approval_status', document.getElementById('approval_status').value);
+
+
 
             selectedFiles.forEach(file => {
                 formData.append('measurement_files[]', file);

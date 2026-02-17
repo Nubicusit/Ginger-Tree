@@ -16,46 +16,34 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-
         $request->validate([
             'email' => ['required', 'email'],
             'password' => ['required'],
         ]);
 
+        $user = User::with('department')->where('email', $request->email)->first();
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user) {
-            return back()->withErrors(['email' => 'Invalid email or password.'])
-                ->onlyInput('email');
-        }
-
-        if ($user->status != 1) {
-            return back()->withErrors(['email' => 'Your account is inactive.'])
-                ->onlyInput('email');
-        }
-
-        if (!Hash::check($request->password, $user->password)) {
+        if (!$user || !Hash::check($request->password, $user->password)) {
             return back()->withErrors(['email' => 'Invalid email or password.'])
                 ->onlyInput('email');
         }
 
         Auth::login($user, $request->filled('remember'));
 
-        // ===== HR REDIRECT ADDED =====
+        // Admin by role
         if ($user->role === 'admin') {
             return redirect()->route('admin.dashboard');
         }
 
-        if ($user->role === 'hr') {  // ← ADD THIS
-            return redirect()->route('hr.dashboard');
+        // Everyone else redirected by department slug
+        $slug = $user->department?->slug;
+        $routeName = $slug . '.dashboard';
+
+        if ($slug && \Route::has($routeName)) {
+            return redirect()->route($routeName);
         }
 
-        if ($user->role === 'sales_executive') {
-        return redirect()->route('sales.dashboard');
-        }
-
-        return redirect('/');  // Default fallback
+        return redirect('/'); // Default fallback
     }
 
     public function logout(Request $request)
@@ -65,5 +53,4 @@ class AuthController extends Controller
         $request->session()->regenerateToken();
         return redirect('/');
     }
-
 }

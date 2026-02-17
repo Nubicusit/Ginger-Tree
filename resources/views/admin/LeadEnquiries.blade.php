@@ -141,17 +141,17 @@
 
                     <td class="px-6 py-4">
                         <span class="px-3 py-2 rounded text-[10px] font-bold uppercase
-@if($lead->status == 'Won')
-    bg-green-500 text-white
-@elseif($lead->status == 'Lost')
-    bg-red-500 text-white
-@elseif($lead->status == 'Contacted')
-    bg-yellow-400 text-white
-@elseif($lead->status == 'Site Visit')
-    bg-blue-400 text-white
-@else
-    bg-orange-500 text-white
-@endif">
+                            @if($lead->status == 'Won')
+                                bg-green-500 text-white
+                            @elseif($lead->status == 'Lost')
+                                bg-red-500 text-white
+                            @elseif($lead->status == 'Contacted')
+                                bg-yellow-400 text-white
+                            @elseif($lead->status == 'Site Visit')
+                                bg-blue-400 text-white
+                            @else
+                                bg-orange-500 text-white
+                            @endif">
                             {{ $lead->status }}
                         </span>
 

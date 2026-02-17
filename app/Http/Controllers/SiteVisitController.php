@@ -22,7 +22,7 @@ class SiteVisitController extends Controller
         ->latest()
         ->get();
 
-        return view('sale_executive.Sitevisit', compact('leads'));
+        return view('sales_executive.Sitevisit', compact('leads'));
     }
 
     public function store(Request $request)

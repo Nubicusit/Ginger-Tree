@@ -138,7 +138,6 @@
                 </div>
                 <input type="text" name="contact_no"
                     class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-gray-200 focus:ring-1 focus:ring-gray-200" />
-
             </div>
 
             <!-- Role -->
@@ -157,6 +156,7 @@
                     @endforeach
                 </select>
             </div>
+            
             <!-- Footer -->
             <div class="flex justify-end gap-3 pt-5 border-t">
                 <button type="button" onclick="closeModal()"
