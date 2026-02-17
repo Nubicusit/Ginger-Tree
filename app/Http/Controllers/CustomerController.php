@@ -11,11 +11,11 @@ public function index()
 {
     $customers = Customer::latest()->get();
     $totalCustomers = $customers->count();
-    return view('customer.customermanagement', compact('customers','totalCustomers'));
+    return view('admin.customermanagement', compact('customers','totalCustomers'));
 }
 public function create()
 {
-    return view('customer.createcustomer');
+    return view('admin.createcustomer');
 }
 public function store(Request $request)
 {
@@ -42,7 +42,7 @@ public function store(Request $request)
     };
 
     if ($request->customer_id) {
-     
+
         Customer::where('id', $request->customer_id)->update($data);
     } else {
 

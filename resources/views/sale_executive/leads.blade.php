@@ -155,24 +155,22 @@
 
                         <td class="px-6 py-4">
                             <span class="px-3 py-2 rounded text-[10px] font-bold uppercase
-@if($lead->status == 'Won')
-    bg-green-500 text-white
-@elseif($lead->status == 'Lost')
-    bg-red-500 text-white
-@elseif($lead->status == 'Contacted')
-    bg-yellow-400 text-white
-    @elseif($lead->status == 'Site Visit')
-    bg-blue-400 text-white
-@else
-    bg-orange-500 text-white
-@endif">
+                                @if($lead->status == 'Won')
+                                    bg-green-500 text-white
+                                @elseif($lead->status == 'Lost')
+                                    bg-red-500 text-white
+                                @elseif($lead->status == 'Contacted')
+                                    bg-yellow-400 text-white
+                                    @elseif($lead->status == 'Site Visit')
+                                    bg-blue-400 text-white
+                                @else
+                                    bg-orange-500 text-white
+                                @endif">
                                 {{ $lead->status }}
                             </span>
-
                         </td>
 
                         <td class="px-6 py-4" id="assigned_sales_{{ $lead->id }}">
-
                             <button
                                 onclick="openLeadDrawer({{ $lead->id }})"
                                 class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
@@ -330,7 +328,6 @@
 </div>
 <div id="taskModal"
     class="fixed inset-0 bg-black/40 hidden z-60 flex items-center justify-center">
-
     <div class="bg-white w-[400px] rounded-lg shadow-xl p-4">
 
         <h3 class="font-bold mb-3" id="taskModalTitle">Add New Task</h3>
