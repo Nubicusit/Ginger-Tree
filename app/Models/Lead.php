@@ -29,14 +29,13 @@ class Lead extends Model
 
     public function designer()
     {
-        return $this->belongsTo(Designer::class);
+        return $this->belongsTo(User::class, 'designer_id');
     }
 
     public function salesExecutive()
-    {
-        return $this->belongsTo(SalesExecutive::class);
-    }
-
+{
+    return $this->belongsTo(User::class, 'sales_executive_id');
+}
     public function tasks()
 {
     return $this->hasMany(Task::class);

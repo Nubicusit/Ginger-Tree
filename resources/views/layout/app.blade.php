@@ -8,7 +8,6 @@
   <!-- Tailwind CSS -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-
   <!-- Custom Styles for Sidebar Transitions & Scrollbar -->
   <style>
     .custom-scrollbar::-webkit-scrollbar {
@@ -55,6 +54,7 @@
     background-color: #f9fafb;
 }
 </style>
+
 </head>
 <body class="bg-gray-50 text-gray-800 font-sans antialiased">
 
@@ -77,6 +77,8 @@
         </main>
     </div>
     <!-- Optional Global Scripts -->
+     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
     <script>
         // Toggle Sidebar Logic
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');

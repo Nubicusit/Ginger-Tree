@@ -7,7 +7,7 @@
 @section('content')
 <div class="bg-[#F3F4F6]">
   <!-- Dashboard -->
-<div class="max-w-full mx-auto">
+    <div class="max-w-full mx-auto">
         <!-- Top Cards Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
             <!-- Customers Management -->
@@ -117,6 +117,7 @@
                             </svg>
                         </div>
                     </div>
+
                     <div class="space-y-2 mb-6">
                         <div class="flex justify-between text-sm font-semibold">
                             <span class="text-gray-700">In Progress :</span>
@@ -132,6 +133,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="flex justify-end">
                     <button class="bg-[#2962FF] text-white px-6 py-2 rounded-full text-xs font-medium hover:bg-blue-700 transition-colors">
                         Detail
@@ -151,6 +153,7 @@
                             </svg>
                         </div>
                     </div>
+
                     <div class="space-y-2 mb-6">
                         <div class="flex justify-between text-sm font-semibold">
                             <span class="text-gray-700">Deliveries :</span>

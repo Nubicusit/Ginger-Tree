@@ -328,31 +328,31 @@
 
                                 if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
                                     preview.innerHTML += `
-                <div class="relative">
-                    <img src="/${file}"
-                         onclick="openMediaViewer('/${file}', 'image')"
-                         class="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80" />
-                         <button
-                onclick="removeExistingFile('${file}', event)"
-                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">
-                ✕
-            </button>
-                </div>
-            `;
+                                <div class="relative">
+                                    <img src="/${file}"
+                                        onclick="openMediaViewer('/${file}', 'image')"
+                                        class="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80" />
+                                        <button
+                                onclick="removeExistingFile('${file}', event)"
+                                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">
+                                ✕
+                            </button>
+                                </div>
+                            `;
                                 } else {
                                     preview.innerHTML += `
-                <div class="relative">
-                    <video class="w-full h-24 rounded border cursor-pointer"
-                           onclick="openMediaViewer('/${file}', 'video')">
-                        <source src="/${file}">
-                         <button
-                onclick="removeExistingFile('${file}', event)"
-                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">
-                ✕
-            </button>
-                    </video>
-                </div>
-            `;
+                                <div class="relative">
+                                    <video class="w-full h-24 rounded border cursor-pointer"
+                                        onclick="openMediaViewer('/${file}', 'video')">
+                                        <source src="/${file}">
+                                        <button
+                                onclick="removeExistingFile('${file}', event)"
+                                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">
+                                ✕
+                            </button>
+                                    </video>
+                                </div>
+                            `;
                                 }
                             });
                         }
@@ -503,7 +503,7 @@
                 });
         }
     </script>
-    
+
     <script>
         function openMediaViewer(src, type) {
             const viewer = document.getElementById('mediaViewer');
@@ -523,7 +523,6 @@
                    class="max-w-full max-h-[90vh] rounded shadow-lg"></video>
         `;
             }
-
             viewer.classList.remove('hidden');
         }
 
