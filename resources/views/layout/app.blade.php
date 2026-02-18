@@ -7,6 +7,10 @@
 
    <link rel="icon" type="image/x-icon" href="{{ asset('img/Boltoni-Favicon.png') }}">
 
+   <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+      crossorigin="anonymous">
+
   <!-- Tailwind CSS -->
   @vite(['resources/css/app.css', 'resources/js/app.js'])
 
@@ -101,5 +105,7 @@
     </script>
 
     @stack('scripts')
+    <script src="//unpkg.com/alpinejs" defer></script>
+
 </body>
 </html>

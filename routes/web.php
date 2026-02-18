@@ -31,7 +31,7 @@ Route::get('/customers', [CustomerController::class, 'index'])->middleware(['aut
 Route::get('/customers/create', [CustomerController::class, 'create']);
 Route::post('/customers/store', [CustomerController::class, 'store'])->name('customers.store');
 
-// admin dashboard
+// admin-dashboard
 Route::get('/dashboard', [AdminController::class, 'index'])->middleware(['auth', 'admin'])->name('admin.dashboard');
 Route::get('/leads', [AdminController::class, 'leads'])->middleware(['auth', 'admin'])->name('leads');
 Route::get('/leads/create', [AdminController::class, 'create'])->middleware(['auth', 'admin'])->name('leads.create');
@@ -41,6 +41,11 @@ Route::put('/leads/{lead}', [AdminController::class, 'update'])->name('leads.upd
 Route::delete('/leads/{lead}', [AdminController::class, 'destroy'])->name('leads.destroy');
 Route::post('/users/{user}/toggle-status', [AdminController::class, 'toggleUserStatus']);
 Route::get('/inventory', [AdminController::class, 'stocks'])->name('inventory.index');
+Route::get('inventory/create', [AdminController::class, 'createstock'])->name('inventory.create');
+Route::post('inventory/store', [AdminController::class, 'storestock'])->name('inventory.store');
+Route::get('inventory/{id}/edit', [AdminController::class, 'editstock'])->name('inventory.edit');
+Route::put('inventory/{id}', [AdminController::class, 'updatestock'])->name('inventory.update');
+Route::delete('inventory/{id}', [AdminController::class, 'destroystock'])->name('inventory.destroy');
 
 Route::get('/useraccounts', [AdminController::class, 'useraccounts'])->middleware(['auth', 'admin'])->name('useraccounts');
 Route::post('/useraccounts/store', [AdminController::class, 'storeUser'])->middleware(['auth', 'admin'])->name('users.store');
@@ -54,6 +59,7 @@ Route::delete('/useraccounts/{user}', [AdminController::class, 'destroyUser'])->
 | Sales Routes
 |--------------------------------------------------------------------------
 */
+
 Route::get('/sales/sitevisits', [SiteVisitController::class, 'sitevisit'])
     ->name('sales.sitevisit')
     ->middleware('auth');
@@ -71,7 +77,7 @@ Route::get('/lead/{id}', [AdminController::class, 'getLead']);
 | Marketing Routes
 |--------------------------------------------------------------------------
 */
-Route::post('/marketing-store', [AdminController::class, 'storeMarketing'])->name('marketing.store');
+Route::post('/marketing-store', [AdminController::class, 'storeMarketing'])->name('admin.marketing.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -85,8 +91,8 @@ Route::post('/leads/{lead}/site-visit', [SiteVisitController::class, 'saveSiteVi
 
 Route::get('/sale-executive/quotations/{lead}', [QuotationController::class, 'index'])->name('sale.quotations.index');
 
-Route::post('quotations/store', [QuotationController::class, 'store'])->name('sale.quotations.store');
-
+Route::post('/sale-executive/quotation/store', [QuotationController::class, 'storequotation'])->name('sale.quotations.store');
+Route::get('/sale-executive/quotation/{quotation}/pdf', [QuotationController::class, 'generatePdf'])->name('sale.quotations.pdf');
 /*
 |--------------------------------------------------------------------------
 | HR Routes
@@ -197,3 +203,4 @@ Route::post('/hr/self-checkin', [HRController::class, 'selfCheckIn'])
 Route::get('/hr/today-attendance', [HRController::class, 'todayAttendance'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.today.attendance');
+

@@ -256,11 +256,11 @@
 
                 <!-- Quotation Action (JS controlled) -->
 <div id="quotationAction" class="mt-3 hidden">
-    <a id="manageQuotationBtn"
-       href="#"
-       class="inline-block bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
-         Quotation
-    </a>
+    <button
+        onclick="openQuotationModal()"
+        class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+        Make Quotation
+    </button>
 </div>
 
                 <div class="mt-4 flex justify-end">
@@ -287,6 +287,51 @@
             class="max-w-[90vw] max-h-[90vh] flex items-center justify-center">
         </div>
     </div>
+<div id="quotationModal"
+     class="fixed inset-0 bg-black/50 hidden z-[999] flex items-center justify-center">
+
+    <div class="bg-white w-[500px] rounded-lg shadow-xl p-5 relative">
+
+        <button onclick="closeQuotationModal()"
+            class="absolute top-3 right-3 text-gray-500 text-xl">✕</button>
+
+        <h3 class="text-lg font-semibold mb-4">Create Quotation</h3>
+
+        <div class="space-y-3">
+
+            <div>
+                <label class="label">Description</label>
+                <textarea id="q_description" class="input w-full h-20"></textarea>
+            </div>
+
+            <div>
+                <label class="label">Image</label>
+                <input type="file" id="q_image" class="input">
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="label">Quantity</label>
+                    <input type="number" id="q_quantity" class="input">
+                </div>
+
+                <div>
+                    <label class="label">Price</label>
+                    <input type="number" id="q_price" class="input">
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-3">
+                <button
+                    onclick="submitQuotation()"
+                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                    Save Quotation
+                </button>
+            </div>
+
+        </div>
+    </div>
+</div>
 
     <script>
         const drawer = document.getElementById('SitevisitDrawer');
@@ -327,12 +372,9 @@
                         document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
                         document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
                         document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
-                        const quotationBox = document.getElementById('quotationAction');
-const quotationBtn = document.getElementById('manageQuotationBtn');
+                         const quotationBox = document.getElementById('quotationAction');
 
 if (data.site_visit && data.site_visit.approval_status === 'Yes') {
-    quotationBtn.href = `/sale-executive/quotations/${leadId}`;
-    quotationBtn.target = "_blank"; // optional: open PDF in new tab
     quotationBox.classList.remove('hidden');
 } else {
     quotationBox.classList.add('hidden');
@@ -556,4 +598,47 @@ if (data.site_visit && data.site_visit.approval_status === 'Yes') {
             viewer.classList.add('hidden');
         }
     </script>
+    <script>
+function openQuotationModal() {
+    document.getElementById('quotationModal').classList.remove('hidden');
+}
+
+function closeQuotationModal() {
+    document.getElementById('quotationModal').classList.add('hidden');
+}
+
+function submitQuotation() {
+    const leadId = document.getElementById('current_lead_id').value;
+
+    const formData = new FormData();
+    formData.append('lead_id', leadId);
+    formData.append('description', document.getElementById('q_description').value);
+    formData.append('quantity', document.getElementById('q_quantity').value);
+    formData.append('price', document.getElementById('q_price').value);
+
+    const image = document.getElementById('q_image').files[0];
+    if (image) formData.append('image', image);
+
+    fetch('/sale-executive/quotation/store', {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(res => {
+        if (res.success) {
+            closeQuotationModal();
+
+            // 🔥 OPEN PDF IMMEDIATELY
+            window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
+        } else {
+            alert('Failed to create quotation');
+        }
+    })
+    .catch(() => alert('Server error'));
+}
+</script>
+
     @endsection
