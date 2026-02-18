@@ -8,6 +8,8 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Department;
+use App\Models\InventoryStock;
+
 
 class AdminController extends Controller
 {
@@ -229,13 +231,54 @@ public function storeDepartment(Request $request)
 
     return back()->with('success', 'Department added');
 }
+   public function stocks()
+        {
+            $stocks = InventoryStock::latest()->get();
+            return view('admin.Masters.inventory',compact('stocks'));
+        }
+public function storestock(Request $request)
+{
+    $request->validate([
+        'item_name' => 'required',
+        'price'     => 'required|numeric',
+        'quantity'  => 'required|numeric',
+    ]);
 
+    InventoryStock::create([
+        'item_name' => $request->item_name,
+        'category'  => $request->category,
+        'unit'      => $request->unit,
+        'price'     => $request->price,
+        'quantity'  => $request->quantity,
+    ]);
 
+    return redirect()->back()->with('success', 'Stock added successfully');
+}
+public function editstock($id)
+{
+    return InventoryStock::findOrFail($id);
+}
+public function updatestock(Request $request, $id)
+{
+    $stock = InventoryStock::findOrFail($id);
 
-public function stocks()
-    {
-        // Return inventory view
-        return view('admin.Masters.inventory');
-    }
+    $stock->update([
+        'item_name' => $request->item_name,
+        'category'  => $request->category,
+        'unit'      => $request->unit,
+        'price'     => $request->price,
+        'quantity'  => $request->quantity,
+        'status'    => $request->quantity > 0 ? 'In Stock' : 'Out of Stock',
+    ]);
 
-    }
+    return redirect()->route('inventory.index')->with('success', 'Stock updated');
+}
+
+public function destroystock($id)
+{
+    InventoryStock::findOrFail($id)->delete();
+
+    return redirect()->route('inventory.index')->with('success', 'Stock deleted');
+}
+
+}
