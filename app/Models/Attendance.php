@@ -1,5 +1,4 @@
 <?php
-// app/Models/Attendance.php
 
 namespace App\Models;
 
@@ -10,18 +9,24 @@ class Attendance extends Model
 {
     use HasFactory;
 
-    // ✅ CRITICAL: Your table is 'attendance' (singular)
-    protected $table = 'attendance';  // ← ADD THIS LINE
+    protected $table = 'attendance';
 
     protected $fillable = [
-        'employee_id', 'date', 'status', 'check_in', 'check_out', 'late_minutes', 'notes'
+        'employee_id',
+        'date',
+        'status',
+        'check_in',
+        'check_out',
+        'late_minutes',   // ← keep this name
+        'notes',
+        'leave_type',     // ← add
+        'leave_status',   // ← add
     ];
 
-
     protected $casts = [
-        'date' => 'date',
-        'check_in' => 'datetime:H:i',
-        'check_out' => 'datetime:H:i',
+        'date'         => 'date',
+        'check_in'     => 'datetime:H:i',
+        'check_out'    => 'datetime:H:i',
         'late_minutes' => 'integer',
     ];
 
