@@ -327,4 +327,77 @@ class HRController extends Controller
 
         return 'present';
     }
+public function payroll(Request $request)
+{
+    $filter    = $request->get('filter', 'monthly');
+    $month     = $request->get('month', now()->format('Y-m'));
+    $weekStart = $request->get('week_start', now()->startOfWeek()->format('Y-m-d'));
+
+    $employees = Employee::with('department')->get()->map(function ($employee) use ($filter, $month, $weekStart) {
+
+        if ($filter === 'weekly') {
+            $start = Carbon::parse($weekStart)->startOfWeek();
+            $end   = Carbon::parse($weekStart)->endOfWeek();
+        } else {
+            $start = Carbon::parse($month . '-01')->startOfMonth();
+            $end   = Carbon::parse($month . '-01')->endOfMonth();
+        }
+
+        $totalDays      = $start->diffInWeekdays($end) + 1;
+        $presentDays    = Attendance::where('employee_id', $employee->id)
+                            ->whereBetween('date', [$start, $end])
+                            ->whereIn('status', ['present', 'late', 'half_day'])
+                            ->count();
+        $absentDays     = Attendance::where('employee_id', $employee->id)
+                            ->whereBetween('date', [$start, $end])
+                            ->where('status', 'absent')
+                            ->count();
+        $leaveDays      = Attendance::where('employee_id', $employee->id)
+                            ->whereBetween('date', [$start, $end])
+                            ->where('status', 'leave')
+                            ->count();
+        $lateDays       = Attendance::where('employee_id', $employee->id)
+                            ->whereBetween('date', [$start, $end])
+                            ->where('status', 'late')
+                            ->count();
+        $totalLateMinutes = Attendance::where('employee_id', $employee->id)
+                            ->whereBetween('date', [$start, $end])
+                            ->where('status', 'late')
+                            ->sum('late_minutes');
+
+        $dailySalary    = $employee->salary / 26; // 26 working days/month
+        $earnedSalary   = $dailySalary * $presentDays;
+        $deductions     = $dailySalary * $absentDays;
+        $netSalary      = $earnedSalary;
+
+        return [
+            'id'                => $employee->id,
+            'employee_id'       => $employee->employee_id,
+            'name'              => $employee->first_name . ' ' . $employee->last_name,
+            'department'        => $employee->department->name ?? '—',
+            'gross_salary'      => $employee->salary,
+            'daily_salary'      => round($dailySalary, 2),
+            'present_days'      => $presentDays,
+            'absent_days'       => $absentDays,
+            'leave_days'        => $leaveDays,
+            'late_days'         => $lateDays,
+            'total_late_minutes'=> $totalLateMinutes,
+            'earned_salary'     => round($earnedSalary, 2),
+            'deductions'        => round($deductions, 2),
+            'net_salary'        => round($netSalary, 2),
+        ];
+    });
+
+    return view('HR.payroll', compact('employees', 'filter', 'month', 'weekStart'));
+}
+public function clearCache()
+{
+    \Artisan::call('cache:clear');
+    \Artisan::call('config:clear');
+    \Artisan::call('view:clear');
+    \Artisan::call('route:clear');
+
+    return response()->json(['message' => 'Cache cleared successfully!']);
+}
+    
 }

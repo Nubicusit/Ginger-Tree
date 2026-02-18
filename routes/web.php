@@ -13,7 +13,7 @@ use App\Http\Controllers\HRController;
 Route::get('/', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
+Route::post('/hr/clear-cache', [HRController::class, 'clearCache'])->name('hr.clear-cache');
 // sales executive
 Route::get('/sales/dashboard', [SalesController::class, 'dashboard'])->middleware(['auth', 'department:sales_executive'])->name('sales_executive.dashboard');
 Route::get('/sales/leads', [SalesController::class, 'leads'])->name('sales.leads')->middleware(['auth', 'department:sales_executive']);
