@@ -338,7 +338,43 @@ document.addEventListener('DOMContentLoaded', function() {
             statusCheck.innerHTML = '<p class="text-red-600">Status check failed!</p>';
         });
     }
+// Perform Check-out
+performCheckout.addEventListener('click', function() {
+    const btn = this;
+    btn.disabled = true;
+    btn.innerHTML = `<svg class="animate-spin w-6 h-6 mr-2 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+                     Checking out...`;
 
+    fetch('{{ route("hr.self.checkout") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            btn.innerHTML = `<svg class="w-6 h-6 mr-2 mx-auto text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+                            ${data.message}`;
+            setTimeout(() => {
+                closeModal();
+                location.reload();
+            }, 2000);
+        } else {
+            alert(data.message || 'Check-out failed!');
+            btn.disabled = false;
+            btn.innerHTML = 'Check-out Now';
+        }
+    })
+    .catch(error => {
+        alert('Check-out failed! Please try again.');
+        btn.disabled = false;
+        btn.innerHTML = 'Check-out Now';
+    });
+});
     // Perform Check-in
     performCheckin.addEventListener('click', function() {
         const btn = this;

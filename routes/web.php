@@ -9,7 +9,7 @@ use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SiteVisitController;
 use App\Http\Controllers\Sales\QuotationController;
 use App\Http\Controllers\HRController;
-
+use App\Http\Controllers\AccountsController;
 Route::get('/', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -46,6 +46,7 @@ Route::post('inventory/store', [AdminController::class, 'storestock'])->name('in
 Route::get('inventory/{id}/edit', [AdminController::class, 'editstock'])->name('inventory.edit');
 Route::put('inventory/{id}', [AdminController::class, 'updatestock'])->name('inventory.update');
 Route::delete('inventory/{id}', [AdminController::class, 'destroystock'])->name('inventory.destroy');
+Route::get('/inventory/items', [AdminController::class, 'getInventoryItems'])->name('inventory.items');
 
 Route::get('/useraccounts', [AdminController::class, 'useraccounts'])->middleware(['auth', 'admin'])->name('useraccounts');
 Route::post('/useraccounts/store', [AdminController::class, 'storeUser'])->middleware(['auth', 'admin'])->name('users.store');
@@ -105,6 +106,8 @@ Route::get('/hr/dashboard', [HRController::class, 'dashboard'])
 Route::get('/hr/employees', [HRController::class, 'employees'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.employees');
+    Route::put('/hr/employees/{id}',    [HRController::class, 'updateEmployee'])->name('hr.employees.update');
+Route::delete('/hr/employees/{id}', [HRController::class, 'destroyEmployee'])->name('hr.employees.destroy');
 
 // hr dashboard
 // Route::get('/hr/dashboard', function () {
@@ -167,7 +170,7 @@ Route::post('/hr/attendance/check-in', [HRController::class, 'checkIn'])
 Route::post('/hr/attendance/check-out', [HRController::class, 'checkOut'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.attendance.checkout');
-
+Route::post('/self-checkout', [HRController::class, 'checkout'])->name('hr.self.checkout');
 // Reports
 Route::get('/hr/attendance/report', [HRController::class, 'report'])
     ->middleware(['auth', 'department:hr'])
@@ -199,8 +202,31 @@ Route::get('/hr/attendance/status', [HRController::class, 'attendanceStatus'])
 Route::post('/hr/self-checkin', [HRController::class, 'selfCheckIn'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.self.checkin');
+    Route::post('/self-checkout', [HrController::class, 'selfCheckout'])->name('hr.self.checkout');
 
 Route::get('/hr/today-attendance', [HRController::class, 'todayAttendance'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.today.attendance');
 
+Route::post('sales/attendance/self-check-in', [SalesController::class, 'selfCheckIn'])
+    ->middleware(['auth','department:sales_executive'])
+    ->name('sales.attendance.self-check-in');
+
+Route::post('sales/attendance/self-check-out', [SalesController::class, 'selfCheckOut'])
+    ->middleware(['auth','department:sales_executive'])
+    ->name('sales.attendance.self-check-out');
+Route::get('/sales/attendance/status', [SalesController::class, 'attendanceStatus'])
+    ->middleware(['auth', 'department:sales_executive'])
+    ->name('sales.attendance.status');
+
+
+
+
+//accounts
+
+
+
+
+Route::get('/accounts/dashboard', [AccountsController::class, 'dashboard'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.dashboard');

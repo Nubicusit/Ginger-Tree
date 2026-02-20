@@ -4,7 +4,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
-class HrMiddleware
+class AccountsMiddleware
 {
     public function handle(Request $request, Closure $next)
     {
@@ -12,8 +12,10 @@ class HrMiddleware
             return redirect()->route('login');
         }
 
-        
-        if (Auth::user()->role === 'hr' || Auth::user()->role === 'admin') {
+        $user = Auth::user();
+
+        // Admin-നും Accountant-നും access
+        if ($user->role === 'admin' || $user->role === 'accountant') {
             return $next($request);
         }
 

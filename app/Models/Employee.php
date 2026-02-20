@@ -1,6 +1,5 @@
 <?php
 // app/Models/Employee.php
-
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -12,15 +11,17 @@ class Employee extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'user_id',        // ✅ added (was missing)
         'employee_id',
         'first_name',
-        'last_name', 
+        'last_name',
         'email',
         'phone',
         'department_id',
         'designation_id',
         'joining_date',
         'salary',
+        'salary_type',    // ✅ added
         'status',
         'profile_image',
         'address',
@@ -28,15 +29,15 @@ class Employee extends Model
         'pan_number',
         'bank_account',
         'ifsc_code',
-        'blood_group'
+        'blood_group',
     ];
 
     protected $casts = [
         'joining_date' => 'date',
-        'salary' => 'decimal:2',
+        'salary'       => 'decimal:2',
     ];
 
-    // Relationships
+    // ===== RELATIONSHIPS =====
     public function department()
     {
         return $this->belongsTo(Department::class);
@@ -62,7 +63,12 @@ class Employee extends Model
         return $this->hasMany(LeaveRequest::class);
     }
 
-    // Scopes
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    // ===== SCOPES =====
     public function scopeActive($query)
     {
         return $query->where('status', 'active');
@@ -73,7 +79,7 @@ class Employee extends Model
         return $query->where('joining_date', '>=', now()->subDays($days));
     }
 
-    // Accessors
+    // ===== ACCESSORS =====
     public function getFullNameAttribute()
     {
         return $this->first_name . ' ' . $this->last_name;
@@ -83,20 +89,4 @@ class Employee extends Model
     {
         return str($this->first_name)->substr(0, 1) . '. ' . $this->last_name;
     }
-     public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-    
-public function hasEmployee()
-{
-    return $this->employee() ? true : false;
-}
-   
-// app/Models/User.php - ADD THIS
-public function employee()
-{
-    return $this->hasOne(Employee::class, 'user_id');
-}
-
 }

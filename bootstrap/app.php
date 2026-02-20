@@ -19,6 +19,8 @@ return Application::configure(basePath: dirname(__DIR__))
         'admin' => AdminMiddleware::class,
         'department' => DepartmentMiddleware::class,
         'hr'    => HrMiddleware::class,
+        'accounts'   => \App\Http\Middleware\AccountsMiddleware::class, // ← ഇത് add ചെയ്യൂ
+
     ]);
   })
     ->withExceptions(function (Exceptions $exceptions) {

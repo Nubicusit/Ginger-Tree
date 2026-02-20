@@ -50,6 +50,7 @@ class HRController extends Controller
             'department_id'     => 'required|exists:departments,id',
             'joining_date'      => 'required|date',
             'salary'            => 'required|numeric|min:0',
+            'salary_type'       => 'required|in:monthly,weekly', // ✅ added
             'status'            => 'required|in:active,inactive',
             'address'           => 'nullable|string',
             'emergency_contact' => 'nullable|string|max:20',
@@ -59,12 +60,50 @@ class HRController extends Controller
             'blood_group'       => 'nullable|string|max:5',
         ]);
 
-        $validated['employee_id'] = 'EMP' . str_pad(Employee::count() + 1, 5, '0', STR_PAD_LEFT);
+        // ✅ Fixed: use withTrashed()->max() to avoid duplicate employee_id
+        $lastEmployee = Employee::withTrashed()->max('employee_id');
+        $nextNumber   = $lastEmployee ? (int) substr($lastEmployee, 3) + 1 : 1;
+        $validated['employee_id'] = 'EMP' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
+
         Employee::create($validated);
 
         return redirect()->route('hr.employees')->with('success', 'Employee added successfully!');
     }
 
+
+
+public function updateEmployee(Request $request, $id)
+{
+    $employee = Employee::findOrFail($id);
+
+    $validated = $request->validate([
+        'first_name'        => 'required|string|max:255',
+        'last_name'         => 'required|string|max:255',
+        'email'             => 'required|email|unique:employees,email,' . $id,
+        'phone'             => 'nullable|string|max:20',
+        'department_id'     => 'required|exists:departments,id',
+        'joining_date'      => 'required|date',
+        'salary'            => 'required|numeric|min:0',
+        'salary_type'       => 'required|in:monthly,weekly',
+        'status'            => 'required|in:active,inactive',
+        'address'           => 'nullable|string',
+        'emergency_contact' => 'nullable|string|max:20',
+        'pan_number'        => 'nullable|string|max:10',
+        'bank_account'      => 'nullable|string|max:20',
+        'ifsc_code'         => 'nullable|string|max:11',
+        'blood_group'       => 'nullable|string|max:5',
+    ]);
+
+    $employee->update($validated);
+
+    return redirect()->route('hr.employees')->with('success', 'Employee updated successfully!');
+}
+
+public function destroyEmployee($id)
+{
+    Employee::findOrFail($id)->delete();
+    return redirect()->route('hr.employees')->with('success', 'Employee deleted successfully!');
+}
     // ===== ATTENDANCE MANAGEMENT (HR VIEW) =====
     public function attendance(Request $request)
     {
@@ -93,7 +132,7 @@ class HRController extends Controller
             'date'         => 'required|date',
             'check_in'     => 'nullable|date_format:H:i',
             'check_out'    => 'nullable|date_format:H:i',
-            'status'       => 'required|in:present,absent,late,half_day,leave', // ✅ added leave
+            'status'       => 'required|in:present,absent,late,half_day,leave',
             'notes'        => 'nullable|string',
             'leave_type'   => 'nullable|in:annual,sick,emergency,unpaid',
             'leave_status' => 'nullable|in:approved,pending,applied',
@@ -137,7 +176,7 @@ class HRController extends Controller
             'date'         => 'required|date',
             'check_in'     => 'nullable|date_format:H:i',
             'check_out'    => 'nullable|date_format:H:i',
-            'status'       => 'required|in:present,absent,late,half_day,leave', // ✅ added leave
+            'status'       => 'required|in:present,absent,late,half_day,leave',
             'notes'        => 'nullable|string',
             'leave_type'   => 'nullable|in:annual,sick,emergency,unpaid',
             'leave_status' => 'nullable|in:approved,pending,applied',
@@ -202,16 +241,20 @@ class HRController extends Controller
                            ->first();
 
             if (!$employee) {
-                $employeeId = (Employee::max('id') ?? 0) + 1;
-                $employee   = Employee::create([
-                    'user_id'     => $user->id,
-                    'first_name'  => explode(' ', $user->name)[0] ?? 'Staff',
-                    'last_name'   => '',
-                    'email'       => $user->email,
-                    'employee_id' => 'EMP' . str_pad($employeeId, 5, '0', STR_PAD_LEFT),
-                    'status'      => 'active',
-                    'joining_date'=> now(),
-                    'salary'      => 0,
+                // ✅ Fixed: use withTrashed()->max() here too
+                $lastEmployee = Employee::withTrashed()->max('employee_id');
+                $nextNumber   = $lastEmployee ? (int) substr($lastEmployee, 3) + 1 : 1;
+
+                $employee = Employee::create([
+                    'user_id'       => $user->id,
+                    'first_name'    => explode(' ', $user->name)[0] ?? 'Staff',
+                    'last_name'     => '',
+                    'email'         => $user->email,
+                    'employee_id'   => 'EMP' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT),
+                    'status'        => 'active',
+                    'joining_date'  => now(),
+                    'salary'        => 0,
+                    'salary_type'   => 'monthly', // ✅ added default
                     'department_id' => Department::first()?->id ?? 1,
                 ]);
             }
@@ -327,77 +370,81 @@ class HRController extends Controller
 
         return 'present';
     }
-public function payroll(Request $request)
-{
-    $filter    = $request->get('filter', 'monthly');
-    $month     = $request->get('month', now()->format('Y-m'));
-    $weekStart = $request->get('week_start', now()->startOfWeek()->format('Y-m-d'));
 
-    $employees = Employee::with('department')->get()->map(function ($employee) use ($filter, $month, $weekStart) {
+    public function payroll(Request $request)
+    {
+        $filter    = $request->get('filter', 'monthly');
+        $month     = $request->get('month', now()->format('Y-m'));
+        $weekStart = $request->get('week_start', now()->startOfWeek()->format('Y-m-d'));
 
-        if ($filter === 'weekly') {
-            $start = Carbon::parse($weekStart)->startOfWeek();
-            $end   = Carbon::parse($weekStart)->endOfWeek();
-        } else {
-            $start = Carbon::parse($month . '-01')->startOfMonth();
-            $end   = Carbon::parse($month . '-01')->endOfMonth();
-        }
+        $employees = Employee::with('department')->get()->map(function ($employee) use ($filter, $month, $weekStart) {
 
-        $totalDays      = $start->diffInWeekdays($end) + 1;
-        $presentDays    = Attendance::where('employee_id', $employee->id)
-                            ->whereBetween('date', [$start, $end])
-                            ->whereIn('status', ['present', 'late', 'half_day'])
-                            ->count();
-        $absentDays     = Attendance::where('employee_id', $employee->id)
-                            ->whereBetween('date', [$start, $end])
-                            ->where('status', 'absent')
-                            ->count();
-        $leaveDays      = Attendance::where('employee_id', $employee->id)
-                            ->whereBetween('date', [$start, $end])
-                            ->where('status', 'leave')
-                            ->count();
-        $lateDays       = Attendance::where('employee_id', $employee->id)
-                            ->whereBetween('date', [$start, $end])
-                            ->where('status', 'late')
-                            ->count();
-        $totalLateMinutes = Attendance::where('employee_id', $employee->id)
-                            ->whereBetween('date', [$start, $end])
-                            ->where('status', 'late')
-                            ->sum('late_minutes');
+            if ($filter === 'weekly') {
+                $start = Carbon::parse($weekStart)->startOfWeek();
+                $end   = Carbon::parse($weekStart)->endOfWeek();
+            } else {
+                $start = Carbon::parse($month . '-01')->startOfMonth();
+                $end   = Carbon::parse($month . '-01')->endOfMonth();
+            }
 
-        $dailySalary    = $employee->salary / 26; // 26 working days/month
-        $earnedSalary   = $dailySalary * $presentDays;
-        $deductions     = $dailySalary * $absentDays;
-        $netSalary      = $earnedSalary;
+            $totalDays        = $start->diffInWeekdays($end) + 1;
+            $presentDays      = Attendance::where('employee_id', $employee->id)
+                                    ->whereBetween('date', [$start, $end])
+                                    ->whereIn('status', ['present', 'late', 'half_day'])
+                                    ->count();
+            $absentDays       = Attendance::where('employee_id', $employee->id)
+                                    ->whereBetween('date', [$start, $end])
+                                    ->where('status', 'absent')
+                                    ->count();
+            $leaveDays        = Attendance::where('employee_id', $employee->id)
+                                    ->whereBetween('date', [$start, $end])
+                                    ->where('status', 'leave')
+                                    ->count();
+            $lateDays         = Attendance::where('employee_id', $employee->id)
+                                    ->whereBetween('date', [$start, $end])
+                                    ->where('status', 'late')
+                                    ->count();
+            $totalLateMinutes = Attendance::where('employee_id', $employee->id)
+                                    ->whereBetween('date', [$start, $end])
+                                    ->where('status', 'late')
+                                    ->sum('late_minutes');
 
-        return [
-            'id'                => $employee->id,
-            'employee_id'       => $employee->employee_id,
-            'name'              => $employee->first_name . ' ' . $employee->last_name,
-            'department'        => $employee->department->name ?? '—',
-            'gross_salary'      => $employee->salary,
-            'daily_salary'      => round($dailySalary, 2),
-            'present_days'      => $presentDays,
-            'absent_days'       => $absentDays,
-            'leave_days'        => $leaveDays,
-            'late_days'         => $lateDays,
-            'total_late_minutes'=> $totalLateMinutes,
-            'earned_salary'     => round($earnedSalary, 2),
-            'deductions'        => round($deductions, 2),
-            'net_salary'        => round($netSalary, 2),
-        ];
-    });
+            // ✅ Fixed: respect salary_type for daily rate calculation
+            $workingDays  = $employee->salary_type === 'weekly' ? 5 : 26;
+            $dailySalary  = $employee->salary / $workingDays;
+            $earnedSalary = $dailySalary * $presentDays;
+            $deductions   = $dailySalary * $absentDays;
+            $netSalary    = $earnedSalary;
 
-    return view('HR.payroll', compact('employees', 'filter', 'month', 'weekStart'));
-}
-public function clearCache()
-{
-    \Artisan::call('cache:clear');
-    \Artisan::call('config:clear');
-    \Artisan::call('view:clear');
-    \Artisan::call('route:clear');
+            return [
+                'id'                 => $employee->id,
+                'employee_id'        => $employee->employee_id,
+                'name'               => $employee->first_name . ' ' . $employee->last_name,
+                'department'         => $employee->department->name ?? '—',
+                'salary_type'        => $employee->salary_type ?? 'monthly', // ✅ added
+                'gross_salary'       => $employee->salary,
+                'daily_salary'       => round($dailySalary, 2),
+                'present_days'       => $presentDays,
+                'absent_days'        => $absentDays,
+                'leave_days'         => $leaveDays,
+                'late_days'          => $lateDays,
+                'total_late_minutes' => $totalLateMinutes,
+                'earned_salary'      => round($earnedSalary, 2),
+                'deductions'         => round($deductions, 2),
+                'net_salary'         => round($netSalary, 2),
+            ];
+        });
 
-    return response()->json(['message' => 'Cache cleared successfully!']);
-}
-    
+        return view('HR.payroll', compact('employees', 'filter', 'month', 'weekStart'));
+    }
+
+    public function clearCache()
+    {
+        \Artisan::call('cache:clear');
+        \Artisan::call('config:clear');
+        \Artisan::call('view:clear');
+        \Artisan::call('route:clear');
+
+        return response()->json(['message' => 'Cache cleared successfully!']);
+    }
 }
