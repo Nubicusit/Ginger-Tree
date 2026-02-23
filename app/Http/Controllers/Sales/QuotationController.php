@@ -24,29 +24,42 @@ class QuotationController extends Controller
 }
 public function storequotation(Request $request)
 {
-    $data = $request->validate([
-        'lead_id' => 'required|exists:leads,id',
-        'description' => 'required',
-        'quantity' => 'required|numeric|min:1',
-        'price' => 'required|numeric|min:0',
-        'image' => 'nullable|image'
+    $request->validate([
+        'lead_id'         => 'required|exists:leads,id',
+        'items'           => 'required|array|min:1',
+        'items.*.item'    => 'required|string',
+        'items.*.quantity'=> 'required|numeric|min:1',
+        'items.*.price'   => 'required|numeric|min:0',
     ]);
 
-    if ($request->hasFile('image')) {
-        $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-        $request->file('image')->move(public_path('img'), $imageName);
-        $data['image'] = $imageName;  // stores just the filename
+    $lastQuotation = null;
+
+    foreach ($request->items as $index => $itemData) {
+        $imageName = null;
+
+        if ($request->hasFile("items.{$index}.image")) {
+            $file = $request->file("items.{$index}.image");
+            $imageName = time() . '_' . $index . '_' . $file->getClientOriginalName();
+            $file->move(public_path('img'), $imageName);
+        }
+
+        $lastQuotation = Quotation::create([
+            'lead_id'     => $request->lead_id,
+            'item'        => $itemData['item'],
+            'description' => $itemData['description'] ?? null,
+            'quantity'    => $itemData['quantity'],
+            'price'       => $itemData['price'],
+            'total'       => $itemData['quantity'] * $itemData['price'],
+            'image'       => $imageName,
+        ]);
     }
 
-    $data['total'] = $data['quantity'] * $data['price'];
-
-    $quotation = Quotation::create($data);
-
     return response()->json([
-        'success' => true,
-        'quotation_id' => $quotation->id
+        'success'      => true,
+        'quotation_id' => $lastQuotation->id
     ]);
 }
+
 public function generatePdf(Quotation $quotation)
 {
     $lead = Lead::findOrFail($quotation->lead_id);

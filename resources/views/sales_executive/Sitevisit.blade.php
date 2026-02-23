@@ -290,14 +290,74 @@
 <div id="quotationModal"
      class="fixed inset-0 bg-black/50 hidden z-[999] flex items-center justify-center">
 
-    <div class="bg-white w-[500px] rounded-lg shadow-xl p-5 relative">
+    <div class="bg-white w-[600px] max-h-[90vh] rounded-lg shadow-xl p-5 relative flex flex-col">
 
         <button onclick="closeQuotationModal()"
             class="absolute top-3 right-3 text-gray-500 text-xl">✕</button>
 
         <h3 class="text-lg font-semibold mb-4">Create Quotation</h3>
 
-        <div class="space-y-3">
+        <!-- Scrollable items area -->
+        <div id="quotation_items_wrapper" class="space-y-4 overflow-y-auto flex-1 pr-1">
+            <!-- First item row (template) -->
+            <div class="quotation-item border border-gray-200 rounded-lg p-4 relative">
+                <button type="button"
+                    onclick="removeQuotationItem(this)"
+                    class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm hidden">
+                    ✕ Remove
+                </button>
+
+                <div class="space-y-3">
+                    <div>
+                        <label class="label">Item Name</label>
+                        <select class="q_item input w-full">
+                            <option value="">-- Select Item --</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label class="label">Description</label>
+                        <textarea class="q_description input w-full h-16 resize-none"></textarea>
+                    </div>
+
+                    <div>
+                        <label class="label">Image</label>
+                        <input type="file" class="q_image input" accept="image/*">
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="label">Quantity</label>
+                            <input type="number" class="q_quantity input">
+                        </div>
+                        <div>
+                            <label class="label">Price</label>
+                            <input type="number" class="q_price input" readonly>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add More Button -->
+        <div class="mt-3">
+            <button type="button"
+                onclick="addMoreQuotationItem()"
+                class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-500 hover:text-blue-500 py-2 rounded-lg text-sm font-medium transition">
+                + Add More Item
+            </button>
+        </div>
+
+        <!-- Footer Actions -->
+        <div class="flex justify-end pt-3 mt-2 border-t">
+            <button onclick="submitQuotation()"
+                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+                Save Quotation
+            </button>
+        </div>
+    </div>
+</div>
+
 
             <div>
                 <label class="label">Description</label>
@@ -601,17 +661,39 @@ if (data.site_visit && data.site_visit.approval_status === 'Yes') {
     <script>
 function openQuotationModal() {
     document.getElementById('quotationModal').classList.remove('hidden');
+
+    // Fetch inventory items
+    fetch('/inventory/items')
+        .then(res => res.json())
+        .then(data => {
+            const select = document.getElementById('q_item');
+            select.innerHTML = '<option value="">-- Select Item --</option>';
+            data.forEach(item => {
+                const opt = document.createElement('option');
+                opt.value = item.item_name;
+                opt.dataset.price = item.price;
+                opt.textContent = item.item_name;
+                select.appendChild(opt);
+            });
+        });
 }
 
 function closeQuotationModal() {
     document.getElementById('quotationModal').classList.add('hidden');
 }
 
+// Auto-fill price when item is selected
+document.getElementById('q_item').addEventListener('change', function () {
+    const price = this.options[this.selectedIndex].dataset.price;
+    if (price) document.getElementById('q_price').value = price;
+});
+
 function submitQuotation() {
     const leadId = document.getElementById('current_lead_id').value;
 
     const formData = new FormData();
     formData.append('lead_id', leadId);
+    formData.append('item', document.getElementById('q_item').value);   // 👈 added
     formData.append('description', document.getElementById('q_description').value);
     formData.append('quantity', document.getElementById('q_quantity').value);
     formData.append('price', document.getElementById('q_price').value);
@@ -630,8 +712,6 @@ function submitQuotation() {
     .then(res => {
         if (res.success) {
             closeQuotationModal();
-
-            // 🔥 OPEN PDF IMMEDIATELY
             window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
         } else {
             alert('Failed to create quotation');

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lead;
+use App\Models\Service;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
@@ -233,15 +234,23 @@ public function storeDepartment(Request $request)
 }
    public function stocks()
         {
+
             $stocks = InventoryStock::latest()->get();
             return view('admin.Masters.inventory',compact('stocks'));
         }
+        public function getInventoryItems()
+{
+    return response()->json(
+        InventoryStock::select('item_name', 'price')->orderBy('item_name')->get()
+    );
+}
 public function storestock(Request $request)
 {
     $request->validate([
         'item_name' => 'required',
         'price'     => 'required|numeric',
         'quantity'  => 'required|numeric',
+        'gst_percentage'  => 'required|numeric',
     ]);
 
     InventoryStock::create([
@@ -249,6 +258,7 @@ public function storestock(Request $request)
         'category'  => $request->category,
         'unit'      => $request->unit,
         'price'     => $request->price,
+        'gst_percentage'     => $request->gst_percentage,
         'quantity'  => $request->quantity,
     ]);
 
@@ -267,6 +277,7 @@ public function updatestock(Request $request, $id)
         'category'  => $request->category,
         'unit'      => $request->unit,
         'price'     => $request->price,
+        'gst_percentage'  => $request->gst_percentage,
         'quantity'  => $request->quantity,
         'status'    => $request->quantity > 0 ? 'In Stock' : 'Out of Stock',
     ]);
@@ -279,6 +290,60 @@ public function destroystock($id)
     InventoryStock::findOrFail($id)->delete();
 
     return redirect()->route('inventory.index')->with('success', 'Stock deleted');
+}
+public function services(){
+
+    $stocks = Service::latest()->get();
+    return view('admin.Masters.services',compact('stocks'));
+}
+
+public function storeservice(Request $request)
+{
+    $request->validate([
+        'service_name' => 'required',
+        'price'     => 'required|numeric',
+        'category_service'  => 'nullable|string',
+        'gst_percentage' => 'nullable|numeric|min:0',
+        'service_tax' => 'nullable|numeric|min:0',
+    ]);
+
+    Service::create([
+        'service_name' => $request->service_name,
+        'category_service'  => $request->category_service,
+        'price'     => $request->price,
+        'gst_percentage'     => $request->gst_percentage,
+        'service_tax'  => $request->service_tax,
+    ]);
+
+    return redirect()->back()->with('success', 'Stock added successfully');
+}
+
+public function editservice($id)
+{
+    return Service::findOrFail($id);
+}
+
+public function updateservice(Request $request, $id)
+{
+    $stock = Service::findOrFail($id);
+
+    $stock->update([
+        'service_name' => $request->service_name,
+        'category_service'  => $request->category_service,
+
+        'price'     => $request->price,
+        'gst_percentage'  => $request->gst_percentage,
+        'service_tax'  => $request->service_tax,
+
+    ]);
+    return redirect()->route('services.index')->with('success', 'Service updated');
+}
+
+public function destroyservice($id)
+{
+    Service::findOrFail($id)->delete();
+
+    return redirect()->route('services.index')->with('success', 'Service deleted');
 }
 
 }

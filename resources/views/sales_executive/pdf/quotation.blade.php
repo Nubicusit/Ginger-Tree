@@ -54,7 +54,8 @@ tr { page-break-inside: avoid; }
 <thead>
     <tr>
         <th>SN</th>
-        <th>Item Description</th>
+        <th>Item </th>
+        <th>Description</th>
         <th>Image</th>
         <th>Unit Rate</th>
         <th>Qty</th>
@@ -64,6 +65,7 @@ tr { page-break-inside: avoid; }
 <tbody>
     <tr>
         <td class="text-center">1</td>
+        <td>{{ $quotation->item }}</td>
         <td>
             <p class="item-title">{{ $quotation->description }}</p>
         </td>
@@ -103,6 +105,5 @@ tr { page-break-inside: avoid; }
         <td class="text-right">₹ {{ number_format($grand, 2) }}</td>
     </tr>
 </table>
-
 </body>
 </html>

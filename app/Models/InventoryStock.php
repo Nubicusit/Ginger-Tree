@@ -11,6 +11,7 @@ class InventoryStock extends Model
         'category',
         'unit',
         'price',
+        'gst_percentage',
         'quantity',
         'low_stock_alert'
     ];

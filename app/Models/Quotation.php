@@ -8,6 +8,7 @@ class Quotation extends Model
 {
     protected $fillable = [
         'lead_id',
+        'item',
         'description',
         'image',
         'quantity',
