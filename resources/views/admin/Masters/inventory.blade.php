@@ -31,7 +31,7 @@
                 gst_percentage = '';
                 quantity = '';
             "
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-red-800 rounded-lg hover:bg-red-900">
             <i class="fas fa-plus mr-2"></i>
             Add Stock
         </a>
@@ -139,7 +139,7 @@
     <div
         x-show="openStockModal"
         x-transition x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div
             @click.away="openStockModal = false"
             class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
@@ -216,7 +216,6 @@
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-400 focus:ring-1 focus:ring-blue-400" />
                     </div>
                 </div>
-
                 <div>
                     <label class="block text-sm font-medium text-gray-700">Quantity</label>
                     <input
@@ -238,7 +237,7 @@
 
                     <button
                         type="submit"
-                        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                        class="px-4 py-2 text-sm text-white bg-red-700 rounded-lg hover:bg-red-800"
                         x-text="formMethod === 'PUT' ? 'Update Stock' : 'Save Stock'">
                     </button>
                 </div>

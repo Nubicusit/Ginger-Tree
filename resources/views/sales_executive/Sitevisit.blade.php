@@ -3,12 +3,79 @@
 @section('title', 'Sales Dashboard')
 
 @section('content')
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
+    <!-- Total Leads -->
+    <div class="bg-teal-600 p-4 rounded-lg shadow-sm border border-teal-600">
+        <div class="grid grid-cols-2 items-center">
+
+            <!-- LEFT: Text -->
+            <div class="flex items-center gap-3">
+                <div>
+                    <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">
+                        Total Site Visits
+                    </span>
+                </div>
+            </div>
+
+            <!-- RIGHT: Number -->
+            <div class="text-right">
+                <span class="text-4xl font-bold text-white">
+                    {{ $totalSiteVisits }}
+                </span>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Failed Leads -->
+    <div class="bg-green-600 p-4 rounded-lg shadow-sm border border-green-600">
+        <div class="grid grid-cols-2 items-center">
+
+            <!-- LEFT: Text -->
+            <div class="flex items-center gap-3">
+                <div>
+                    <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">
+                        Completed Site Visits
+                    </span>
+                </div>
+            </div>
+
+            <!-- RIGHT: Number -->
+            <div class="text-right">
+                <span class="text-4xl font-bold text-white">
+                    12
+                </span>
+            </div>
+        </div>
+    </div>
+    <div class="bg-red-400 p-4 rounded-lg shadow-sm border border-red-400">
+        <div class="grid grid-cols-2 items-center">
+
+            <!-- LEFT: Text -->
+            <div class="flex items-center gap-3">
+                <div>
+                    <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">
+                        Assigned Site visit
+                    </span>
+                </div>
+            </div>
+
+            <!-- RIGHT: Number -->
+            <div class="text-right">
+                <span class="text-4xl font-bold text-white">
+                    12
+                </span>
+            </div>
+
+        </div>
+    </div>
+</div>
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
             <thead>
-                <tr class="text-gray-500 text-sm font-semibold bg-gray-50 border-b border-gray-200">
+                <tr class="text-sm font-semibold bg-gray-50 border-b border-gray-200" style="background-color: #9b9b9b; color:beige;">
                     <th class="px-6 py-4">Name</th>
                     <th class="px-6 py-4">Project Type</th>
                     <th class="px-6 py-4">Site Visit Date and Time</th>
@@ -255,13 +322,13 @@
                 </div>
 
                 <!-- Quotation Action (JS controlled) -->
-<div id="quotationAction" class="mt-3 hidden">
-    <button
-        onclick="openQuotationModal()"
-        class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
-        Make Quotation
-    </button>
-</div>
+                <div id="quotationAction" class="mt-3 hidden">
+                    <button
+                        onclick="openQuotationModal()"
+                        class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
+                        Make Quotation
+                    </button>
+                </div>
 
                 <div class="mt-4 flex justify-end">
                     <button
@@ -287,169 +354,134 @@
             class="max-w-[90vw] max-h-[90vh] flex items-center justify-center">
         </div>
     </div>
-<div id="quotationModal"
-     class="fixed inset-0 bg-black/50 hidden z-[999] flex items-center justify-center">
+    <div id="quotationModal"
+        class="fixed inset-0 bg-black/50 hidden z-[999] flex items-center justify-center">
 
-    <div class="bg-white w-[600px] max-h-[90vh] rounded-lg shadow-xl p-5 relative flex flex-col">
+        <div class="bg-white w-[600px] max-h-[90vh] rounded-lg shadow-xl p-5 relative flex flex-col">
 
-        <button onclick="closeQuotationModal()"
-            class="absolute top-3 right-3 text-gray-500 text-xl">✕</button>
+            <button onclick="closeQuotationModal()"
+                class="absolute top-3 right-3 text-gray-500 text-xl">✕</button>
 
-        <h3 class="text-lg font-semibold mb-4">Create Quotation</h3>
+            <h3 class="text-lg font-semibold mb-4">Create Quotation</h3>
 
-        <!-- Scrollable items area -->
-        <div id="quotation_items_wrapper" class="space-y-4 overflow-y-auto flex-1 pr-1">
-            <!-- First item row (template) -->
-            <div class="quotation-item border border-gray-200 rounded-lg p-4 relative">
+            <!-- Scrollable items area -->
+            <div id="quotation_items_wrapper" class="space-y-4 overflow-y-auto flex-1 pr-1">
+                <!-- First item row (template) -->
+                <div class="quotation-item border border-gray-200 rounded-lg p-4 relative">
+                    <button type="button"
+                        onclick="removeQuotationItem(this)"
+                        class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm hidden">
+                        ✕ Remove
+                    </button>
+
+                    <div class="space-y-3">
+                        <div>
+                            <label class="label">Item Name</label>
+                            <select class="q_item input w-full">
+                                <option value="">-- Select Item --</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="label">Description</label>
+                            <textarea class="q_description input w-full h-16 resize-none"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="label">Image</label>
+                            <input type="file" class="q_image input" accept="image/*">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="label">Quantity</label>
+                                <input type="number" class="q_quantity input">
+                            </div>
+                            <div>
+                                <label class="label">Price</label>
+                                <input type="number" class="q_price input" readonly>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Add More Button -->
+            <div class="mt-3">
                 <button type="button"
-                    onclick="removeQuotationItem(this)"
-                    class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm hidden">
-                    ✕ Remove
+                    onclick="addMoreQuotationItem()"
+                    class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-500 hover:text-blue-500 py-2 rounded-lg text-sm font-medium transition">
+                    + Add More Item
                 </button>
-
-                <div class="space-y-3">
-                    <div>
-                        <label class="label">Item Name</label>
-                        <select class="q_item input w-full">
-                            <option value="">-- Select Item --</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label class="label">Description</label>
-                        <textarea class="q_description input w-full h-16 resize-none"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="label">Image</label>
-                        <input type="file" class="q_image input" accept="image/*">
-                    </div>
-
-                    <div class="grid grid-cols-2 gap-3">
-                        <div>
-                            <label class="label">Quantity</label>
-                            <input type="number" class="q_quantity input">
-                        </div>
-                        <div>
-                            <label class="label">Price</label>
-                            <input type="number" class="q_price input" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Add More Button -->
-        <div class="mt-3">
-            <button type="button"
-                onclick="addMoreQuotationItem()"
-                class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-500 hover:text-blue-500 py-2 rounded-lg text-sm font-medium transition">
-                + Add More Item
-            </button>
-        </div>
-
-        <!-- Footer Actions -->
-        <div class="flex justify-end pt-3 mt-2 border-t">
-            <button onclick="submitQuotation()"
-                class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                Save Quotation
-            </button>
-        </div>
-    </div>
-</div>
-
-
-            <div>
-                <label class="label">Description</label>
-                <textarea id="q_description" class="input w-full h-20"></textarea>
             </div>
 
-            <div>
-                <label class="label">Image</label>
-                <input type="file" id="q_image" class="input">
-            </div>
-
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="label">Quantity</label>
-                    <input type="number" id="q_quantity" class="input">
-                </div>
-
-                <div>
-                    <label class="label">Price</label>
-                    <input type="number" id="q_price" class="input">
-                </div>
-            </div>
-
-            <div class="flex justify-end pt-3">
-                <button
-                    onclick="submitQuotation()"
+            <!-- Footer Actions -->
+            <div class="flex justify-end pt-3 mt-2 border-t">
+                <button onclick="submitQuotation()"
                     class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
                     Save Quotation
                 </button>
             </div>
-
         </div>
     </div>
 </div>
+<script>
+    const drawer = document.getElementById('SitevisitDrawer');
 
-    <script>
-        const drawer = document.getElementById('SitevisitDrawer');
+    function openSitevisitDrawer(leadId, scrollToFiles = false) {
+        drawer.classList.remove('hidden');
+        document.getElementById('current_lead_id').value = leadId;
 
-        function openSitevisitDrawer(leadId, scrollToFiles = false) {
-            drawer.classList.remove('hidden');
-            document.getElementById('current_lead_id').value = leadId;
+        fetch(`/sale-executive/site-visit/${leadId}`)
+            .then(res => res.json())
+            .then(data => {
 
-            fetch(`/sale-executive/site-visit/${leadId}`)
-                .then(res => res.json())
-                .then(data => {
+                // Client Info
+                document.getElementById('client_name').innerText = data.client_name ?? '-';
+                document.getElementById('email').innerText = data.email ?? '-';
 
-                    // Client Info
-                    document.getElementById('client_name').innerText = data.client_name ?? '-';
-                    document.getElementById('email').innerText = data.email ?? '-';
+                const nameParts = (data.client_name ?? '').trim().split(' ');
+                document.getElementById('first_name').value = nameParts[0] ?? '';
+                document.getElementById('last_name').value = nameParts.slice(1).join(' ') ?? '';
 
-                    const nameParts = (data.client_name ?? '').trim().split(' ');
-                    document.getElementById('first_name').value = nameParts[0] ?? '';
-                    document.getElementById('last_name').value = nameParts.slice(1).join(' ') ?? '';
+                const initials = `${(nameParts[0] ?? ' ')[0]}${(nameParts[1] ?? ' ')[0]}`.toUpperCase();
+                document.getElementById('avatar_initials').innerText = initials;
 
-                    const initials = `${(nameParts[0] ?? ' ')[0]}${(nameParts[1] ?? ' ')[0]}`.toUpperCase();
-                    document.getElementById('avatar_initials').innerText = initials;
+                if (data.site_visit) {
+                    document.getElementById('assigned_staff').value = data.site_visit.assigned_staff ?? '';
+                    document.getElementById('visit_datetime').value =
+                        data.site_visit.visit_datetime ?
+                        data.site_visit.visit_datetime.replace(' ', 'T') :
+                        '';
 
-                    if (data.site_visit) {
-                        document.getElementById('assigned_staff').value = data.site_visit.assigned_staff ?? '';
-                        document.getElementById('visit_datetime').value =
-                            data.site_visit.visit_datetime ?
-                            data.site_visit.visit_datetime.replace(' ', 'T') :
-                            '';
+                    document.getElementById('site_condition_notes').value = data.site_visit.site_condition_notes ?? '';
+                    document.getElementById('space_details').value = data.site_visit.space_details ?? '';
+                    document.getElementById('materials_finishes').value = data.site_visit.materials_finishes ?? '';
+                    document.getElementById('style_preferences').value = data.site_visit.style_preferences ?? '';
+                    document.getElementById('appliances_accessories').value = data.site_visit.appliances_accessories ?? '';
+                    document.getElementById('brand_preferences').value = data.site_visit.brand_preferences ?? '';
+                    document.getElementById('finish_preferences').value = data.site_visit.finish_preferences ?? '';
+                    document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
+                    document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
+                    document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
+                    const quotationBox = document.getElementById('quotationAction');
 
-                        document.getElementById('site_condition_notes').value = data.site_visit.site_condition_notes ?? '';
-                        document.getElementById('space_details').value = data.site_visit.space_details ?? '';
-                        document.getElementById('materials_finishes').value = data.site_visit.materials_finishes ?? '';
-                        document.getElementById('style_preferences').value = data.site_visit.style_preferences ?? '';
-                        document.getElementById('appliances_accessories').value = data.site_visit.appliances_accessories ?? '';
-                        document.getElementById('brand_preferences').value = data.site_visit.brand_preferences ?? '';
-                        document.getElementById('finish_preferences').value = data.site_visit.finish_preferences ?? '';
-                        document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
-                        document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
-                        document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
-                         const quotationBox = document.getElementById('quotationAction');
+                    if (data.site_visit && data.site_visit.approval_status === 'Yes') {
+                        quotationBox.classList.remove('hidden');
+                    } else {
+                        quotationBox.classList.add('hidden');
+                    }
 
-if (data.site_visit && data.site_visit.approval_status === 'Yes') {
-    quotationBox.classList.remove('hidden');
-} else {
-    quotationBox.classList.add('hidden');
-}
+                    // ✅ Measurement preview
+                    const preview = document.getElementById('measurement_preview');
+                    preview.innerHTML = '';
 
-                        // ✅ Measurement preview
-                        const preview = document.getElementById('measurement_preview');
-                        preview.innerHTML = '';
+                    if (Array.isArray(data.site_visit.measurement_files)) {
+                        data.site_visit.measurement_files.forEach(file => {
+                            const ext = file.split('.').pop().toLowerCase();
 
-                        if (Array.isArray(data.site_visit.measurement_files)) {
-                            data.site_visit.measurement_files.forEach(file => {
-                                const ext = file.split('.').pop().toLowerCase();
-
-                                if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
-                                    preview.innerHTML += `
+                            if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+                                preview.innerHTML += `
                                 <div class="relative">
                                     <img src="/${file}"
                                         onclick="openMediaViewer('/${file}', 'image')"
@@ -461,8 +493,8 @@ if (data.site_visit && data.site_visit.approval_status === 'Yes') {
                             </button>
                                 </div>
                             `;
-                                } else {
-                                    preview.innerHTML += `
+                            } else {
+                                preview.innerHTML += `
                                 <div class="relative">
                                     <video class="w-full h-24 rounded border cursor-pointer"
                                         onclick="openMediaViewer('/${file}', 'video')">
@@ -475,94 +507,94 @@ if (data.site_visit && data.site_visit.approval_status === 'Yes') {
                                     </video>
                                 </div>
                             `;
-                                }
-                            });
-                        }
-                        if (scrollToFiles) {
-                            setTimeout(() => {
-                                document
-                                    .getElementById('measurement_preview')
-                                    .scrollIntoView({
-                                        behavior: 'smooth',
-                                        block: 'center'
-                                    });
-                            }, 300);
-                        }
+                            }
+                        });
                     }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Failed to load site visit details');
-                });
-        }
-
-        function closeSitevisitDrawer() {
-            drawer.classList.add('hidden');
-        }
-
-        function saveSiteVisit() {
-            const leadId = document.getElementById('current_lead_id').value;
-
-            const formData = new FormData();
-            formData.append('lead_id', leadId);
-            formData.append('assigned_staff', document.getElementById('assigned_staff').value);
-            formData.append('visit_datetime', document.getElementById('visit_datetime').value);
-            formData.append('site_condition_notes', document.getElementById('site_condition_notes').value);
-            formData.append('space_details', document.getElementById('space_details').value);
-            formData.append('materials_finishes', document.getElementById('materials_finishes').value);
-            formData.append('style_preferences', document.getElementById('style_preferences').value);
-            formData.append('appliances_accessories', document.getElementById('appliances_accessories').value);
-            formData.append('brand_preferences', document.getElementById('brand_preferences').value);
-            formData.append('finish_preferences', document.getElementById('finish_preferences').value);
-            formData.append('budget_sensitivity', document.getElementById('budget_sensitivity').value);
-            formData.append('initial_cost_estimate', document.getElementById('initial_cost_estimate').value);
-            formData.append('approval_status', document.getElementById('approval_status').value);
-
-
-
-            selectedFiles.forEach(file => {
-                formData.append('measurement_files[]', file);
+                    if (scrollToFiles) {
+                        setTimeout(() => {
+                            document
+                                .getElementById('measurement_preview')
+                                .scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center'
+                                });
+                        }, 300);
+                    }
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Failed to load site visit details');
             });
+    }
 
-            fetch('/sale-executive/site-visit/update', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document
-                            .querySelector('meta[name="csrf-token"]')
-                            .getAttribute('content')
-                    },
-                    body: formData
-                })
-                .then(res => res.json())
-                .then(response => {
-                    if (response.success) {
-                        alert('Site visit updated successfully');
-                        // document.getElementById('measurement_files').value = '';
-                        location.reload();
-                    } else {
-                        alert('Something went wrong');
-                    }
-                })
-                .catch(err => {
-                    console.error(err);
-                    alert('Error saving data');
-                });
-        }
-    </script>
-    <script>
-        let selectedFiles = [];
+    function closeSitevisitDrawer() {
+        drawer.classList.add('hidden');
+    }
 
-        function previewMeasurements(event) {
-            const preview = document.getElementById('measurement_preview');
-            const files = Array.from(event.target.files);
+    function saveSiteVisit() {
+        const leadId = document.getElementById('current_lead_id').value;
 
-            files.forEach((file, index) => {
-                selectedFiles.push(file);
-                const fileIndex = selectedFiles.length - 1;
-                const url = URL.createObjectURL(file);
+        const formData = new FormData();
+        formData.append('lead_id', leadId);
+        formData.append('assigned_staff', document.getElementById('assigned_staff').value);
+        formData.append('visit_datetime', document.getElementById('visit_datetime').value);
+        formData.append('site_condition_notes', document.getElementById('site_condition_notes').value);
+        formData.append('space_details', document.getElementById('space_details').value);
+        formData.append('materials_finishes', document.getElementById('materials_finishes').value);
+        formData.append('style_preferences', document.getElementById('style_preferences').value);
+        formData.append('appliances_accessories', document.getElementById('appliances_accessories').value);
+        formData.append('brand_preferences', document.getElementById('brand_preferences').value);
+        formData.append('finish_preferences', document.getElementById('finish_preferences').value);
+        formData.append('budget_sensitivity', document.getElementById('budget_sensitivity').value);
+        formData.append('initial_cost_estimate', document.getElementById('initial_cost_estimate').value);
+        formData.append('approval_status', document.getElementById('approval_status').value);
 
-                if (file.type.startsWith('image/')) {
-                    preview.innerHTML += `
+
+
+        selectedFiles.forEach(file => {
+            formData.append('measurement_files[]', file);
+        });
+
+        fetch('/sale-executive/site-visit/update', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document
+                        .querySelector('meta[name="csrf-token"]')
+                        .getAttribute('content')
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    alert('Site visit updated successfully');
+                    // document.getElementById('measurement_files').value = '';
+                    location.reload();
+                } else {
+                    alert('Something went wrong');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error saving data');
+            });
+    }
+</script>
+<script>
+    let selectedFiles = [];
+
+    function previewMeasurements(event) {
+        const preview = document.getElementById('measurement_preview');
+        const files = Array.from(event.target.files);
+
+        files.forEach((file, index) => {
+            selectedFiles.push(file);
+            const fileIndex = selectedFiles.length - 1;
+            const url = URL.createObjectURL(file);
+
+            if (file.type.startsWith('image/')) {
+                preview.innerHTML += `
                 <div class="relative group">
                     <img src="${url}"
                          class="w-full h-24 object-cover rounded border cursor-pointer"
@@ -575,8 +607,8 @@ if (data.site_visit && data.site_visit.approval_status === 'Yes') {
                     </button>
                 </div>
             `;
-                } else {
-                    preview.innerHTML += `
+            } else {
+                preview.innerHTML += `
                 <div class="relative group">
                     <video class="w-full h-24 rounded border cursor-pointer"
                            onclick="openMediaViewer('${url}', 'video')">
@@ -589,136 +621,136 @@ if (data.site_visit && data.site_visit.approval_status === 'Yes') {
                     </button>
                 </div>
             `;
+            }
+        });
+
+        event.target.value = '';
+    }
+
+    function removeNewFile(index, event) {
+        event.stopPropagation();
+        selectedFiles.splice(index, 1);
+        event.target.closest('div').remove();
+    }
+
+    function removeExistingFile(file, event) {
+        event.stopPropagation();
+
+        if (!confirm('Delete this file?')) return;
+
+        fetch('/sale-executive/site-visit/delete-file', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    file
+                })
+            })
+
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    event.target.closest('div').remove();
+                } else {
+                    alert('Failed to delete file');
                 }
             });
+    }
+</script>
 
-            event.target.value = '';
-        }
+<script>
+    function openMediaViewer(src, type) {
+        const viewer = document.getElementById('mediaViewer');
+        const content = document.getElementById('mediaViewerContent');
 
-        function removeNewFile(index, event) {
-            event.stopPropagation();
-            selectedFiles.splice(index, 1);
-            event.target.closest('div').remove();
-        }
+        content.innerHTML = '';
 
-        function removeExistingFile(file, event) {
-            event.stopPropagation();
-
-            if (!confirm('Delete this file?')) return;
-
-            fetch('/sale-executive/site-visit/delete-file', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        file
-                    })
-                })
-
-                .then(res => res.json())
-                .then(res => {
-                    if (res.success) {
-                        event.target.closest('div').remove();
-                    } else {
-                        alert('Failed to delete file');
-                    }
-                });
-        }
-    </script>
-
-    <script>
-        function openMediaViewer(src, type) {
-            const viewer = document.getElementById('mediaViewer');
-            const content = document.getElementById('mediaViewerContent');
-
-            content.innerHTML = '';
-
-            if (type === 'image') {
-                content.innerHTML = `
+        if (type === 'image') {
+            content.innerHTML = `
             <img src="${src}"
                  class="max-w-full max-h-[90vh] rounded shadow-lg" />
         `;
-            } else {
-                content.innerHTML = `
+        } else {
+            content.innerHTML = `
             <video src="${src}"
                    controls autoplay
                    class="max-w-full max-h-[90vh] rounded shadow-lg"></video>
         `;
-            }
-            viewer.classList.remove('hidden');
         }
+        viewer.classList.remove('hidden');
+    }
 
-        function closeMediaViewer() {
-            const viewer = document.getElementById('mediaViewer');
-            const content = document.getElementById('mediaViewerContent');
+    function closeMediaViewer() {
+        const viewer = document.getElementById('mediaViewer');
+        const content = document.getElementById('mediaViewerContent');
 
-            content.innerHTML = '';
-            viewer.classList.add('hidden');
-        }
-    </script>
-    <script>
-function openQuotationModal() {
-    document.getElementById('quotationModal').classList.remove('hidden');
+        content.innerHTML = '';
+        viewer.classList.add('hidden');
+    }
+</script>
+<script>
+    function openQuotationModal() {
+        document.getElementById('quotationModal').classList.remove('hidden');
 
-    // Fetch inventory items
-    fetch('/inventory/items')
-        .then(res => res.json())
-        .then(data => {
-            const select = document.getElementById('q_item');
-            select.innerHTML = '<option value="">-- Select Item --</option>';
-            data.forEach(item => {
-                const opt = document.createElement('option');
-                opt.value = item.item_name;
-                opt.dataset.price = item.price;
-                opt.textContent = item.item_name;
-                select.appendChild(opt);
+        // Fetch inventory items
+        fetch('/inventory/items')
+            .then(res => res.json())
+            .then(data => {
+                const select = document.getElementById('q_item');
+                select.innerHTML = '<option value="">-- Select Item --</option>';
+                data.forEach(item => {
+                    const opt = document.createElement('option');
+                    opt.value = item.item_name;
+                    opt.dataset.price = item.price;
+                    opt.textContent = item.item_name;
+                    select.appendChild(opt);
+                });
             });
-        });
-}
+    }
 
-function closeQuotationModal() {
-    document.getElementById('quotationModal').classList.add('hidden');
-}
+    function closeQuotationModal() {
+        document.getElementById('quotationModal').classList.add('hidden');
+    }
 
-// Auto-fill price when item is selected
-document.getElementById('q_item').addEventListener('change', function () {
-    const price = this.options[this.selectedIndex].dataset.price;
-    if (price) document.getElementById('q_price').value = price;
-});
+    // Auto-fill price when item is selected
+    document.getElementById('q_item').addEventListener('change', function() {
+        const price = this.options[this.selectedIndex].dataset.price;
+        if (price) document.getElementById('q_price').value = price;
+    });
 
-function submitQuotation() {
-    const leadId = document.getElementById('current_lead_id').value;
+    function submitQuotation() {
+        const leadId = document.getElementById('current_lead_id').value;
 
-    const formData = new FormData();
-    formData.append('lead_id', leadId);
-    formData.append('item', document.getElementById('q_item').value);   // 👈 added
-    formData.append('description', document.getElementById('q_description').value);
-    formData.append('quantity', document.getElementById('q_quantity').value);
-    formData.append('price', document.getElementById('q_price').value);
+        const formData = new FormData();
+        formData.append('lead_id', leadId);
+        formData.append('item', document.getElementById('q_item').value); // 👈 added
+        formData.append('description', document.getElementById('q_description').value);
+        formData.append('quantity', document.getElementById('q_quantity').value);
+        formData.append('price', document.getElementById('q_price').value);
 
-    const image = document.getElementById('q_image').files[0];
-    if (image) formData.append('image', image);
+        const image = document.getElementById('q_image').files[0];
+        if (image) formData.append('image', image);
 
-    fetch('/sale-executive/quotation/store', {
-        method: 'POST',
-        headers: {
-            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-        },
-        body: formData
-    })
-    .then(res => res.json())
-    .then(res => {
-        if (res.success) {
-            closeQuotationModal();
-            window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
-        } else {
-            alert('Failed to create quotation');
-        }
-    })
-    .catch(() => alert('Server error'));
-}
+        fetch('/sale-executive/quotation/store', {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    closeQuotationModal();
+                    window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
+                } else {
+                    alert('Failed to create quotation');
+                }
+            })
+            .catch(() => alert('Server error'));
+    }
 </script>
 
-    @endsection
+@endsection

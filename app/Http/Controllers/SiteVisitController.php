@@ -21,8 +21,11 @@ class SiteVisitController extends Controller
         ->whereHas('siteVisit')
         ->latest()
         ->get();
+        $totalSiteVisits = Lead::where('sales_executive_id', $userId)
+        ->whereHas('siteVisit')
+        ->count();
 
-        return view('sales_executive.Sitevisit', compact('leads'));
+        return view('sales_executive.Sitevisit', compact('leads','totalSiteVisits'));
     }
 
     public function store(Request $request)

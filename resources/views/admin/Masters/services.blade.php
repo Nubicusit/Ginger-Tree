@@ -29,7 +29,7 @@
                 gst_percentage = '';
                 service_tax = '';
             "
-            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-lg hover:bg-blue-700">
+            class="inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-green-700 rounded-lg hover:bg-green-800">
             <i class="fas fa-plus mr-2"></i>
             Add Service
         </a>
@@ -40,9 +40,9 @@
         <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">
             <thead class="bg-gray-50 sticky top-0 z-10">
                 <tr class="text-xs font-semibold text-gray-600 uppercase tracking-wider">
-                    <th class="px-6 py-3 text-left">Name</th>
+                    <th class="px-6 py-3 text-left"> Service Name</th>
                     <th class="px-6 py-3 text-left">Category</th>
-                    <th class="px-6 py-3 text-right">Price</th>
+                    <th class="px-6 py-3 text-right"> Service Price</th>
                     <th class="px-6 py-3 text-right">GST</th>
                     <th class="px-6 py-3 text-right">Service TAX</th>
                     <th class="px-6 py-3 text-center">Actions</th>
@@ -122,7 +122,7 @@
     <div
         x-show="openStockModal"
         x-transition x-cloak
-        class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm">
         <div
             @click.away="openStockModal = false"
             class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6">
@@ -213,7 +213,7 @@
 
                     <button
                         type="submit"
-                        class="px-4 py-2 text-sm text-white bg-blue-600 rounded-lg hover:bg-blue-700"
+                        class="px-4 py-2 text-sm text-white bg-green-700 rounded-lg hover:bg-green-900"
                         x-text="formMethod === 'PUT' ? 'Update Service' : 'Save Service'">
                     </button>
                 </div>
