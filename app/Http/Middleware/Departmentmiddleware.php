@@ -1,7 +1,5 @@
 <?php
-
 namespace App\Http\Middleware;
-
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -14,8 +12,14 @@ class DepartmentMiddleware
             return redirect()->route('login');
         }
 
-        $userSlug = Auth::user()->department?->slug;
+        $user = Auth::user();
 
+        
+        if ($user->role === 'admin') {
+            return $next($request);
+        }
+
+        $userSlug = $user->department?->slug;
         if ($userSlug !== $slug) {
             abort(403, 'Unauthorized');
         }
