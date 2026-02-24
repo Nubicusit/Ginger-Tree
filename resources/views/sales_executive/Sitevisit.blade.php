@@ -5,72 +5,40 @@
 @section('content')
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
 
-    <!-- Total Leads -->
     <div class="bg-teal-600 p-4 rounded-lg shadow-sm border border-teal-600">
         <div class="grid grid-cols-2 items-center">
-
-            <!-- LEFT: Text -->
             <div class="flex items-center gap-3">
-                <div>
-                    <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">
-                        Total Site Visits
-                    </span>
-                </div>
+                <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">Total Site Visits</span>
             </div>
-
-            <!-- RIGHT: Number -->
             <div class="text-right">
-                <span class="text-4xl font-bold text-white">
-                    {{ $totalSiteVisits }}
-                </span>
+                <span class="text-4xl font-bold text-white">{{ $totalSiteVisits }}</span>
             </div>
-
         </div>
     </div>
 
-    <!-- Failed Leads -->
     <div class="bg-green-600 p-4 rounded-lg shadow-sm border border-green-600">
         <div class="grid grid-cols-2 items-center">
-
-            <!-- LEFT: Text -->
             <div class="flex items-center gap-3">
-                <div>
-                    <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">
-                        Completed Site Visits
-                    </span>
-                </div>
+                <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">Completed Site Visits</span>
             </div>
-
-            <!-- RIGHT: Number -->
             <div class="text-right">
-                <span class="text-4xl font-bold text-white">
-                    12
-                </span>
+                <span class="text-4xl font-bold text-white">12</span>
             </div>
         </div>
     </div>
+
     <div class="bg-red-400 p-4 rounded-lg shadow-sm border border-red-400">
         <div class="grid grid-cols-2 items-center">
-
-            <!-- LEFT: Text -->
             <div class="flex items-center gap-3">
-                <div>
-                    <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">
-                        Assigned Site visit
-                    </span>
-                </div>
+                <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">Assigned Site visit</span>
             </div>
-
-            <!-- RIGHT: Number -->
             <div class="text-right">
-                <span class="text-4xl font-bold text-white">
-                    12
-                </span>
+                <span class="text-4xl font-bold text-white">12</span>
             </div>
-
         </div>
     </div>
 </div>
+
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -89,122 +57,61 @@
             <tbody class="divide-y divide-gray-50">
                 @forelse($leads as $lead)
                 <tr class="hover:bg-gray-50 text-sm">
-
-                    <!-- Client Name -->
-                    <td class="px-6 py-4">
-                        {{ $lead->client_name }}
-                    </td>
-                    <!-- Project Type -->
-                    <td class="px-6 py-4">
-                        {{ $lead->project_type }}
-                    </td>
-
-                    <!-- Site Visit Date & Time -->
+                    <td class="px-6 py-4">{{ $lead->client_name }}</td>
+                    <td class="px-6 py-4">{{ $lead->project_type }}</td>
                     <td class="px-6 py-4">
                         @if($lead->siteVisit)
-                        {{ \Carbon\Carbon::parse($lead->siteVisit->visit_datetime)->format('d M Y, h:i A') }}
-                        @else
-                        -
-                        @endif
+                            {{ \Carbon\Carbon::parse($lead->siteVisit->visit_datetime)->format('d M Y, h:i A') }}
+                        @else - @endif
                     </td>
-
-                    <!-- Assigned Staff -->
-                    <td class="px-6 py-4">
-                        {{ $lead->siteVisit->assigned_staff ?? '-' }}
-                    </td>
-
-                    <!-- Measurements -->
+                    <td class="px-6 py-4">{{ $lead->siteVisit->assigned_staff ?? '-' }}</td>
                     <td class="px-6 py-4">
                         @if($lead->siteVisit && is_array($lead->siteVisit->measurement_files))
-                        @php
-                        $files = $lead->siteVisit->measurement_files;
-                        @endphp
-
-                        <button
-                            onclick="openSitevisitDrawer({{ $lead->id }}, true)"
-                            class="text-blue-600 underline hover:text-blue-800 text-sm">
-                            {{ count($files) }} files
-                        </button>
-
-                        @else
-                        -
-                        @endif
+                            @php $files = $lead->siteVisit->measurement_files; @endphp
+                            <button onclick="openSitevisitDrawer({{ $lead->id }}, true)"
+                                class="text-blue-600 underline hover:text-blue-800 text-sm">
+                                {{ count($files) }} files
+                            </button>
+                        @else - @endif
                     </td>
-
-                    <!-- Site Notes -->
-                    <td class="px-6 py-4">
-                        {{ Str::limit($lead->siteVisit->site_condition_notes ?? '-', 30) }}
-                    </td>
-
-                    <!-- Approval -->
+                    <td class="px-6 py-4">{{ Str::limit($lead->siteVisit->site_condition_notes ?? '-', 30) }}</td>
                     <td class="px-6 py-4">
                         @if($lead->siteVisit)
-                        <span class="px-2 py-1 rounded text-xs
-                    {{ $lead->siteVisit->approval_status === 'Yes'
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-yellow-100 text-yellow-700' }}">
-                            {{ ucfirst($lead->siteVisit->approval_status) }}
-                        </span>
-                        @else
-                        -
-                        @endif
+                            <span class="px-2 py-1 rounded text-xs {{ $lead->siteVisit->approval_status === 'Yes' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
+                                {{ ucfirst($lead->siteVisit->approval_status) }}
+                            </span>
+                        @else - @endif
                     </td>
-
-                    <!-- View -->
                     <td class="px-6 py-4">
-                        <button
-                            onclick="openSitevisitDrawer({{ $lead->id }})"
-                            class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
-                            View
-                        </button>
+                        <button onclick="openSitevisitDrawer({{ $lead->id }})"
+                            class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">View</button>
                     </td>
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="8" class="text-center py-6 text-gray-400">
-                        No site visits scheduled
-                    </td>
+                    <td colspan="8" class="text-center py-6 text-gray-400">No site visits scheduled</td>
                 </tr>
                 @endforelse
             </tbody>
         </table>
     </div>
-    <div id="SitevisitDrawer"
-        class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center">
-        <!-- Drawer -->
-        <div class="relative w-[900px] h-[90vh] bg-gray-100 shadow-2xl
-            flex gap-4 p-4 rounded-lg overflow-y-auto items-stretch ">
 
-            <!-- CLOSE -->
-            <button onclick="closeSitevisitDrawer()"
-                class="absolute top-4 right-4 text-xl text-gray-400 hover:text-black">
-                ✕
-            </button>
+    <!-- Site Visit Drawer -->
+    <div id="SitevisitDrawer" class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center">
+        <div class="relative w-[900px] h-[90vh] bg-gray-100 shadow-2xl flex gap-4 p-4 rounded-lg overflow-y-auto items-stretch">
 
-            <!-- CLIENT INFORMATION -->
+            <!-- Left: Client Info -->
             <div class="w-1/2 bg-white rounded-lg p-5 shadow-sm flex flex-col h-full">
-
                 <h3 class="font-semibold mb-4">Site Visit Information</h3>
-
-                <!-- Avatar + Name -->
                 <div class="flex items-center gap-4 mb-5">
-                    <!-- Dummy Avatar -->
                     <div class="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
                         <span id="avatar_initials">JD</span>
                     </div>
-
-                    <!-- Name & Email -->
                     <div>
-                        <p class="font-semibold text-gray-800 leading-tight" id="client_name">
-                            John Doe
-                        </p>
-                        <p class="text-xs text-gray-500" id="email">
-                            johndoe@gmail.com
-                        </p>
+                        <p class="font-semibold text-gray-800 leading-tight" id="client_name">John Doe</p>
+                        <p class="text-xs text-gray-500" id="email">johndoe@gmail.com</p>
                     </div>
                 </div>
-
-                <!-- First / Last Name -->
                 <div class="grid grid-cols-2 gap-3">
                     <div>
                         <label class="label">First Name</label>
@@ -215,86 +122,43 @@
                         <input id="last_name" class="input" readonly>
                     </div>
                 </div>
-
-                <!-- Phone -->
                 <div class="mt-3">
                     <label class="label">Assigned Staff</label>
                     <input id="assigned_staff" class="input">
                 </div>
-
-                <!-- Email -->
                 <div class="mt-3">
                     <label class="label">Site visit Date & Time</label>
                     <input id="visit_datetime" type="datetime-local" class="input">
                 </div>
-
-                <!-- Address -->
                 <div class="mt-3">
                     <label class="label">Measurements</label>
-                    <input
-                        type="file"
-                        id="measurement_files"
-                        class="hidden"
-                        multiple
-                        accept="image/*,video/*"
-                        onchange="previewMeasurements(event)" />
-
-                    <button
-                        type="button"
-                        onclick="document.getElementById('measurement_files').click()"
-                        class="mt-2 bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded">
-                        + Add files
-                    </button>
-
+                    <input type="file" id="measurement_files" class="hidden" multiple accept="image/*,video/*" onchange="previewMeasurements(event)" />
+                    <button type="button" onclick="document.getElementById('measurement_files').click()"
+                        class="mt-2 bg-gray-200 hover:bg-gray-300 text-sm px-3 py-1 rounded">+ Add files</button>
                 </div>
-
                 <div class="mt-3">
                     <label class="label">Uploaded Measurements</label>
                     <div id="measurement_preview" class="grid grid-cols-3 gap-2"></div>
                 </div>
             </div>
 
-            <!-- Right Side (SiteVisit Details) -->
+            <!-- Right: Site Visit Details -->
             <div class="w-1/2 bg-white rounded-lg p-5 shadow-sm flex flex-col h-full overflow-y-auto">
-
                 <input type="hidden" id="current_lead_id">
-
-                <!-- Site Condition Notes -->
-                <div class="mb-3">
-                    <label class="label">Site Condition Notes</label>
-                    <textarea id="site_condition_notes" class="input w-full h-24 resize-none"></textarea>
+                <div class="flex justify-between items-center mb-4 top-0 bg-white z-10 pb-3">
+                    <h3 class="font-semibold text-gray-800"></h3>
+                    <div class="flex gap-2">
+                        <button onclick="closeSitevisitDrawer()" class="bg-gray-200 hover:bg-gray-300 text-sm px-4 py-2 rounded">Cancel</button>
+                        <button onclick="saveSiteVisit()" class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded">Save</button>
+                    </div>
                 </div>
-
-                <div class="mb-3">
-                    <label class="label">Space Details</label>
-                    <textarea id="space_details" class="input w-full h-24 resize-none"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="label">Materials & Finishes</label>
-                    <textarea id="materials_finishes" class="input w-full h-24 resize-none"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="label">Style Preferences</label>
-                    <textarea id="style_preferences" class="input w-full h-24 resize-none"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="label">Appliances & Accessories</label>
-                    <textarea id="appliances_accessories" class="input w-full h-24 resize-none"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="label">Brand Preferences</label>
-                    <textarea id="brand_preferences" class="input w-full h-24 resize-none"></textarea>
-                </div>
-
-                <div class="mb-3">
-                    <label class="label">Finish Preferences</label>
-                    <textarea id="finish_preferences" class="input w-full h-24 resize-none"></textarea>
-                </div>
-
+                <div class="mb-3"><label class="label">Site Condition Notes</label><textarea id="site_condition_notes" class="input w-full h-24 resize-none"></textarea></div>
+                <div class="mb-3"><label class="label">Space Details</label><textarea id="space_details" class="input w-full h-24 resize-none"></textarea></div>
+                <div class="mb-3"><label class="label">Materials & Finishes</label><textarea id="materials_finishes" class="input w-full h-24 resize-none"></textarea></div>
+                <div class="mb-3"><label class="label">Style Preferences</label><textarea id="style_preferences" class="input w-full h-24 resize-none"></textarea></div>
+                <div class="mb-3"><label class="label">Appliances & Accessories</label><textarea id="appliances_accessories" class="input w-full h-24 resize-none"></textarea></div>
+                <div class="mb-3"><label class="label">Brand Preferences</label><textarea id="brand_preferences" class="input w-full h-24 resize-none"></textarea></div>
+                <div class="mb-3"><label class="label">Finish Preferences</label><textarea id="finish_preferences" class="input w-full h-24 resize-none"></textarea></div>
                 <div class="mb-3">
                     <label class="label">Budget Sensitivity</label>
                     <select id="budget_sensitivity" class="input">
@@ -304,13 +168,7 @@
                         <option value="High">High</option>
                     </select>
                 </div>
-
-                <div class="mb-3">
-                    <label class="label">Initial Cost Estimate</label>
-                    <textarea id="initial_cost_estimate" class="input w-full h-24 resize-none"></textarea>
-                </div>
-
-                <!-- Approval Status -->
+                <div class="mb-3"><label class="label">Initial Cost Estimate</label><textarea id="initial_cost_estimate" class="input w-full h-24 resize-none"></textarea></div>
                 <div class="mb-3">
                     <label class="label">Approval Status</label>
                     <select id="approval_status" class="input">
@@ -318,80 +176,55 @@
                         <option value="Yes">Approved</option>
                         <option value="Hold">Hold</option>
                     </select>
-
                 </div>
-
-                <!-- Quotation Action (JS controlled) -->
                 <div id="quotationAction" class="mt-3 hidden">
-                    <button
-                        onclick="openQuotationModal()"
-                        class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">
-                        Make Quotation
-                    </button>
-                </div>
-
-                <div class="mt-4 flex justify-end">
-                    <button
-                        onclick="saveSiteVisit()"
-                        class="bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold px-5 py-2 rounded">
-                        SAVE
-                    </button>
+                    <button onclick="openQuotationModal()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">Make Quotation</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Media Preview Modal -->
-    <div id="mediaViewer"
-        class="fixed inset-0 bg-black/80 hidden z-[999] flex items-center justify-center">
-
-        <button onclick="closeMediaViewer()"
-            class="absolute top-5 right-6 text-white text-3xl font-bold">
-            ✕
-        </button>
-
-        <div id="mediaViewerContent"
-            class="max-w-[90vw] max-h-[90vh] flex items-center justify-center">
-        </div>
+    <!-- Media Viewer -->
+    <div id="mediaViewer" class="fixed inset-0 bg-black/80 hidden z-[999] flex items-center justify-center">
+        <button onclick="closeMediaViewer()" class="absolute top-5 right-6 text-white text-3xl font-bold">✕</button>
+        <div id="mediaViewerContent" class="max-w-[90vw] max-h-[90vh] flex items-center justify-center"></div>
     </div>
-    <div id="quotationModal"
-        class="fixed inset-0 bg-black/50 hidden z-[999] flex items-center justify-center">
 
+    <!-- Quotation Modal -->
+    <div id="quotationModal" class="fixed inset-0 bg-black/50 hidden z-[999] flex items-center justify-center">
         <div class="bg-white w-[600px] max-h-[90vh] rounded-lg shadow-xl p-5 relative flex flex-col">
-
-            <button onclick="closeQuotationModal()"
-                class="absolute top-3 right-3 text-gray-500 text-xl">✕</button>
-
+            <button onclick="closeQuotationModal()" class="absolute top-3 right-3 text-gray-500 text-xl">✕</button>
             <h3 class="text-lg font-semibold mb-4">Create Quotation</h3>
 
-            <!-- Scrollable items area -->
-            <div id="quotation_items_wrapper" class="space-y-4 overflow-y-auto flex-1 pr-1">
-                <!-- First item row (template) -->
-                <div class="quotation-item border border-gray-200 rounded-lg p-4 relative">
-                    <button type="button"
-                        onclick="removeQuotationItem(this)"
-                        class="absolute top-2 right-2 text-red-400 hover:text-red-600 text-sm hidden">
-                        ✕ Remove
-                    </button>
+            <!-- Quotation Number -->
+            <div class="mb-4 flex items-center gap-3 bg-gray-50 border border-gray-200 rounded-lg px-4 py-3">
+                <span class="text-sm font-semibold text-gray-500 whitespace-nowrap">Quotation No.</span>
+                <span id="quotationNumberDisplay" class="text-base font-bold text-blue-700 tracking-widest">—</span>
+                <input type="hidden" id="quotationNumber">
+            </div>
 
+            <!-- Items -->
+            <div id="quotation_items_wrapper" class="space-y-4 overflow-y-auto flex-1 pr-1">
+                <div class="quotation-item border border-gray-200 rounded-lg p-4 relative">
+                    <button type="button" onclick="removeQuotationItem(this)"
+                        class="remove-btn absolute top-2 right-2 hidden bg-white text-red-600 border border-red-300 px-3 py-1 rounded-md text-xs font-semibold hover:bg-red-50 hover:border-red-400 transition">
+                        Delete
+                    </button>
                     <div class="space-y-3">
                         <div>
                             <label class="label">Item Name</label>
-                            <select class="q_item input w-full">
+                            <select class="q_item input w-full" onchange="updatePrice(this)">
                                 <option value="">-- Select Item --</option>
                             </select>
                         </div>
-
                         <div>
                             <label class="label">Description</label>
                             <textarea class="q_description input w-full h-16 resize-none"></textarea>
                         </div>
-
                         <div>
                             <label class="label">Image</label>
                             <input type="file" class="q_image input" accept="image/*">
                         </div>
-
                         <div class="grid grid-cols-2 gap-3">
                             <div>
                                 <label class="label">Quantity</label>
@@ -406,25 +239,19 @@
                 </div>
             </div>
 
-            <!-- Add More Button -->
             <div class="mt-3">
-                <button type="button"
-                    onclick="addMoreQuotationItem()"
+                <button type="button" onclick="addMoreQuotationItem()"
                     class="w-full border-2 border-dashed border-gray-300 hover:border-blue-400 text-gray-500 hover:text-blue-500 py-2 rounded-lg text-sm font-medium transition">
                     + Add More Item
                 </button>
             </div>
-
-            <!-- Footer Actions -->
             <div class="flex justify-end pt-3 mt-2 border-t">
-                <button onclick="submitQuotation()"
-                    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
-                    Save Quotation
-                </button>
+                <button onclick="submitQuotation()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">Save Quotation</button>
             </div>
         </div>
     </div>
 </div>
+
 <script>
     const drawer = document.getElementById('SitevisitDrawer');
 
@@ -435,8 +262,6 @@
         fetch(`/sale-executive/site-visit/${leadId}`)
             .then(res => res.json())
             .then(data => {
-
-                // Client Info
                 document.getElementById('client_name').innerText = data.client_name ?? '-';
                 document.getElementById('email').innerText = data.email ?? '-';
 
@@ -449,11 +274,7 @@
 
                 if (data.site_visit) {
                     document.getElementById('assigned_staff').value = data.site_visit.assigned_staff ?? '';
-                    document.getElementById('visit_datetime').value =
-                        data.site_visit.visit_datetime ?
-                        data.site_visit.visit_datetime.replace(' ', 'T') :
-                        '';
-
+                    document.getElementById('visit_datetime').value = data.site_visit.visit_datetime ? data.site_visit.visit_datetime.replace(' ', 'T') : '';
                     document.getElementById('site_condition_notes').value = data.site_visit.site_condition_notes ?? '';
                     document.getElementById('space_details').value = data.site_visit.space_details ?? '';
                     document.getElementById('materials_finishes').value = data.site_visit.materials_finishes ?? '';
@@ -464,60 +285,40 @@
                     document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
                     document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
                     document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
+
                     const quotationBox = document.getElementById('quotationAction');
+                    quotationBox.classList.toggle('hidden', data.site_visit.approval_status !== 'Yes');
 
-                    if (data.site_visit && data.site_visit.approval_status === 'Yes') {
-                        quotationBox.classList.remove('hidden');
-                    } else {
-                        quotationBox.classList.add('hidden');
-                    }
-
-                    // ✅ Measurement preview
                     const preview = document.getElementById('measurement_preview');
                     preview.innerHTML = '';
 
                     if (Array.isArray(data.site_visit.measurement_files)) {
                         data.site_visit.measurement_files.forEach(file => {
                             const ext = file.split('.').pop().toLowerCase();
-
                             if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
                                 preview.innerHTML += `
-                                <div class="relative">
-                                    <img src="/${file}"
-                                        onclick="openMediaViewer('/${file}', 'image')"
-                                        class="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80" />
-                                        <button
-                                onclick="removeExistingFile('${file}', event)"
-                                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">
-                                ✕
-                            </button>
-                                </div>
-                            `;
+                                    <div class="relative">
+                                        <img src="/${file}" onclick="openMediaViewer('/${file}', 'image')"
+                                            class="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80" />
+                                        <button onclick="removeExistingFile('${file}', event)"
+                                            class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">✕</button>
+                                    </div>`;
                             } else {
                                 preview.innerHTML += `
-                                <div class="relative">
-                                    <video class="w-full h-24 rounded border cursor-pointer"
-                                        onclick="openMediaViewer('/${file}', 'video')">
-                                        <source src="/${file}">
-                                        <button
-                                onclick="removeExistingFile('${file}', event)"
-                                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">
-                                ✕
-                            </button>
-                                    </video>
-                                </div>
-                            `;
+                                    <div class="relative">
+                                        <video class="w-full h-24 rounded border cursor-pointer" onclick="openMediaViewer('/${file}', 'video')">
+                                            <source src="/${file}">
+                                        </video>
+                                        <button onclick="removeExistingFile('${file}', event)"
+                                            class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">✕</button>
+                                    </div>`;
                             }
                         });
                     }
+
                     if (scrollToFiles) {
                         setTimeout(() => {
-                            document
-                                .getElementById('measurement_preview')
-                                .scrollIntoView({
-                                    behavior: 'smooth',
-                                    block: 'center'
-                                });
+                            document.getElementById('measurement_preview').scrollIntoView({ behavior: 'smooth', block: 'center' });
                         }, 300);
                     }
                 }
@@ -534,7 +335,6 @@
 
     function saveSiteVisit() {
         const leadId = document.getElementById('current_lead_id').value;
-
         const formData = new FormData();
         formData.append('lead_id', leadId);
         formData.append('assigned_staff', document.getElementById('assigned_staff').value);
@@ -550,80 +350,55 @@
         formData.append('initial_cost_estimate', document.getElementById('initial_cost_estimate').value);
         formData.append('approval_status', document.getElementById('approval_status').value);
 
-
-
-        selectedFiles.forEach(file => {
-            formData.append('measurement_files[]', file);
-        });
+        selectedFiles.forEach(file => formData.append('measurement_files[]', file));
 
         fetch('/sale-executive/site-visit/update', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document
-                        .querySelector('meta[name="csrf-token"]')
-                        .getAttribute('content')
-                },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(response => {
-                if (response.success) {
-                    alert('Site visit updated successfully');
-                    // document.getElementById('measurement_files').value = '';
-                    location.reload();
-                } else {
-                    alert('Something went wrong');
-                }
-            })
-            .catch(err => {
-                console.error(err);
-                alert('Error saving data');
-            });
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(response => {
+            if (response.success) {
+                alert('Site visit updated successfully');
+                location.reload();
+            } else {
+                alert('Something went wrong');
+            }
+        })
+        .catch(err => { console.error(err); alert('Error saving data'); });
     }
 </script>
+
 <script>
     let selectedFiles = [];
 
     function previewMeasurements(event) {
         const preview = document.getElementById('measurement_preview');
-        const files = Array.from(event.target.files);
-
-        files.forEach((file, index) => {
+        Array.from(event.target.files).forEach(file => {
             selectedFiles.push(file);
             const fileIndex = selectedFiles.length - 1;
             const url = URL.createObjectURL(file);
 
             if (file.type.startsWith('image/')) {
                 preview.innerHTML += `
-                <div class="relative group">
-                    <img src="${url}"
-                         class="w-full h-24 object-cover rounded border cursor-pointer"
-                         onclick="openMediaViewer('${url}', 'image')" />
-                    <button
-                        onclick="removeNewFile(${fileIndex}, event)"
-                        class="abso
-                        lute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded">
-                        ✕
-                    </button>
-                </div>
-            `;
+                    <div class="relative group">
+                        <img src="${url}" class="w-full h-24 object-cover rounded border cursor-pointer"
+                             onclick="openMediaViewer('${url}', 'image')" />
+                        <button onclick="removeNewFile(${fileIndex}, event)"
+                            class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded">✕</button>
+                    </div>`;
             } else {
                 preview.innerHTML += `
-                <div class="relative group">
-                    <video class="w-full h-24 rounded border cursor-pointer"
-                           onclick="openMediaViewer('${url}', 'video')">
-                        <source src="${url}">
-                    </video>
-                    <button
-                        onclick="removeNewFile(${fileIndex}, event)"
-                        class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded">
-                        ✕
-                    </button>
-                </div>
-            `;
+                    <div class="relative group">
+                        <video class="w-full h-24 rounded border cursor-pointer" onclick="openMediaViewer('${url}', 'video')">
+                            <source src="${url}">
+                        </video>
+                        <button onclick="removeNewFile(${fileIndex}, event)"
+                            class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded">✕</button>
+                    </div>`;
             }
         });
-
         event.target.value = '';
     }
 
@@ -635,28 +410,21 @@
 
     function removeExistingFile(file, event) {
         event.stopPropagation();
-
         if (!confirm('Delete this file?')) return;
 
         fetch('/sale-executive/site-visit/delete-file', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    file
-                })
-            })
-
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    event.target.closest('div').remove();
-                } else {
-                    alert('Failed to delete file');
-                }
-            });
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ file })
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) event.target.closest('div').remove();
+            else alert('Failed to delete file');
+        });
     }
 </script>
 
@@ -664,93 +432,171 @@
     function openMediaViewer(src, type) {
         const viewer = document.getElementById('mediaViewer');
         const content = document.getElementById('mediaViewerContent');
-
-        content.innerHTML = '';
-
-        if (type === 'image') {
-            content.innerHTML = `
-            <img src="${src}"
-                 class="max-w-full max-h-[90vh] rounded shadow-lg" />
-        `;
-        } else {
-            content.innerHTML = `
-            <video src="${src}"
-                   controls autoplay
-                   class="max-w-full max-h-[90vh] rounded shadow-lg"></video>
-        `;
-        }
+        content.innerHTML = type === 'image'
+            ? `<img src="${src}" class="max-w-full max-h-[90vh] rounded shadow-lg" />`
+            : `<video src="${src}" controls autoplay class="max-w-full max-h-[90vh] rounded shadow-lg"></video>`;
         viewer.classList.remove('hidden');
     }
 
     function closeMediaViewer() {
-        const viewer = document.getElementById('mediaViewer');
-        const content = document.getElementById('mediaViewerContent');
-
-        content.innerHTML = '';
-        viewer.classList.add('hidden');
+        document.getElementById('mediaViewerContent').innerHTML = '';
+        document.getElementById('mediaViewer').classList.add('hidden');
     }
 </script>
+
 <script>
+    // ✅ Global cache so cloned rows can reuse items without re-fetching
+    let inventoryItems = [];
+
     function openQuotationModal() {
         document.getElementById('quotationModal').classList.remove('hidden');
 
-        // Fetch inventory items
-        fetch('/inventory/items')
+        // Generate quotation number
+        fetch('/quotation/generate-number')
             .then(res => res.json())
             .then(data => {
-                const select = document.getElementById('q_item');
-                select.innerHTML = '<option value="">-- Select Item --</option>';
-                data.forEach(item => {
-                    const opt = document.createElement('option');
-                    opt.value = item.item_name;
-                    opt.dataset.price = item.price;
-                    opt.textContent = item.item_name;
-                    select.appendChild(opt);
-                });
+                document.getElementById('quotationNumberDisplay').textContent = data.quotation_no;
+                document.getElementById('quotationNumber').value = data.quotation_no;
+            })
+            .catch(err => {
+                console.error('Failed to generate quotation number', err);
+                document.getElementById('quotationNumberDisplay').textContent = '—';
             });
+
+        // Load inventory items and cache
+        fetch('/inventory/items')
+            .then(res => res.json())
+            .then(items => {
+                inventoryItems = items;
+                // Populate the first (existing) dropdown
+                populateItemDropdown(document.querySelector('#quotation_items_wrapper .q_item'));
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Failed to load inventory items');
+            });
+    }
+
+    // ✅ Reusable: populate any select with cached inventory items
+    function populateItemDropdown(select) {
+        select.innerHTML = '<option value="">-- Select Item --</option>';
+        inventoryItems.forEach(item => {
+            const option = document.createElement('option');
+            option.value = String(item.id); // ensure string for FormData consistency
+            option.textContent = item.item_name;
+            option.dataset.price = item.price;
+            select.appendChild(option);
+        });
     }
 
     function closeQuotationModal() {
         document.getElementById('quotationModal').classList.add('hidden');
     }
 
-    // Auto-fill price when item is selected
-    document.getElementById('q_item').addEventListener('change', function() {
-        const price = this.options[this.selectedIndex].dataset.price;
-        if (price) document.getElementById('q_price').value = price;
-    });
+    function updatePrice(select) {
+        const priceInput = select.closest('.quotation-item').querySelector('.q_price');
+        priceInput.value = select.options[select.selectedIndex].dataset.price || 0;
+    }
 
     function submitQuotation() {
         const leadId = document.getElementById('current_lead_id').value;
+        const quotationNo = document.getElementById('quotationNumber').value;
+
+        if (!quotationNo) {
+            alert('Quotation number not generated yet. Please wait.');
+            return;
+        }
+
+        const allItemRows = document.querySelectorAll('.quotation-item');
+
+        // ✅ Collect only rows that have an item selected — no index gaps
+        const validItems = [];
+        allItemRows.forEach(row => {
+            const itemSelect  = row.querySelector('.q_item');
+            const description = row.querySelector('.q_description');
+            const quantity    = row.querySelector('.q_quantity');
+            const price       = row.querySelector('.q_price');
+            const image       = row.querySelector('.q_image');
+
+            if (!itemSelect.value) return; // skip unselected rows
+
+            validItems.push({
+                item_id:     itemSelect.value,
+                description: description.value,
+                quantity:    quantity.value,
+                price:       price.value,
+                imageFile:   image.files[0] ?? null
+            });
+        });
+
+        if (validItems.length === 0) {
+            alert('Please select at least one item.');
+            return;
+        }
 
         const formData = new FormData();
         formData.append('lead_id', leadId);
-        formData.append('item', document.getElementById('q_item').value); // 👈 added
-        formData.append('description', document.getElementById('q_description').value);
-        formData.append('quantity', document.getElementById('q_quantity').value);
-        formData.append('price', document.getElementById('q_price').value);
+        formData.append('quotation_no', quotationNo);
 
-        const image = document.getElementById('q_image').files[0];
-        if (image) formData.append('image', image);
+        // ✅ Sequential index from 0 — no gaps, Laravel won't reject
+        validItems.forEach((item, index) => {
+            formData.append(`items[${index}][item_id]`,    item.item_id);
+            formData.append(`items[${index}][description]`, item.description);
+            formData.append(`items[${index}][quantity]`,   item.quantity);
+            formData.append(`items[${index}][price]`,      item.price);
+            if (item.imageFile) {
+                formData.append(`items[${index}][image]`, item.imageFile);
+            }
+        });
 
         fetch('/sale-executive/quotation/store', {
-                method: 'POST',
-                headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                },
-                body: formData
-            })
-            .then(res => res.json())
-            .then(res => {
-                if (res.success) {
-                    closeQuotationModal();
-                    window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
-                } else {
-                    alert('Failed to create quotation');
-                }
-            })
-            .catch(() => alert('Server error'));
+            method: 'POST',
+            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
+            body: formData
+        })
+        .then(res => res.json())
+        .then(res => {
+            if (res.success) {
+                closeQuotationModal();
+                window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
+            } else {
+                alert(res.message ?? 'Failed to create quotation');
+            }
+        })
+        .catch(err => { console.error(err); alert('Server error'); });
     }
 </script>
 
+<script>
+    function addMoreQuotationItem() {
+        const wrapper   = document.getElementById('quotation_items_wrapper');
+        const firstItem = wrapper.querySelector('.quotation-item');
+        const clone     = firstItem.cloneNode(true);
+
+        // Reset all inputs/textareas in clone
+        clone.querySelectorAll('input:not([type=file]), textarea').forEach(el => el.value = '');
+        clone.querySelectorAll('input[type=file]').forEach(el => el.value = '');
+
+        // ✅ Repopulate dropdown from cached inventory items
+        populateItemDropdown(clone.querySelector('.q_item'));
+
+        // Show delete button on cloned rows
+        clone.querySelector('.remove-btn').classList.remove('hidden');
+
+        wrapper.appendChild(clone);
+        toggleRemoveButtons();
+    }
+
+    function removeQuotationItem(button) {
+        button.closest('.quotation-item').remove();
+        toggleRemoveButtons();
+    }
+
+    function toggleRemoveButtons() {
+        document.querySelectorAll('.quotation-item').forEach((item, index) => {
+            const btn = item.querySelector('.remove-btn');
+            if (btn) btn.classList.toggle('hidden', index === 0);
+        });
+    }
+</script>
 @endsection

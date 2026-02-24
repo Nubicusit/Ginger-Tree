@@ -42,8 +42,11 @@ tr { page-break-inside: avoid; }
 </table>
 
 <!-- CLIENT -->
-<p style="margin-top:15px;">Prepared for</p>
-<p><strong>{{ $lead->client_name }}</strong></p>
+<p style="margin-top:15px;">Prepared for  : <strong>{{ $lead->client_name }}</strong></p>
+
+<p>
+    <strong>Quotation No:</strong> {{ $quotationNo }}
+</p>
 <p>Project: {{ $lead->project_type ?? $lead->id }}</p>
 <p>{{ now()->format('M d, Y') }}</p>
 
@@ -63,25 +66,30 @@ tr { page-break-inside: avoid; }
     </tr>
 </thead>
 <tbody>
-    <tr>
-        <td class="text-center">1</td>
-        <td>{{ $quotation->item }}</td>
-        <td>
-            <p class="item-title">{{ $quotation->description }}</p>
-        </td>
-        <td class="text-center">
-            <div class="img-box">
-                @if($quotation->image)
-                    <img src="{{ public_path('img/' . $quotation->image) }}">
-                @else
-                    <span style="font-size:10px;color:#aaa;">No image</span>
-                @endif
-            </div>
-        </td>
-        <td class="text-center">₹ {{ number_format($quotation->price, 2) }}</td>
-        <td class="text-center">{{ $quotation->quantity }}</td>
-        <td class="text-right">₹ {{ number_format($quotation->total, 2) }}</td>
-    </tr>
+@php $subTotal = 0; @endphp
+
+@foreach($quotations as $index => $quotation)
+@php $subTotal += $quotation->total; @endphp
+<tr>
+    <td class="text-center">{{ $index + 1 }}</td>
+    <td>{{ $quotation->inventoryStock->item_name ?? 'N/A' }}</td>
+    <td>
+        <p class="item-title">{{ $quotation->description }}</p>
+    </td>
+    <td class="text-center">
+        <div class="img-box">
+            @if($quotation->image)
+                <img src="{{ public_path($quotation->image) }}">
+            @else
+                <span style="font-size:10px;color:#aaa;">No image</span>
+            @endif
+        </div>
+    </td>
+    <td class="text-center">₹ {{ number_format($quotation->price, 2) }}</td>
+    <td class="text-center">{{ $quotation->quantity }}</td>
+    <td class="text-right">₹ {{ number_format($quotation->total, 2) }}</td>
+</tr>
+@endforeach
 </tbody>
 </table>
 

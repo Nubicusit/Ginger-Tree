@@ -3,11 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Support\Facades\DB;
 class Quotation extends Model
 {
     protected $fillable = [
         'lead_id',
+        'quotation_no',
         'item',
         'description',
         'image',
@@ -20,5 +21,9 @@ class Quotation extends Model
     public function lead()
     {
         return $this->belongsTo(Lead::class);
+    }
+      public function inventoryStock()
+    {
+        return $this->belongsTo(InventoryStock::class, 'item');
     }
 }

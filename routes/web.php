@@ -229,3 +229,6 @@ Route::get('/sales/attendance/status', [SalesController::class, 'attendanceStatu
 // Route::get('/sales/self-checkin', [SalesController::class, 'selfCheckinReport'])
 //     ->middleware(['auth', 'department:sales_executive'])
 //     ->name('sales.self.checkin');
+
+Route::get('/quotation/generate-number', [QuotationController::class, 'generateNumber'])->name('quotation.generate-number');
+Route::get('/inventory/items', [QuotationController::class, 'getItems']);
