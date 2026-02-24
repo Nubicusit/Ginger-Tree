@@ -9,11 +9,11 @@ use App\Http\Controllers\SalesController;
 use App\Http\Controllers\SiteVisitController;
 use App\Http\Controllers\Sales\QuotationController;
 use App\Http\Controllers\HRController;
-
+use App\Http\Controllers\AccountsController;
 Route::get('/', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-Route::post('/hr/clear-cache', [HRController::class, 'clearCache'])->name('hr.clear-cache');
+Route::post('/hr/clear-cache', [HRController::class, 'clearCache'])->name('hr.clear-cache');Route::post('/hr/clear-cache', [HRController::class, 'clearCache'])->name('hr.clear-cache');
 // sales executive
 Route::get('/sales/dashboard', [SalesController::class, 'dashboard'])->middleware(['auth', 'department:sales_executive'])->name('sales_executive.dashboard');
 Route::get('/sales/leads', [SalesController::class, 'leads'])->name('sales.leads')->middleware(['auth', 'department:sales_executive']);
@@ -54,6 +54,7 @@ Route::post('services/store', [AdminController::class, 'storeservice'])->name('s
 Route::get('services/{id}/edit', [AdminController::class, 'editservice'])->name('services.edit');
 Route::put('services/{id}', [AdminController::class, 'updateservice'])->name('services.update');
 Route::delete('services/{id}', [AdminController::class, 'destroyservice'])->name('services.destroy');
+Route::get('/inventory/items', [AdminController::class, 'getInventoryItems'])->name('inventory.items');
 
 Route::get('/useraccounts', [AdminController::class, 'useraccounts'])->middleware(['auth', 'admin'])->name('useraccounts');
 Route::post('/useraccounts/store', [AdminController::class, 'storeUser'])->middleware(['auth', 'admin'])->name('users.store');
@@ -113,6 +114,8 @@ Route::get('/hr/dashboard', [HRController::class, 'dashboard'])
 Route::get('/hr/employees', [HRController::class, 'employees'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.employees');
+    Route::put('/hr/employees/{id}',    [HRController::class, 'updateEmployee'])->name('hr.employees.update');
+Route::delete('/hr/employees/{id}', [HRController::class, 'destroyEmployee'])->name('hr.employees.destroy');
     Route::put('/hr/employees/{id}',    [HRController::class, 'updateEmployee'])->name('hr.employees.update');
 Route::delete('/hr/employees/{id}', [HRController::class, 'destroyEmployee'])->name('hr.employees.destroy');
 
@@ -210,6 +213,7 @@ Route::post('/hr/self-checkin', [HRController::class, 'selfCheckIn'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.self.checkin');
     Route::post('/self-checkout', [HrController::class, 'selfCheckout'])->name('hr.self.checkout');
+    Route::post('/self-checkout', [HrController::class, 'selfCheckout'])->name('hr.self.checkout');
 
 Route::get('/hr/today-attendance', [HRController::class, 'todayAttendance'])
     ->middleware(['auth', 'department:hr'])
@@ -232,3 +236,36 @@ Route::get('/sales/attendance/status', [SalesController::class, 'attendanceStatu
 
 Route::get('/quotation/generate-number', [QuotationController::class, 'generateNumber'])->name('quotation.generate-number');
 Route::get('/inventory/items', [QuotationController::class, 'getItems']);
+Route::post('sales/attendance/self-check-in', [SalesController::class, 'selfCheckIn'])
+    ->middleware(['auth','department:sales_executive'])
+    ->name('sales.attendance.self-check-in');
+
+Route::post('sales/attendance/self-check-out', [SalesController::class, 'selfCheckOut'])
+    ->middleware(['auth','department:sales_executive'])
+    ->name('sales.attendance.self-check-out');
+Route::get('/sales/attendance/status', [SalesController::class, 'attendanceStatus'])
+    ->middleware(['auth', 'department:sales_executive'])
+    ->name('sales.attendance.status');
+
+
+
+
+//accounts
+
+
+
+
+Route::get('/accounts/dashboard', [AccountsController::class, 'dashboard'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.dashboard');
+Route::get('/accounts/income-expenses', [AccountsController::class, 'incomeExpenses'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.income-expenses');
+    Route::post('/accounts/transactions', [AccountsController::class, 'store'])->name('accounts.transactions.store');
+Route::put('/accounts/transactions/{id}', [AccountsController::class, 'update']);
+Route::delete('/accounts/transactions/{id}', [AccountsController::class, 'destroy']);
+
+
+Route::get('/accounts/payroll', [AccountsController::class, 'payroll'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.payroll');

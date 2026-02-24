@@ -53,5 +53,10 @@ public function department()
 {
     return $this->belongsTo(Department::class);
 }
+// app/Models/User.php
+public function employee()
+{
+    return $this->hasOne(Employee::class, 'user_id');
+}
 
 }

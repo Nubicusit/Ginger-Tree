@@ -402,4 +402,8 @@
 </script>
 @endpush
 
+<<<<<<< HEAD
 @endsection
+=======
+@endsection
+>>>>>>> 8997a689f50c3b12a661006f6160ab3041137a2c
