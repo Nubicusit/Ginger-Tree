@@ -82,10 +82,20 @@
                             </span>
                         @else - @endif
                     </td>
-                    <td class="px-6 py-4">
-                        <button onclick="openSitevisitDrawer({{ $lead->id }})"
-                            class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">View</button>
-                    </td>
+                    <td class="px-6 py-4 flex gap-2">
+    <button onclick="openSitevisitDrawer({{ $lead->id }})"
+        class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
+        View
+    </button>
+
+    @if($lead->latestQuotation)
+        <a href="{{ route('sale.quotations.pdf', $lead->latestQuotation->id) }}"
+           target="_blank"
+           class="bg-green-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
+            PDF
+        </a>
+    @endif
+</td>
                 </tr>
                 @empty
                 <tr>

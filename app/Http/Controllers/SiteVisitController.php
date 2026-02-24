@@ -15,11 +15,11 @@ class SiteVisitController extends Controller
   public function sitevisit()
     {
         $userId = Auth::id();
-        $leads = Lead::with('siteVisit')
-        ->where('sales_executive_id', $userId)
-        ->whereHas('siteVisit')
-        ->latest()
-        ->get();
+        $leads = Lead::with(['siteVisit', 'latestQuotation'])
+    ->where('sales_executive_id', $userId)
+    ->whereHas('siteVisit')
+    ->latest()
+    ->get();
         $totalSiteVisits = Lead::where('sales_executive_id', $userId)
         ->whereHas('siteVisit')
         ->count();
