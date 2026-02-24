@@ -230,3 +230,14 @@ Route::get('/sales/attendance/status', [SalesController::class, 'attendanceStatu
 Route::get('/accounts/dashboard', [AccountsController::class, 'dashboard'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.dashboard');
+Route::get('/accounts/income-expenses', [AccountsController::class, 'incomeExpenses'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.income-expenses');
+    Route::post('/accounts/transactions', [AccountsController::class, 'store'])->name('accounts.transactions.store');
+Route::put('/accounts/transactions/{id}', [AccountsController::class, 'update']);
+Route::delete('/accounts/transactions/{id}', [AccountsController::class, 'destroy']);
+
+
+Route::get('/accounts/payroll', [AccountsController::class, 'payroll'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.payroll');
