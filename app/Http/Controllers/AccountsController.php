@@ -3,7 +3,8 @@
 namespace App\Http\Controllers;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
-
+use App\Models\Quotation;
+use App\Models\Customer;
 class AccountsController extends Controller
 {
     public function dashboard()
@@ -130,6 +131,147 @@ public function payroll(Request $request)
         'totalEmployees', 'totalNetSalary',
         'totalPending', 'totalPaid'
     ));
+}
+
+public function invoicesIndex(Request $request)
+{
+    $query = Quotation::with('lead')->orderByDesc('id');
+
+    // Search
+    if ($request->search) {
+        $query->whereHas('lead', fn($q) => 
+            $q->where('client_name', 'like', '%'.$request->search.'%')
+        );
+    }
+
+    // Status filter
+    if ($request->status) {
+        $query->where('status', $request->status);
+    }
+
+    // Date filter
+    if ($request->from_date) {
+        $query->whereDate('created_at', '>=', $request->from_date);
+    }
+    if ($request->to_date) {
+        $query->whereDate('created_at', '<=', $request->to_date);
+    }
+
+    $invoices = $query->paginate(10);
+
+    return view('accounts.invoices', compact('invoices'));
+}
+
+public function invoicesCreate()
+{
+    $customers = Customer::orderBy('name')->get();
+    return view('accounts.invoices.create', compact('customers'));
+}
+
+public function invoicesStore(Request $request)
+{
+    $request->validate([
+        'customer_id'    => 'required|exists:customers,id',
+        'invoice_date'   => 'required|date',
+        'due_date'       => 'required|date|after_or_equal:invoice_date',
+        'status'         => 'required|in:paid,unpaid,overdue,draft',
+        'items'          => 'required|array|min:1',
+        'items.*.description' => 'required|string',
+        'items.*.quantity'    => 'required|numeric|min:1',
+        'items.*.unit_price'  => 'required|numeric|min:0',
+    ]);
+
+    $invoice = Invoice::create([
+        'invoice_number' => 'INV-' . strtoupper(uniqid()),
+        'customer_id'    => $request->customer_id,
+        'invoice_date'   => $request->invoice_date,
+        'due_date'       => $request->due_date,
+        'status'         => $request->status,
+        'notes'          => $request->notes,
+        'total_amount'   => collect($request->items)->sum(fn($i) => $i['quantity'] * $i['unit_price']),
+    ]);
+
+    foreach ($request->items as $item) {
+        $invoice->items()->create([
+            'description' => $item['description'],
+            'quantity'    => $item['quantity'],
+            'unit_price'  => $item['unit_price'],
+            'total'       => $item['quantity'] * $item['unit_price'],
+        ]);
+    }
+
+    return redirect()->route('accounts.invoices.index')
+        ->with('success', 'Invoice created successfully.');
+}
+
+public function invoicesShow($id)
+{
+    $invoice = Invoice::with(['customer', 'items'])->findOrFail($id);
+    return view('accounts.invoices.show', compact('invoice'));
+}
+
+public function invoicesEdit($id)
+{
+    $invoice   = Invoice::with('items')->findOrFail($id);
+    $customers = Customer::orderBy('name')->get();
+    return view('accounts.invoices.edit', compact('invoice', 'customers'));
+}
+
+public function invoicesUpdate(Request $request, $id)
+{
+    $request->validate([
+        'customer_id'  => 'required|exists:customers,id',
+        'invoice_date' => 'required|date',
+        'due_date'     => 'required|date|after_or_equal:invoice_date',
+        'status'       => 'required|in:paid,unpaid,overdue,draft',
+        'items'        => 'required|array|min:1',
+        'items.*.description' => 'required|string',
+        'items.*.quantity'    => 'required|numeric|min:1',
+        'items.*.unit_price'  => 'required|numeric|min:0',
+    ]);
+
+    $invoice = Invoice::findOrFail($id);
+
+    $total = collect($request->items)->sum(fn($i) => $i['quantity'] * $i['unit_price']);
+
+    $invoice->update([
+        'customer_id'  => $request->customer_id,
+        'invoice_date' => $request->invoice_date,
+        'due_date'     => $request->due_date,
+        'status'       => $request->status,
+        'notes'        => $request->notes,
+        'total_amount' => $total,
+    ]);
+
+    // Replace all line items
+    $invoice->items()->delete();
+    foreach ($request->items as $item) {
+        $invoice->items()->create([
+            'description' => $item['description'],
+            'quantity'    => $item['quantity'],
+            'unit_price'  => $item['unit_price'],
+            'total'       => $item['quantity'] * $item['unit_price'],
+        ]);
+    }
+
+    return redirect()->route('accounts.invoices.index')
+        ->with('success', 'Invoice updated successfully.');
+}
+
+public function invoicesDestroy($id)
+{
+    $invoice = Invoice::findOrFail($id);
+    $invoice->items()->delete();
+    $invoice->delete();
+
+    return redirect()->route('accounts.invoices.index')
+        ->with('success', 'Invoice deleted successfully.');
+}
+
+public function invoicesPrint($id)
+{
+    $invoice = Invoice::with(['customer', 'items'])->findOrFail($id);
+    return view('accounts.invoices.print', compact('invoice'));
 }
 
 }
