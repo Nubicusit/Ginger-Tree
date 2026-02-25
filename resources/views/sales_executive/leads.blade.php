@@ -89,7 +89,6 @@
                     {{ $convertedLeads }}
                 </span>
             </div>
-
             <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">
                 <div>Website: 10</div>
                 <div>Referral: 0</div>
@@ -110,7 +109,6 @@
                                 d="M18 9a3 3 0 11-6 0 3 3 0 016 0zM21 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M16 11h6m-3-3v6" />
                         </svg>
                     </div>
-
                     <span class="text-xs font-bold text-white uppercase tracking-wider">
                         Arrived Leads
                     </span>

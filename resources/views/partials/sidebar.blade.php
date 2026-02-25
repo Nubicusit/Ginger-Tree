@@ -78,28 +78,28 @@
                     </li>
 
                     <!-- HR -->
-                 <li>
-    <a href="{{ route('hr.dashboard') }}"
-        class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
+                    <li>
+                        <a href="{{ route('hr.dashboard') }}"
+                            class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
         {{ request()->is('hr*')
            ? 'bg-gray-300 text-gray-900 shadow-md'
            : 'text-gray-700 hover:bg-gray-200' }}">
-        <i class="fas fa-id-badge text-lg w-6 text-center"></i>
-        <span>HR & Payroll</span>
-    </a>
-</li>
+                            <i class="fas fa-id-badge text-lg w-6 text-center"></i>
+                            <span>HR & Payroll</span>
+                        </a>
+                    </li>
 
                     <!-- Finance -->
-                  <li>
-    <a href="{{ route('accounts.dashboard') }}"
-        class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
+                    <li>
+                        <a href="{{ route('accounts.dashboard') }}"
+                            class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
         {{ request()->is('accounts*')
            ? 'bg-gray-300 text-gray-900 shadow-md'
            : 'text-gray-700 hover:bg-gray-200' }}">
-        <i class="fas fa-calculator text-lg w-6 text-center"></i>
-        <span>Accounts</span>
-    </a>
-</li>
+                            <i class="fas fa-calculator text-lg w-6 text-center"></i>
+                            <span>Accounts</span>
+                        </a>
+                    </li>
 
                     <!-- <li>
                         <a href="{{ url('useraccounts') }}"
@@ -134,40 +134,26 @@
                                     <span>Employee Accounts</span>
                                 </a>
                             </li>
-<<<<<<< HEAD
-                    <li>
-                        <a href="{{ url('inventory') }}"
-                            class="flex items-center space-x-3 px-4 py-2 text-sm rounded-lg
-                            {{ request()->is('inventory*')
-                                ? 'bg-gray-300 text-gray-900 shadow-md'
-                                : 'text-gray-700 hover:bg-gray-200' }}">
-                            <i class="fas fa-boxes-stacked w-5 text-center"></i>
-                            <span>Inventory</span>
-                        </a>
-                    </li>
-                    <li>
-=======
                             <li>
-            <a href="{{ url('inventory') }}"
-                class="flex items-center space-x-3 px-4 py-2 text-sm rounded-lg
+                                <a href="{{ url('inventory') }}"
+                                    class="flex items-center space-x-3 px-4 py-2 text-sm rounded-lg
                 {{ request()->is('inventory*')
                     ? 'bg-gray-300 text-gray-900 shadow-md'
                     : 'text-gray-700 hover:bg-gray-200' }}">
-                <i class="fas fa-boxes-stacked w-5 text-center"></i>
-                <span>Inventory</span>
-            </a>
-        </li>
-        <li>
->>>>>>> 8997a689f50c3b12a661006f6160ab3041137a2c
-                        <a href="{{ url('services') }}"
-                            class="flex items-center space-x-3 px-4 py-2 text-sm rounded-lg
+                                    <i class="fas fa-boxes-stacked w-5 text-center"></i>
+                                    <span>Inventory</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="{{ url('services') }}"
+                                    class="flex items-center space-x-3 px-4 py-2 text-sm rounded-lg
                             {{ request()->is('services*')
                                 ? 'bg-gray-300 text-gray-900 shadow-md'
                                 : 'text-gray-700 hover:bg-gray-200' }}">
-                            <i class="fas fa-concierge-bell w-5 text-center"></i>
-                            <span>Services</span>
-                        </a>
-                    </li>
+                                    <i class="fas fa-concierge-bell w-5 text-center"></i>
+                                    <span>Services</span>
+                                </a>
+                            </li>
                         </ul>
                     </li>
                     <!-- <li>
