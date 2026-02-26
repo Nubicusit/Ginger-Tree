@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 class Quotation extends Model
 {
-   
+
    protected $fillable = [
     'lead_id',
     'quotation_no',
@@ -18,7 +18,6 @@ class Quotation extends Model
 protected $casts = [
     'items' => 'array'
 ];
-
     public function lead()
     {
         return $this->belongsTo(Lead::class);

@@ -26,4 +26,5 @@ class Department extends Model
     {
         return $this->belongsTo(Employee::class, 'head_employee_id');
     }
+    
 }

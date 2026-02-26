@@ -48,11 +48,22 @@ public function quotations()
 {
     return $this->hasMany(Quotation::class);
 }
-public function latestQuotation()
+public function latestFinalQuotation()
 {
     return $this->hasOne(Quotation::class)
         ->whereNotNull('quotation_no')
-        ->latest('created_at');
+        ->latestOfMany();
 }
+public function latestQuotation()
+{
+    return $this->hasOne(Quotation::class)
+        ->latestOfMany();
+}
+// public function latestQuotation()
+// {
+//     return $this->hasOne(Quotation::class)
+//         ->whereNotNull('quotation_no')
+//         ->latest('created_at');
+// }
 }
 

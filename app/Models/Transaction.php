@@ -22,7 +22,6 @@ class Transaction extends Model
         'amount' => 'decimal:2',
     ];
 
-    // ── Scopes ──────────────────────────────────────────
     public function scopeIncome($query)
     {
         return $query->where('type', 'income');
@@ -32,4 +31,5 @@ class Transaction extends Model
     {
         return $query->where('type', 'expense');
     }
+
 }
