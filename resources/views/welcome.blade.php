@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
     <title>Ginger Tree</title>
+    <link rel="icon" type="image/x-icon" href="{{ asset('img/Boltoni-Favicon.png') }}">
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -69,7 +70,7 @@
 
             <!-- SS Logo - Bottom -->
             <div class="absolute bottom-4 sm:bottom-6 md:bottom-8 left-1/2 transform -translate-x-1/2 z-10 px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 rounded-lg">
-                <img src="images/" alt="Ginger Tree Logo" class="h-10 sm:h-12 md:h-14 lg:h-16">
+                <img src="{{asset('img/gingertree-white-logo.png')}}" alt="Ginger Tree Logo" class="h-10 sm:h-12 md:h-14 lg:h-16">
             </div>
         </div>
 

@@ -40,6 +40,10 @@
       opacity: 1;
       pointer-events: auto;
     }
+
+    [x-cloak] {
+    display: none !important;
+}
 .label {
     display: block;
     font-size: 12px;
@@ -105,7 +109,5 @@
     </script>
 
     @stack('scripts')
-    <script src="//unpkg.com/alpinejs" defer></script>
-
 </body>
 </html>

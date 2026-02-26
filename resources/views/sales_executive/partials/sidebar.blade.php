@@ -50,7 +50,7 @@
                {{ request()->is('leads*')
                   ? 'bg-gray-300 text-gray-900 shadow-md'
                   : 'text-gray-700 hover:bg-gray-200' }}">
-              <i class="fas fa-file-alt text-lg w-6 text-center"></i>
+              <i class="fas fa-clipboard-list text-lg w-6 text-center"></i>
               <span>Leads and Inquiries</span>
             </a>
           </li>
@@ -61,7 +61,7 @@
                {{ request()->is('leads*')
                   ? 'bg-gray-300 text-gray-900 shadow-md'
                   : 'text-gray-700 hover:bg-gray-200' }}">
-              <i class="fas fa-file-alt text-lg w-6 text-center"></i>
+              <i class="fas fa-ruler-combined text-lg w-6 text-center"></i>
               <span>Sitevisit and Requirements</span>
             </a>
           </li>

@@ -13,16 +13,17 @@ return new class extends Migration
     {
         Schema::create('quotations', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('lead_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('lead_id')
+                  ->constrained()
+                  ->onDelete('cascade');
 
-    $table->text('description');
-    $table->string('image')->nullable();
+            $table->string('quotation_no')->unique();
 
-    $table->integer('quantity');
-    $table->decimal('price', 10, 2);
-    $table->decimal('total', 10, 2);
+            // ✅ JSON array for storing multiple items
+            $table->json('items');
 
-    $table->enum('status', ['Draft', 'Sent', 'Approved'])->default('Draft');
+            $table->enum('status', ['Draft', 'Approved', 'Rejected'])
+                  ->default('Draft');
             $table->timestamps();
         });
     }

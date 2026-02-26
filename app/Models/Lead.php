@@ -44,6 +44,15 @@ public function siteVisit()
 {
     return $this->hasOne(SiteVisit::class);
 }
-
+public function quotations()
+{
+    return $this->hasMany(Quotation::class);
+}
+public function latestQuotation()
+{
+    return $this->hasOne(Quotation::class)
+        ->whereNotNull('quotation_no')
+        ->latest('created_at');
+}
 }
 
