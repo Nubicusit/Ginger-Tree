@@ -305,8 +305,7 @@ Route::get('/accounts/invoices/{id}/print', [AccountsController::class, 'invoice
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.invoices.print');
 
-
-    Route::patch('/accounts/invoices/{id}/approve', [AccountsController::class, 'invoicesApprove'])
+Route::patch('/accounts/invoices/{id}/approve', [AccountsController::class, 'invoicesApprove'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.invoices.approve');
 
