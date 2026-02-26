@@ -14,7 +14,7 @@ class DepartmentMiddleware
 
         $user = Auth::user();
 
-        
+        // Admin-നെ allow ചെയ്യൂ
         if ($user->role === 'admin') {
             return $next($request);
         }

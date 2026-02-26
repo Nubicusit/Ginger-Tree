@@ -27,23 +27,23 @@ tr { page-break-inside: avoid; }
 
 <!-- HEADER -->
 <table class="header-table">
-    <tr>
-        <td>
-            <img src="{{ public_path('img/gingertree-white-logo.png') }}" height="50">
-        </td>
-        <td class="right">
-            <div class="company-name">Gingertree Interiors</div>
-            <p>C-309, Third Floor, Block-5, M3M abc</p>
-            <p>Sector-67, 122001</p>
-            <p>8920380418</p>
-            <p>contact@gingertreeinteriors.com</p>
-        </td>
-    </tr>
+<tr>
+    <td>
+        <img src="{{ public_path('img/gingertree-white-logo.png') }}" height="50">
+    </td>
+    <td class="right">
+        <div class="company-name">Gingertree Interiors</div>
+        <p>C-309, Third Floor, Block-5, M3M abc</p>
+        <p>Sector-67, 122001</p>
+        <p>8920380418</p>
+        <p>contact@gingertreeinteriors.com</p>
+    </td>
+</tr>
 </table>
 
-<!-- CLIENT -->
-<p style="margin-top:15px;">Prepared for</p>
-<p><strong>{{ $lead->client_name }}</strong></p>
+<!-- CLIENT DETAILS -->
+<p style="margin-top:15px;">Prepared for : <strong>{{ $lead->client_name }}</strong></p>
+<p><strong>Quotation No:</strong> {{ $quotationNo }}</p>
 <p>Project: {{ $lead->project_type ?? $lead->id }}</p>
 <p>{{ now()->format('M d, Y') }}</p>
 
@@ -52,57 +52,71 @@ tr { page-break-inside: avoid; }
 <!-- ITEMS TABLE -->
 <table>
 <thead>
-    <tr>
-        <th>SN</th>
-        <th>Item Description</th>
-        <th>Image</th>
-        <th>Unit Rate</th>
-        <th>Qty</th>
-        <th>Total</th>
-    </tr>
+<tr>
+    <th>SN</th>
+    <th>Item</th>
+    <th>Description</th>
+    <th>Image</th>
+    <th>Unit Rate</th>
+    <th>Qty</th>
+    <th>Total</th>
+</tr>
 </thead>
 <tbody>
-    <tr>
-        <td class="text-center">1</td>
-        <td>
-            <p class="item-title">{{ $quotation->description }}</p>
-        </td>
-        <td class="text-center">
-            <div class="img-box">
-                @if($quotation->image)
-                    <img src="{{ public_path('img/' . $quotation->image) }}">
-                @else
-                    <span style="font-size:10px;color:#aaa;">No image</span>
-                @endif
-            </div>
-        </td>
-        <td class="text-center">₹ {{ number_format($quotation->price, 2) }}</td>
-        <td class="text-center">{{ $quotation->quantity }}</td>
-        <td class="text-right">₹ {{ number_format($quotation->total, 2) }}</td>
-    </tr>
+
+@php $subTotal = 0; @endphp
+
+@foreach($quotation->items as $index => $item)
+@php $subTotal += $item['total']; @endphp
+<tr>
+    <td class="text-center">{{ $index + 1 }}</td>
+
+    <td>
+        {{ \App\Models\InventoryStock::find($item['item_id'])->item_name ?? 'N/A' }}
+    </td>
+
+    <td>
+        <p class="item-title">{{ $item['description'] ?? '-' }}</p>
+    </td>
+
+    <td class="text-center">
+        <div class="img-box">
+            @if(!empty($item['image']))
+                <img src="{{ public_path($item['image']) }}">
+            @else
+                <span style="font-size:10px;color:#aaa;">No image</span>
+            @endif
+        </div>
+    </td>
+
+    <td class="text-center">₹ {{ number_format($item['price'], 2) }}</td>
+    <td class="text-center">{{ $item['quantity'] }}</td>
+    <td class="text-right">₹ {{ number_format($item['total'], 2) }}</td>
+</tr>
+@endforeach
+
 </tbody>
 </table>
 
 <!-- TOTALS -->
 @php
-    $gst = $quotation->total * 0.18;
-    $grand = $quotation->total + $gst;
+    $gst = $subTotal * 0.18;
+    $grand = $subTotal + $gst;
 @endphp
 
 <table class="total-table">
-    <tr>
-        <td class="text-right">Subtotal</td>
-        <td class="text-right">₹ {{ number_format($quotation->total, 2) }}</td>
-    </tr>
-    <tr>
-        <td class="text-right">GST (18%)</td>
-        <td class="text-right">₹ {{ number_format($gst, 2) }}</td>
-    </tr>
-    <tr class="grand">
-        <td class="text-right">Grand Total</td>
-        <td class="text-right">₹ {{ number_format($grand, 2) }}</td>
-    </tr>
+<tr>
+    <td class="text-right">Subtotal</td>
+    <td class="text-right">₹ {{ number_format($subTotal, 2) }}</td>
+</tr>
+<tr>
+    <td class="text-right">GST (18%)</td>
+    <td class="text-right">₹ {{ number_format($gst, 2) }}</td>
+</tr>
+<tr class="grand">
+    <td class="text-right">Grand Total</td>
+    <td class="text-right">₹ {{ number_format($grand, 2) }}</td>
+</tr>
 </table>
-
 </body>
 </html>

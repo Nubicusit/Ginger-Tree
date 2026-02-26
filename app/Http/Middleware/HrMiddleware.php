@@ -12,7 +12,7 @@ class HrMiddleware
             return redirect()->route('login');
         }
 
-        
+
         if (Auth::user()->role === 'hr' || Auth::user()->role === 'admin') {
             return $next($request);
         }
@@ -20,3 +20,4 @@ class HrMiddleware
         abort(403, 'Unauthorized');
     }
 }
+

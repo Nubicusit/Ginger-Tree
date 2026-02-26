@@ -12,17 +12,19 @@ use Illuminate\Support\Facades\DB;
 class SiteVisitController extends Controller
 {
 
-
   public function sitevisit()
     {
         $userId = Auth::id();
-        $leads = Lead::with('siteVisit')
-        ->where('sales_executive_id', $userId)
+        $leads = Lead::with(['siteVisit', 'latestQuotation'])
+    ->where('sales_executive_id', $userId)
+    ->whereHas('siteVisit')
+    ->latest()
+    ->get();
+        $totalSiteVisits = Lead::where('sales_executive_id', $userId)
         ->whereHas('siteVisit')
-        ->latest()
-        ->get();
+        ->count();
 
-        return view('sales_executive.Sitevisit', compact('leads'));
+        return view('sales_executive.Sitevisit', compact('leads','totalSiteVisits'));
     }
 
     public function store(Request $request)
@@ -92,7 +94,6 @@ class SiteVisitController extends Controller
             'measurement_files.*' => 'file|mimes:jpg,jpeg,png,webp,mp4,mov,avi|max:20480',
         ]);
 
-        // ✅ Get existing site visit
         $siteVisit = SiteVisit::where('lead_id', $request->lead_id)->first();
 
         $existingFiles = [];
@@ -101,7 +102,6 @@ class SiteVisitController extends Controller
             $existingFiles = $siteVisit->measurement_files;
         }
 
-        // ✅ New uploads
         $uploadedFiles = [];
 
         if ($request->hasFile('measurement_files')) {
@@ -112,7 +112,6 @@ class SiteVisitController extends Controller
             }
         }
 
-        // ✅ Merge old + new
         $allFiles = array_merge($existingFiles, $uploadedFiles);
 
         $siteVisit = SiteVisit::updateOrCreate(

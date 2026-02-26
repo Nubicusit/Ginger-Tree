@@ -340,8 +340,163 @@
                         </div>
                     </div>
                 </div>
+                <!-- checkin section -->
+                <div class="bg-white rounded-xl card-shadow p-6">
+                    <h3 class="text-gray-800 font-semibold text-base mb-6">Check In</h3>
+                    <div class="space-y-6">
+                        <button id="quickCheckinBtn" class="block w-full p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors text-left flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        ⏰ Self Check-in Now
+                    </button>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
+        <div id="checkinModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-6">
+            <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+                <!-- Modal Header -->
+                <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-8 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold">Self Check-in</h3>
+                            <p class="text-orange-100 mt-1">{{ now()->format('M d, Y - h:i A') }}</p>
+                        </div>
+                        <button id="closeCheckinModal" class="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-xl">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Modal Body -->
+                <div class="p-8">
+                    <!-- Status Check -->
+                    <div id="statusCheck" class="text-center mb-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                        <p class="text-lg text-gray-600">Checking status...</p>
+                    </div>
+
+                    <!-- Check-in Button -->
+                    <div id="checkinSection" class="hidden text-center">
+                        <div class="mb-8">
+                            <div class="w-20 h-20 bg-orange-100 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10h14M5 14h14"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Ready to Check-in</h3>
+                            <p class="text-gray-600">Click below to record your attendance</p>
+                        </div>
+                        <button id="performCheckin" class="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 px-8 rounded-2xl text-lg font-bold hover:from-orange-600 hover:to-orange-700 transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+                            Check-in Now
+                        </button>
+                    </div>
+
+                    <!-- Already Checked -->
+                    <div id="alreadyCheckedSection" class="hidden text-center">
+                        <div class="bg-green-50 rounded-2xl p-8 mb-6">
+                            <div class="w-20 h-20 bg-green-100 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-green-800 mb-2">Already Checked-in!</h3>
+                            <p id="checkinTimeDisplay" class="text-lg font-semibold text-green-700"></p>
+                        </div>
+                        <button id="performCheckout" class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-8 rounded-2xl text-lg font-bold hover:from-red-600 hover:to-red-700 transition-all shadow-xl">
+                            Check-out Now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+
+    const quickCheckinBtn = document.getElementById('quickCheckinBtn');
+    const checkinModal = document.getElementById('checkinModal');
+    const closeCheckinModal = document.getElementById('closeCheckinModal');
+    const statusCheck = document.getElementById('statusCheck');
+    const checkinSection = document.getElementById('checkinSection');
+    const alreadyCheckedSection = document.getElementById('alreadyCheckedSection');
+    const performCheckin = document.getElementById('performCheckin');
+    const performCheckout = document.getElementById('performCheckout');
+    const checkinTimeDisplay = document.getElementById('checkinTimeDisplay');
+
+    // OPEN MODAL
+    quickCheckinBtn.addEventListener('click', function() {
+        checkinModal.classList.remove('hidden');
+        loadCheckinStatus();
+    });
+
+    // CLOSE MODAL
+    closeCheckinModal.addEventListener('click', closeModal);
+
+    function closeModal() {
+        checkinModal.classList.add('hidden');
+        statusCheck.classList.remove('hidden');
+        checkinSection.classList.add('hidden');
+        alreadyCheckedSection.classList.add('hidden');
+    }
+
+    function loadCheckinStatus() {
+        fetch('{{ route("sales.attendance.status") }}', {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            statusCheck.classList.add('hidden');
+            if (data.checked_in_today) {
+                checkinTimeDisplay.textContent = `Checked-in at ${data.checkin_time}`;
+                alreadyCheckedSection.classList.remove('hidden');
+            } else {
+                checkinSection.classList.remove('hidden');
+            }
+        });
+    }
+
+    // ✅ CHECK-IN
+    performCheckin.addEventListener('click', function () {
+        fetch('{{ route("sales.attendance.self-check-in") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        });
+    });
+
+    // ✅ CHECK-OUT
+    performCheckout.addEventListener('click', function () {
+        fetch('{{ route("sales.attendance.self-check-out") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        });
+    });
+});
+</script>
 @endsection
