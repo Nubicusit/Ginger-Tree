@@ -13,7 +13,8 @@ class Quotation extends Model
         'quantity',
         'price',
         'total',
-        'status'
+        'status',
+        'rejection_reason'
     ];
 
     public function lead()

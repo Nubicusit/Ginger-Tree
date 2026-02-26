@@ -270,8 +270,45 @@ public function invoicesDestroy($id)
 
 public function invoicesPrint($id)
 {
-    $invoice = Invoice::with(['customer', 'items'])->findOrFail($id);
-    return view('accounts.invoices.print', compact('invoice'));
+    $quotation = Quotation::with('lead')->findOrFail($id);
+    return view('accounts.invoices.print', compact('quotation'));
 }
 
+
+/**
+ * Approve a quotation.
+ */
+public function invoicesApprove($id)
+{
+    $quotation = Quotation::findOrFail($id);
+
+    $quotation->update([
+        'status'           => 'Approved',
+        'rejection_reason' => null,
+    ]);
+
+    return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been approved.');
+}
+
+/**
+ * Reject a quotation with a reason.
+ */
+public function invoicesReject(Request $request, $id)
+{
+    $quotation = Quotation::findOrFail($id);
+
+    $request->validate([
+        'rejection_reason' => 'required|string|max:500',
+    ], [
+        'rejection_reason.required' => 'Please provide a reason for rejection.',
+        'rejection_reason.max'      => 'Reason must not exceed 500 characters.',
+    ]);
+
+    $quotation->update([
+        'status'           => 'Rejected',
+        'rejection_reason' => $request->rejection_reason,
+    ]);
+
+    return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been rejected.');
+}
 }
