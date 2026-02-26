@@ -14,35 +14,63 @@ use App\Models\InventoryStock;
 
 class AdminController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        return view('Dashboard');
+        $query = Lead::query();
+
+    // Search by name
+    if ($request->search) {
+        $query->where('client_name', 'like', '%' . $request->search . '%');
     }
 
-    public function leads()
-    {
-        $leads = Lead::latest()->get();
+    // Filter by status
+    if ($request->status) {
+        $query->where('status', $request->status);
+    }
 
-        $totalLeads = Lead::count();
-        $convertedLeads = Lead::where('status', 'Won')->count();
-        $failedLeads = Lead::where('status', 'Lost')->count();
-        $designers = User::whereHas('department', function ($q) {
+    $leads = $query->latest()->get();
+        return view('Dashboard',compact('leads'));
+    }
+
+    public function leads(Request $request)
+{
+    $query = Lead::query();
+
+    if ($request->filled('search')) {
+        $query->where('client_name', 'like', '%' . $request->search . '%');
+    }
+
+    if ($request->filled('status')) {
+        $query->where('status', $request->status);
+    }
+
+    if ($request->filled('date')) {
+        $query->whereDate('created_at', $request->date);
+    }
+
+    $leads = $query->latest()->get();
+
+    $totalLeads = Lead::count();
+    $convertedLeads = Lead::where('status', 'Won')->count();
+    $failedLeads = Lead::where('status', 'Lost')->count();
+
+    $designers = User::whereHas('department', function ($q) {
         $q->where('slug', 'designer');
     })->orderBy('name')->get();
 
-    // ✅ Get sales executives via department slug
     $salesExecutives = User::whereHas('department', function ($q) {
         $q->where('slug', 'sales_executive');
     })->orderBy('name')->get();
-        return view('admin.LeadEnquiries', compact(
-            'leads',
-            'totalLeads',
-            'convertedLeads',
-            'failedLeads',
-            'designers',
-            'salesExecutives'
-        ));
-    }
+
+    return view('admin.LeadEnquiries', compact(
+        'leads',
+        'totalLeads',
+        'convertedLeads',
+        'failedLeads',
+        'designers',
+        'salesExecutives'
+    ));
+}
 
     public function create()
     {
@@ -345,5 +373,30 @@ public function destroyservice($id)
 
     return redirect()->route('services.index')->with('success', 'Service deleted');
 }
+public function import(Request $request)
+{
+    $request->validate([
+        'csv_file' => 'required|mimes:csv,txt'
+    ]);
 
+
+    $file = fopen($request->file('csv_file'), 'r');
+
+    while (($row = fgetcsv($file)) !== false) {
+
+        Lead::create([
+            'client_name' => $row[0],
+            'phone' => $row[1],
+            'email' => $row[2],
+            'location' => $row[3],
+            'lead_source' => $row[4],
+            'project_type' => $row[5],
+            'status' => 'New',
+        ]);
+    }
+
+    fclose($file);
+
+    return redirect()->back()->with('success', 'CSV Imported Successfully');
+}
 }

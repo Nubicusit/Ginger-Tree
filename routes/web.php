@@ -61,6 +61,8 @@ Route::post('/useraccounts/store', [AdminController::class, 'storeUser'])->middl
 Route::post('/departments/store', [AdminController::class, 'storeDepartment'])->middleware(['auth','admin'])->name('departments.store');
 Route::delete('/useraccounts/{user}', [AdminController::class, 'destroyUser'])->middleware(['auth', 'admin'])->name('users.destroy');
 
+// csv
+Route::post('/leads/import', [AdminController::class, 'import'])->name('leads.import');
 // Route::post('/marketing/store', [MarketingController::class, 'store'])->name('marketing.store');
 
 /*
@@ -303,7 +305,7 @@ Route::get('/accounts/invoices/{id}/print', [AccountsController::class, 'invoice
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.invoices.print');
 
-    
+
     Route::patch('/accounts/invoices/{id}/approve', [AccountsController::class, 'invoicesApprove'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.invoices.approve');

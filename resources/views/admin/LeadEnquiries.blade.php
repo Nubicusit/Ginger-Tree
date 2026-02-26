@@ -95,7 +95,64 @@
         </a>
     </div>
 </div>
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
+        <form method="GET" action="{{ route('leads') }}" class="flex flex-wrap gap-3 items-center justify-between">
 
+            <!-- Left Section -->
+            <div class="flex flex-wrap gap-3 items-center">
+
+                <!-- Search by Name -->
+                <input
+                    type="text"
+                    name="search"
+                    value="{{ request('search') }}"
+                    placeholder="Search by client name..."
+                    class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+
+                <!-- Filter by Status -->
+                <select
+                    name="status"
+                    class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+
+                    <option value="">All Status</option>
+                    <option value="New" {{ request('status')=='New' ? 'selected' : '' }}>New</option>
+                    <option value="Contacted" {{ request('status')=='Contacted' ? 'selected' : '' }}>Contacted</option>
+                    <option value="Site Visit" {{ request('status')=='Site Visit' ? 'selected' : '' }}>Site Visit</option>
+                    <option value="Won" {{ request('status')=='Won' ? 'selected' : '' }}>Won</option>
+                    <option value="Lost" {{ request('status')=='Lost' ? 'selected' : '' }}>Lost</option>
+                </select>
+
+                <input
+    type="date"
+    name="date"
+    value="{{ request('date') }}"
+    class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+
+                <button
+                    type="submit"
+                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+                    Filter
+                </button>
+
+                <a href="{{ route('leads') }}"
+                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded">
+                    Reset
+                </a>
+            </div>
+
+            <!-- Right Section -->
+            <div>
+                <form action="{{ route('leads.import') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <label class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded cursor-pointer">
+                        Import CSV
+                        <input type="file" name="csv_file" class="hidden" onchange="this.form.submit()">
+                    </label>
+                </form>
+            </div>
+
+        </form>
+    </div>
 <!-- Table Section -->
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
     <div class="overflow-x-auto">
@@ -347,8 +404,8 @@
     class="fixed inset-0 bg-black/40 backdrop-blur-sm hidden items-center justify-center z-50">
     <div class="relative w-full max-w-md bg-white rounded-lg shadow-2xl z-10 flex flex-col max-h-[90vh]"> -->
 
-        <!-- Header -->
-        <!-- <div class="flex items-center justify-between px-6 py-4 bg-blue-600 rounded-t-lg shrink-0">
+<!-- Header -->
+<!-- <div class="flex items-center justify-between px-6 py-4 bg-blue-600 rounded-t-lg shrink-0">
             <h2 class="text-white font-semibold text-lg tracking-wide">
                 Add Marketing/Designer
             </h2>
@@ -356,8 +413,8 @@
                 &times;
             </button>
         </div> -->
-        <!-- Tabs Navigation -->
-        <!-- <div class="flex border-b text-sm bg-gray-50 shrink-0 overflow-x-auto">
+<!-- Tabs Navigation -->
+<!-- <div class="flex border-b text-sm bg-gray-50 shrink-0 overflow-x-auto">
             <button
                 onclick="switchTab(event, 'marketing-info')"
                 class="tab-btn px-6 py-3 border-b-2 border-blue-600 text-blue-600 font-medium hover:bg-gray-100 transition-colors whitespace-nowrap"
@@ -372,24 +429,24 @@
             </button>
         </div> -->
 
-        <!-- Scrollable Content Area -->
-        <!-- <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
+<!-- Scrollable Content Area -->
+<!-- <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
             <form id="marketingForm">
                 @csrf
                 <input type="hidden" name="sales_executive_id"> -->
 
-                <!-- TAB 1: Customer Information -->
-                <!-- <div id="marketing-info" class="tab-content space-y-4 fade-in"> -->
+<!-- TAB 1: Customer Information -->
+<!-- <div id="marketing-info" class="tab-content space-y-4 fade-in"> -->
 
-                    <!-- Name -->
-                    <!-- <div>
+<!-- Name -->
+<!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Executive Name <span class="text-red-500">*</span></label>
                         <input type="text" name="marketing_name" required
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-shadow" />
                     </div> -->
 
-                    <!-- Phone -->
-                    <!-- <div>
+<!-- Phone -->
+<!-- <div>
                         <div class="flex items-center justify-between mb-1">
                             <label class="text-gray-700 font-medium text-sm">Phone Number</label>
                             <span class="text-xs text-gray-400">(Optional)</span>
@@ -398,8 +455,8 @@
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div> -->
 
-                    <!-- Email -->
-                    <!-- <div>
+<!-- Email -->
+<!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Email Address <span class="text-red-500">*</span></label>
                         <input type="email" name="email" required
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
@@ -414,26 +471,26 @@
                focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div> -->
 
-                    <!-- Address -->
-                    <!-- <div>
+<!-- Address -->
+<!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Address</label>
                         <input type="text" name="address"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div>
                 </div> -->
 
-                <!-- TAB 2: Designer Profile -->
-                <!-- <div id="designer-profile" class="tab-content space-y-4 hidden fade-in"> -->
+<!-- TAB 2: Designer Profile -->
+<!-- <div id="designer-profile" class="tab-content space-y-4 hidden fade-in"> -->
 
-                    <!-- Designer Name -->
-                    <!-- <div>
+<!-- Designer Name -->
+<!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Designer Name <span class="text-red-500">*</span></label>
                         <input type="text" name="designer_name"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div> -->
 
-                    <!-- Phone -->
-                    <!-- <div>
+<!-- Phone -->
+<!-- <div>
                         <div class="flex items-center justify-between mb-1">
                             <label class="text-gray-700 font-medium text-sm">Phone Number</label>
                             <span class="text-xs text-gray-400">(Optional)</span>
@@ -442,8 +499,8 @@
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
                     </div> -->
 
-                    <!-- Email -->
-                    <!-- <div>
+<!-- Email -->
+<!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Email Address <span class="text-red-500">*</span></label>
                         <input type="email" name="email" required
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
@@ -458,8 +515,8 @@
                focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     </div> -->
 
-                    <!-- Address -->
-                    <!-- <div>
+<!-- Address -->
+<!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Address</label>
                         <input type="text" name="address"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
@@ -468,8 +525,8 @@
             </form>
         </div> -->
 
-        <!-- Footer -->
-        <!-- <div class="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-lg shrink-0">
+<!-- Footer -->
+<!-- <div class="flex justify-end gap-3 px-6 py-4 border-t bg-gray-50 rounded-b-lg shrink-0">
             <button onclick="closeMarketingModal()" class="px-5 py-2 text-sm font-medium text-gray-600 bg-white border border-gray-300 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-offset-1 focus:ring-gray-200 transition-all">
                 Cancel
             </button>
