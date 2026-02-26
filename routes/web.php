@@ -269,3 +269,36 @@ Route::delete('/accounts/transactions/{id}', [AccountsController::class, 'destro
 Route::get('/accounts/payroll', [AccountsController::class, 'payroll'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.payroll');
+
+    // Invoice Routes
+Route::get('/accounts/invoices', [AccountsController::class, 'invoicesIndex'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.index');
+
+Route::get('/accounts/invoices/create', [AccountsController::class, 'invoicesCreate'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.create');
+
+Route::post('/accounts/invoices', [AccountsController::class, 'invoicesStore'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.store');
+
+Route::get('/accounts/invoices/{id}', [AccountsController::class, 'invoicesShow'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.show');
+
+Route::get('/accounts/invoices/{id}/edit', [AccountsController::class, 'invoicesEdit'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.edit');
+
+Route::put('/accounts/invoices/{id}', [AccountsController::class, 'invoicesUpdate'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.update');
+
+Route::delete('/accounts/invoices/{id}', [AccountsController::class, 'invoicesDestroy'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.destroy');
+
+Route::get('/accounts/invoices/{id}/print', [AccountsController::class, 'invoicesPrint'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.print');
