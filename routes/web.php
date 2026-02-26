@@ -302,3 +302,12 @@ Route::delete('/accounts/invoices/{id}', [AccountsController::class, 'invoicesDe
 Route::get('/accounts/invoices/{id}/print', [AccountsController::class, 'invoicesPrint'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.invoices.print');
+
+    
+    Route::patch('/accounts/invoices/{id}/approve', [AccountsController::class, 'invoicesApprove'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.approve');
+
+Route::patch('/accounts/invoices/{id}/reject', [AccountsController::class, 'invoicesReject'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.reject');
