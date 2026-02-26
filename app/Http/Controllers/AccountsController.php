@@ -137,23 +137,27 @@ public function invoicesIndex(Request $request)
 {
     $query = Quotation::with('lead')->orderByDesc('id');
 
-    // Search
-    if ($request->search) {
-        $query->whereHas('lead', fn($q) => 
-            $q->where('client_name', 'like', '%'.$request->search.'%')
-        );
+    // Search — use LEFT JOIN so null lead_id rows still appear
+    if ($request->filled('search')) {
+        $search = $request->search;
+        $query->where(function($q) use ($search) {
+            $q->whereHas('lead', fn($l) => 
+                $l->where('client_name', 'like', '%'.$search.'%')
+            )
+            ->orWhereNull('lead_id'); // include unassigned too
+        });
     }
 
     // Status filter
-    if ($request->status) {
+    if ($request->filled('status')) {
         $query->where('status', $request->status);
     }
 
     // Date filter
-    if ($request->from_date) {
+    if ($request->filled('from_date')) {
         $query->whereDate('created_at', '>=', $request->from_date);
     }
-    if ($request->to_date) {
+    if ($request->filled('to_date')) {
         $query->whereDate('created_at', '<=', $request->to_date);
     }
 
@@ -271,7 +275,8 @@ public function invoicesDestroy($id)
 public function invoicesPrint($id)
 {
     $quotation = Quotation::with('lead')->findOrFail($id);
-    return view('accounts.invoices.print', compact('quotation'));
+    
+    return view('accounts.print', compact('quotation'));
 }
 
 
