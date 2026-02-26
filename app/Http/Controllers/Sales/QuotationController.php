@@ -62,7 +62,7 @@ public function storequotation(Request $request)
         $quotation = Quotation::create([
             'lead_id'      => $request->lead_id,
             'quotation_no' => $request->quotation_no,
-            'items'        => $itemsArray, // 🔥 stored as JSON
+            'items'        => $itemsArray, 
             'status'       => 'Draft',
         ]);
 

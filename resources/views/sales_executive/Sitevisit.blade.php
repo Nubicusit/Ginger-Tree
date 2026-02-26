@@ -47,10 +47,10 @@
                     <th class="px-6 py-4">Name</th>
                     <th class="px-6 py-4">Project Type</th>
                     <th class="px-6 py-4">Site Visit Date and Time</th>
-                    <th class="px-6 py-4">Assigned staff</th>
-                    <th class="px-6 py-4">Measurements</th>
+                    <!-- <th class="px-6 py-4">Assigned staff</th> -->
+                    <th class="px-6 py-4">Budget Sensitivity</th>
                     <th class="px-6 py-4">Current Site notes</th>
-                    <th class="px-6 py-4">Approval to proceed</th>
+                    <th class="px-6 py-4">Approval</th>
                     <th class="px-6 py-4">View Details</th>
                 </tr>
             </thead>
@@ -64,24 +64,62 @@
                             {{ \Carbon\Carbon::parse($lead->siteVisit->visit_datetime)->format('d M Y, h:i A') }}
                         @else - @endif
                     </td>
-                    <td class="px-6 py-4">{{ $lead->siteVisit->assigned_staff ?? '-' }}</td>
-                    <td class="px-6 py-4">
-                        @if($lead->siteVisit && is_array($lead->siteVisit->measurement_files))
-                            @php $files = $lead->siteVisit->measurement_files; @endphp
-                            <button onclick="openSitevisitDrawer({{ $lead->id }}, true)"
-                                class="text-blue-600 underline hover:text-blue-800 text-sm">
-                                {{ count($files) }} files
-                            </button>
-                        @else - @endif
-                    </td>
+                    <!-- <td class="px-6 py-4">{{ $lead->siteVisit->assigned_staff ?? '-' }}</td> -->
+                  <td class="px-6 py-4">
+    @if($lead->siteVisit && $lead->siteVisit->budget_sensitivity)
+
+        @php
+            $budget = strtolower($lead->siteVisit->budget_sensitivity);
+        @endphp
+
+        <span class="px-3 py-1 rounded-full text-xs font-semibold
+            @if($budget == 'low') bg-green-50 text-green-700 border border-green-200
+            @elseif($budget == 'medium') bg-yellow-50 text-yellow-700 border border-yellow-200
+            @elseif($budget == 'high') bg-red-50 text-red-700 border border-red-200
+            @endif
+        ">
+            {{ ucfirst($budget) }}
+        </span>
+
+    @else
+        <span class="text-gray-400 text-xs">-</span>
+    @endif
+</td>
                     <td class="px-6 py-4">{{ Str::limit($lead->siteVisit->site_condition_notes ?? '-', 30) }}</td>
-                    <td class="px-6 py-4">
-                        @if($lead->siteVisit)
+                    <!-- <td class="px-6 py-4"> -->
+                        <td class="px-6 py-4">
+    @if($lead->latestQuotation)
+
+        @php
+            $status = $lead->latestQuotation->status;
+        @endphp
+
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+            @if($status == 'Draft') bg-gray-100 text-gray-700
+            @elseif($status == 'Submitted') bg-yellow-100 text-yellow-800
+            @elseif($status == 'Approved') bg-green-100 text-green-800
+            @elseif($status == 'Rejected') bg-red-100 text-red-800
+            @endif
+        ">
+            @if($status == 'Draft') 📝
+            @elseif($status == 'Submitted') ⏳
+            @elseif($status == 'Approved') ✅
+            @elseif($status == 'Rejected') ❌
+            @endif
+
+            <span class="ml-1">{{ ucfirst($status) }}</span>
+        </span>
+
+    @else
+        <span class="text-gray-400 text-xs">No Quotation</span>
+    @endif
+</td>
+                        <!-- @if($lead->siteVisit)
                             <span class="px-2 py-1 rounded text-xs {{ $lead->siteVisit->approval_status === 'Yes' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
                                 {{ ucfirst($lead->siteVisit->approval_status) }}
                             </span>
-                        @else - @endif
-                    </td>
+                        @else - @endif -->
+                    <!-- </td> -->
                     <td class="px-6 py-4 flex gap-2">
     <button onclick="openSitevisitDrawer({{ $lead->id }})"
         class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
@@ -132,10 +170,10 @@
                         <input id="last_name" class="input" readonly>
                     </div>
                 </div>
-                <div class="mt-3">
+                <!-- <div class="mt-3">
                     <label class="label">Assigned Staff</label>
                     <input id="assigned_staff" class="input">
-                </div>
+                </div> -->
                 <div class="mt-3">
                     <label class="label">Site visit Date & Time</label>
                     <input id="visit_datetime" type="datetime-local" class="input">
@@ -180,7 +218,7 @@
                 </div>
                 <div class="mb-3"><label class="label">Initial Cost Estimate</label><textarea id="initial_cost_estimate" class="input w-full h-24 resize-none"></textarea></div>
                 <div class="mb-3">
-                    <label class="label">Approval Status</label>
+                    <label class="label">Quotation</label>
                     <select id="approval_status" class="input">
                         <option value="">-- Select Status --</option>
                         <option value="Yes">Approved</option>
@@ -283,7 +321,7 @@
                 document.getElementById('avatar_initials').innerText = initials;
 
                 if (data.site_visit) {
-                    document.getElementById('assigned_staff').value = data.site_visit.assigned_staff ?? '';
+                    // document.getElementById('assigned_staff').value = data.site_visit.assigned_staff ?? '';
                     document.getElementById('visit_datetime').value = data.site_visit.visit_datetime ? data.site_visit.visit_datetime.replace(' ', 'T') : '';
                     document.getElementById('site_condition_notes').value = data.site_visit.site_condition_notes ?? '';
                     document.getElementById('space_details').value = data.site_visit.space_details ?? '';
@@ -347,7 +385,7 @@
         const leadId = document.getElementById('current_lead_id').value;
         const formData = new FormData();
         formData.append('lead_id', leadId);
-        formData.append('assigned_staff', document.getElementById('assigned_staff').value);
+        // formData.append('assigned_staff', document.getElementById('assigned_staff').value);
         formData.append('visit_datetime', document.getElementById('visit_datetime').value);
         formData.append('site_condition_notes', document.getElementById('site_condition_notes').value);
         formData.append('space_details', document.getElementById('space_details').value);

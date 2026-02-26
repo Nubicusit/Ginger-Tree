@@ -12,6 +12,7 @@ class Department extends Model
 
     protected $fillable = [
         'name',
+        'slug',
         'description',
         'head_employee_id'
     ];
@@ -25,4 +26,5 @@ class Department extends Model
     {
         return $this->belongsTo(Employee::class, 'head_employee_id');
     }
+    
 }
