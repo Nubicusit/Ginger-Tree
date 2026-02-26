@@ -50,7 +50,13 @@
         <div>
             <p class="text-sm text-gray-500">Total Value</p>
             <p class="text-xl font-bold text-yellow-600">
-                ₹{{ number_format($invoices->getCollection()->sum('total'), 2) }}
+                @php
+                    $totalValue = $invoices->getCollection()->sum(function($q) {
+                        $items = is_array($q->items) ? $q->items : json_decode($q->items, true) ?? [];
+                        return collect($items)->sum(fn($i) => floatval($i['total'] ?? 0));
+                    });
+                @endphp
+                ₹{{ number_format($totalValue, 2) }}
             </p>
         </div>
     </div>
@@ -95,12 +101,10 @@
             <thead class="bg-gray-100 text-gray-600 uppercase text-xs">
                 <tr>
                     <th class="px-6 py-4">#</th>
-                    <th class="px-6 py-4">Quotation ID</th>
+                    <th class="px-6 py-4">Quotation No</th>
                     <th class="px-6 py-4">Customer</th>
-                    <th class="px-6 py-4">Description</th>
-                    <th class="px-6 py-4">Qty</th>
-                    <th class="px-6 py-4">Price</th>
-                    <th class="px-6 py-4">Total</th>
+                    <th class="px-6 py-4">Items</th>
+                    <th class="px-6 py-4">Grand Total</th>
                     <th class="px-6 py-4">Date</th>
                     <th class="px-6 py-4">Status</th>
                     <th class="px-6 py-4">Rejection Reason</th>
@@ -109,16 +113,23 @@
             </thead>
             <tbody class="divide-y">
                 @forelse($invoices as $invoice)
+                @php
+                    $items     = is_array($invoice->items) ? $invoice->items : json_decode($invoice->items, true) ?? [];
+                    $itemCount = count($items);
+                    $subtotal  = collect($items)->sum(fn($i) => floatval($i['total'] ?? 0));
+                    $gst       = $subtotal * 0.18;
+                    $grand     = $subtotal + $gst;
+                @endphp
                 <tr class="hover:bg-gray-50">
                     <td class="px-6 py-4">{{ $loop->iteration }}</td>
-                    <td class="px-6 py-4 font-medium text-gray-800">
-                        {{ $invoice->quotation_no }}
-                    </td>
+                    <td class="px-6 py-4 font-medium text-gray-800">{{ $invoice->quotation_no }}</td>
                     <td class="px-6 py-4">{{ $invoice->lead->client_name ?? '-' }}</td>
-                    <td class="px-6 py-4 text-gray-500">{{ \Str::limit($invoice->description, 30) }}</td>
-                    <td class="px-6 py-4">{{ $invoice->quantity ?? '-' }}</td>
-                    <td class="px-6 py-4">₹{{ number_format($invoice->price ?? 0, 2) }}</td>
-                    <td class="px-6 py-4 font-semibold text-gray-800">₹{{ number_format($invoice->total ?? 0, 2) }}</td>
+                    <td class="px-6 py-4 text-gray-500">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-blue-50 text-blue-600 text-xs rounded-full border border-blue-100">
+                            {{ $itemCount }} {{ Str::plural('item', $itemCount) }}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 font-semibold text-gray-800">₹{{ number_format($grand, 2) }}</td>
                     <td class="px-6 py-4">{{ \Carbon\Carbon::parse($invoice->created_at)->format('d M Y') }}</td>
 
                     {{-- Status Badge --}}
@@ -198,7 +209,7 @@
                 </tr>
                 @empty
                 <tr>
-                    <td colspan="11" class="text-center py-12 text-gray-500">
+                    <td colspan="9" class="text-center py-12 text-gray-500">
                         <i class="fa-solid fa-file-invoice fa-2x mb-2 block"></i>
                         No quotations found.
                     </td>
@@ -235,6 +246,7 @@
                 <span id="modal_status" class="px-3 py-1 text-xs rounded-full font-medium"></span>
             </div>
 
+            {{-- Customer --}}
             <div class="bg-gray-50 rounded-lg p-4">
                 <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Customer</p>
                 <p id="modal_client" class="font-bold text-gray-800 text-base"></p>
@@ -243,34 +255,33 @@
                 <p id="modal_location" class="text-gray-500 text-sm"></p>
             </div>
 
+            {{-- Project --}}
             <div class="bg-gray-50 rounded-lg p-4">
                 <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Project</p>
                 <p class="text-sm text-gray-700">Type: <span id="modal_project_type" class="font-medium"></span></p>
                 <p class="text-sm text-gray-700">Budget: <span id="modal_budget" class="font-medium"></span></p>
             </div>
 
+            {{-- Items Table --}}
             <div class="bg-gray-50 rounded-lg p-4">
-                <p class="text-xs text-gray-500 uppercase font-semibold mb-3">Item</p>
+                <p class="text-xs text-gray-500 uppercase font-semibold mb-3">Items</p>
                 <table class="w-full text-sm">
                     <thead>
-                        <tr class="text-gray-500 text-xs uppercase">
+                        <tr class="text-gray-500 text-xs uppercase border-b border-gray-200">
+                            <th class="text-left pb-2">#</th>
                             <th class="text-left pb-2">Description</th>
                             <th class="text-right pb-2">Qty</th>
                             <th class="text-right pb-2">Price</th>
                             <th class="text-right pb-2">Total</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td id="modal_desc" class="text-gray-800 py-1"></td>
-                            <td id="modal_qty" class="text-right text-gray-700"></td>
-                            <td id="modal_price" class="text-right text-gray-700"></td>
-                            <td id="modal_total" class="text-right font-semibold text-gray-800"></td>
-                        </tr>
+                    <tbody id="modal_items_body">
+                        {{-- filled by JS --}}
                     </tbody>
                 </table>
             </div>
 
+            {{-- Grand Total --}}
             <div class="flex justify-end">
                 <div class="w-64 space-y-1 text-sm">
                     <div class="flex justify-between text-gray-600">
@@ -288,17 +299,10 @@
                 </div>
             </div>
 
-            {{-- Rejection Reason (shown only if Rejected) --}}
+            {{-- Rejection Reason --}}
             <div id="modal_rejection_wrap" class="hidden bg-red-50 border border-red-200 rounded-lg p-4">
                 <p class="text-xs text-red-500 uppercase font-semibold mb-1">Rejection Reason</p>
                 <p id="modal_rejection_reason" class="text-sm text-red-700"></p>
-            </div>
-
-            <div id="modal_image_wrap" class="hidden">
-                <p class="text-xs text-gray-500 uppercase font-semibold mb-2">Image</p>
-                <img id="modal_image" src=""
-                     class="w-32 h-24 object-cover rounded border"
-                     onerror="this.closest('div').classList.add('hidden')">
             </div>
 
         </div>
@@ -332,7 +336,6 @@
         <form id="rejectForm" method="POST">
             @csrf
             @method('PATCH')
-
             <div class="p-6 space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
@@ -344,7 +347,6 @@
                         required></textarea>
                 </div>
             </div>
-
             <div class="p-6 border-t flex justify-end gap-3">
                 <button type="button" onclick="closeRejectModal()"
                     class="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
@@ -368,24 +370,27 @@ const quotations = @json($invoices->getCollection());
 const printBaseUrl = "{{ url('accounts/invoices') }}";
 const rejectBaseUrl = "{{ url('accounts/invoices') }}";
 
+function fmt(val) {
+    return '₹' + parseFloat(val ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
+}
+
 function openViewModal(id) {
     const q = quotations.find(q => q.id === id);
     if (!q) return;
 
-    const lead     = q.lead ?? {};
-    const subtotal = parseFloat(q.total ?? 0);
+    const lead  = q.lead ?? {};
+    const items = Array.isArray(q.items)
+        ? q.items
+        : (typeof q.items === 'string' ? JSON.parse(q.items) : []);
+
+    const subtotal = items.reduce((s, i) => s + parseFloat(i.total ?? 0), 0);
     const gst      = subtotal * 0.18;
     const grand    = subtotal + gst;
 
-    document.getElementById('modal_qt_id').textContent    = q.quotation_no ?? ('QT-' + String(q.id).padStart(4, '0'));
-    document.getElementById('modal_desc').textContent     = q.description ?? '-';
-    document.getElementById('modal_qty').textContent      = q.quantity ?? '-';
-    document.getElementById('modal_price').textContent    = '₹' + parseFloat(q.price ?? 0).toLocaleString('en-IN', {minimumFractionDigits:2});
-    document.getElementById('modal_total').textContent    = '₹' + subtotal.toLocaleString('en-IN', {minimumFractionDigits:2});
-    document.getElementById('modal_subtotal').textContent = '₹' + subtotal.toLocaleString('en-IN', {minimumFractionDigits:2});
-    document.getElementById('modal_gst').textContent      = '₹' + gst.toLocaleString('en-IN', {minimumFractionDigits:2});
-    document.getElementById('modal_grand').textContent    = '₹' + grand.toLocaleString('en-IN', {minimumFractionDigits:2});
+    // Header
+    document.getElementById('modal_qt_id').textContent = q.quotation_no ?? ('QT-' + String(q.id).padStart(4, '0'));
 
+    // Customer
     document.getElementById('modal_client').textContent       = lead.client_name ?? '-';
     document.getElementById('modal_phone').textContent        = lead.phone ?? '';
     document.getElementById('modal_email').textContent        = lead.email ?? '';
@@ -393,7 +398,28 @@ function openViewModal(id) {
     document.getElementById('modal_project_type').textContent = lead.project_type ?? '-';
     document.getElementById('modal_budget').textContent       = lead.budget_range ?? '-';
 
-    // Status badge — title case to match enum
+    // Items table
+    const tbody = document.getElementById('modal_items_body');
+    tbody.innerHTML = '';
+    items.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+        tr.className = 'border-b border-gray-100';
+        tr.innerHTML = `
+            <td class="py-2 text-gray-400 text-xs">${idx + 1}</td>
+            <td class="py-2 text-gray-800">${item.description ?? '-'}</td>
+            <td class="py-2 text-right text-gray-700">${item.quantity ?? '-'}</td>
+            <td class="py-2 text-right text-gray-700">${fmt(item.price)}</td>
+            <td class="py-2 text-right font-semibold text-gray-800">${fmt(item.total)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    // Totals
+    document.getElementById('modal_subtotal').textContent = fmt(subtotal);
+    document.getElementById('modal_gst').textContent      = fmt(gst);
+    document.getElementById('modal_grand').textContent    = fmt(grand);
+
+    // Status badge
     const statusEl  = document.getElementById('modal_status');
     const statusMap = {
         Approved: 'bg-green-100 text-green-700',
@@ -414,20 +440,7 @@ function openViewModal(id) {
         rejWrap.classList.add('hidden');
     }
 
-    // Image
-    const imgEl = document.getElementById('modal_image');
-    const wrap  = document.getElementById('modal_image_wrap');
-    if (q.image) {
-        imgEl.src = '/storage/' + q.image;
-        imgEl.onerror = function() {
-            this.src = '/img/' + q.image;
-            this.onerror = function() { wrap.classList.add('hidden'); };
-        };
-        wrap.classList.remove('hidden');
-    } else {
-        wrap.classList.add('hidden');
-    }
-
+    // Print link
     document.getElementById('modal_print_btn').href = printBaseUrl + '/' + id + '/print';
     document.getElementById('viewModal').classList.remove('hidden');
 }
