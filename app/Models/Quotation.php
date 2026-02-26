@@ -6,21 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 class Quotation extends Model
 {
-    protected $fillable = [
-        'lead_id',
-        'description',
-        'image',
-        'quantity',
-        'price',
-        'total',
-        'status',
-        'rejection_reason'
-    ];
+   
    protected $fillable = [
     'lead_id',
     'quotation_no',
     'items',
-    'status'
+    'status',
+    'rejection_reason'
 ];
 
 protected $casts = [
