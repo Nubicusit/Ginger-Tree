@@ -5,13 +5,14 @@ use App\Models\Transaction;
 use Illuminate\Http\Request;
 use App\Models\Quotation;
 use App\Models\Customer;
+use App\Models\Invoice;
 class AccountsController extends Controller
 {
     public function dashboard()
     {
         return view('accounts.dashboard');
     }
- 
+
 public function incomeExpenses()
 {
     $transactions  = Transaction::latest()->get(); // your model
@@ -141,7 +142,7 @@ public function invoicesIndex(Request $request)
     if ($request->filled('search')) {
         $search = $request->search;
         $query->where(function($q) use ($search) {
-            $q->whereHas('lead', fn($l) => 
+            $q->whereHas('lead', fn($l) =>
                 $l->where('client_name', 'like', '%'.$search.'%')
             )
             ->orWhereNull('lead_id'); // include unassigned too
@@ -275,7 +276,7 @@ public function invoicesDestroy($id)
 public function invoicesPrint($id)
 {
     $quotation = Quotation::with('lead')->findOrFail($id);
-    
+
     return view('accounts.print', compact('quotation'));
 }
 

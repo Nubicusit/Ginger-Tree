@@ -95,14 +95,14 @@
         @endphp
 
         <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
-            @if($status == 'Draft') bg-gray-100 text-gray-700
-            @elseif($status == 'Submitted') bg-yellow-100 text-yellow-800
+            @if($status == 'Submitted') bg-gray-100 text-gray-700
+            @elseif($status == 'Negotiation') bg-yellow-100 text-yellow-800
             @elseif($status == 'Approved') bg-green-100 text-green-800
             @elseif($status == 'Rejected') bg-red-100 text-red-800
             @endif
         ">
-            @if($status == 'Draft') 📝
-            @elseif($status == 'Submitted') ⏳
+            @if($status == 'Submitted') 📝
+            @elseif($status == 'Negotition') ⏳
             @elseif($status == 'Approved') ✅
             @elseif($status == 'Rejected') ❌
             @endif

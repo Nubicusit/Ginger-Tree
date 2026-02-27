@@ -312,3 +312,5 @@ Route::patch('/accounts/invoices/{id}/approve', [AccountsController::class, 'inv
 Route::patch('/accounts/invoices/{id}/reject', [AccountsController::class, 'invoicesReject'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.invoices.reject');
+
+    

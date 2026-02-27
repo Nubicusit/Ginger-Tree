@@ -64,7 +64,7 @@ class QuotationController extends Controller
                 'lead_id'      => $request->lead_id,
                 'quotation_no' => $request->quotation_no,
                 'items'        => $itemsArray,
-                'status'       => 'Draft',
+                // 'status'       => 'Draft',
             ]);
 
             return response()->json([
@@ -198,7 +198,7 @@ class QuotationController extends Controller
 
         return response()->json(['quotation_no' => $quotationNo]);
     }
-    
+
     public function getItems()
     {
         return response()->json(
