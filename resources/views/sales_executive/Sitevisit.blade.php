@@ -61,79 +61,105 @@
                     <td class="px-6 py-4">{{ $lead->project_type }}</td>
                     <td class="px-6 py-4">
                         @if($lead->siteVisit)
-                            {{ \Carbon\Carbon::parse($lead->siteVisit->visit_datetime)->format('d M Y, h:i A') }}
+                        {{ \Carbon\Carbon::parse($lead->siteVisit->visit_datetime)->format('d M Y, h:i A') }}
                         @else - @endif
                     </td>
                     <!-- <td class="px-6 py-4">{{ $lead->siteVisit->assigned_staff ?? '-' }}</td> -->
-                  <td class="px-6 py-4">
-    @if($lead->siteVisit && $lead->siteVisit->budget_sensitivity)
+                    <td class="px-6 py-4">
+                        @if($lead->siteVisit && $lead->siteVisit->budget_sensitivity)
 
-        @php
-            $budget = strtolower($lead->siteVisit->budget_sensitivity);
-        @endphp
+                        @php
+                        $budget = strtolower($lead->siteVisit->budget_sensitivity);
+                        @endphp
 
-        <span class="px-3 py-1 rounded-full text-xs font-semibold
+                        <span class="px-3 py-1 rounded-full text-xs font-semibold
             @if($budget == 'low') bg-green-50 text-green-700 border border-green-200
             @elseif($budget == 'medium') bg-yellow-50 text-yellow-700 border border-yellow-200
             @elseif($budget == 'high') bg-red-50 text-red-700 border border-red-200
             @endif
         ">
-            {{ ucfirst($budget) }}
-        </span>
+                            {{ ucfirst($budget) }}
+                        </span>
 
-    @else
-        <span class="text-gray-400 text-xs">-</span>
-    @endif
-</td>
+                        @else
+                        <span class="text-gray-400 text-xs">-</span>
+                        @endif
+                    </td>
                     <td class="px-6 py-4">{{ Str::limit($lead->siteVisit->site_condition_notes ?? '-', 30) }}</td>
                     <!-- <td class="px-6 py-4"> -->
-                        <td class="px-6 py-4">
-    @if($lead->latestQuotation)
+                    <td class="px-6 py-4">
+                        @if($lead->latestQuotation)
 
-        @php
-            $status = $lead->latestQuotation->status;
-        @endphp
+                        @php
+                        $quotation = $lead->latestQuotation;
+                        $status = $quotation->status;
+                        @endphp
 
-        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
+                        <div class="flex flex-col gap-1">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold
             @if($status == 'Submitted') bg-gray-100 text-gray-700
             @elseif($status == 'Negotiation') bg-yellow-100 text-yellow-800
             @elseif($status == 'Approved') bg-green-100 text-green-800
             @elseif($status == 'Rejected') bg-red-100 text-red-800
             @endif
         ">
-            @if($status == 'Submitted') 📝
-            @elseif($status == 'Negotition') ⏳
-            @elseif($status == 'Approved') ✅
-            @elseif($status == 'Rejected') ❌
-            @endif
+                                @if($status == 'Submitted') 📝
+                                @elseif($status == 'Negotiation') ⏳
+                                @elseif($status == 'Approved') ✅
+                                @elseif($status == 'Rejected') ❌
+                                @endif
 
-            <span class="ml-1">{{ ucfirst($status) }}</span>
-        </span>
+                                <span class="ml-1">{{ ucfirst($status) }}</span>
+                            </span>
 
-    @else
-        <span class="text-gray-400 text-xs">No Quotation</span>
-    @endif
-</td>
-                        <!-- @if($lead->siteVisit)
+                            {{-- Show Negotiation Reason --}}
+                            @if($status == 'Negotiation' && $quotation->negotiation_reason)
+                            <span class="text-xs text-yellow-700 italic">
+                                Reason: {{ $quotation->negotiation_reason }}
+                            </span>
+                            @endif
+
+                            @if($status == 'Rejected' && $quotation->rejection_reason)
+                            <span class="text-xs text-red-700 italic">
+                                Reason: {{ $quotation->rejection_reason }}
+                            </span>
+                            @endif
+                        </div>
+
+                        @else
+                        <span class="text-gray-400 text-xs">No Quotation</span>
+                        @endif
+                    </td>
+                    <!-- @if($lead->siteVisit)
                             <span class="px-2 py-1 rounded text-xs {{ $lead->siteVisit->approval_status === 'Yes' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700' }}">
                                 {{ ucfirst($lead->siteVisit->approval_status) }}
                             </span>
                         @else - @endif -->
                     <!-- </td> -->
                     <td class="px-6 py-4 flex gap-2">
-    <button onclick="openSitevisitDrawer({{ $lead->id }})"
-        class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
-        View
-    </button>
+                        <button onclick="openSitevisitDrawer({{ $lead->id }})"
+                            class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
+                            View
+                        </button>
 
-    @if($lead->latestQuotation)
-        <a href="{{ route('sale.quotations.pdf', $lead->latestQuotation->id) }}"
-           target="_blank"
-           class="bg-green-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
-            PDF
-        </a>
-    @endif
-</td>
+                        @if($lead->latestQuotation)
+                        @php
+                        $status = $lead->latestQuotation->status;
+                        @endphp
+
+                        <a href="{{ route('sale.quotations.pdf', $lead->latestQuotation->id) }}"
+                            target="_blank"
+                            class="text-white text-[10px] font-bold py-2 px-4 rounded uppercase
+    @if($status == 'Negotiation') bg-red-600 hover:bg-red-700
+    @elseif($status == 'Rejected') bg-gray-600 hover:bg-gray-700
+    @elseif($status == 'Approved') bg-green-600 hover:bg-green-700
+    @else bg-blue-600 hover:bg-blue-700
+    @endif">
+                            PDF
+                        </a>
+
+                        @endif
+                    </td>
                 </tr>
                 @empty
                 <tr>
@@ -333,7 +359,6 @@
                     document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
                     document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
                     document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
-
                     const quotationBox = document.getElementById('quotationAction');
                     quotationBox.classList.toggle('hidden', data.site_visit.approval_status !== 'Yes');
 
@@ -366,7 +391,10 @@
 
                     if (scrollToFiles) {
                         setTimeout(() => {
-                            document.getElementById('measurement_preview').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                            document.getElementById('measurement_preview').scrollIntoView({
+                                behavior: 'smooth',
+                                block: 'center'
+                            });
                         }, 300);
                     }
                 }
@@ -401,20 +429,25 @@
         selectedFiles.forEach(file => formData.append('measurement_files[]', file));
 
         fetch('/sale-executive/site-visit/update', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content') },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(response => {
-            if (response.success) {
-                alert('Site visit updated successfully');
-                location.reload();
-            } else {
-                alert('Something went wrong');
-            }
-        })
-        .catch(err => { console.error(err); alert('Error saving data'); });
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(response => {
+                if (response.success) {
+                    alert('Site visit updated successfully');
+                    location.reload();
+                } else {
+                    alert('Something went wrong');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Error saving data');
+            });
     }
 </script>
 
@@ -461,18 +494,20 @@
         if (!confirm('Delete this file?')) return;
 
         fetch('/sale-executive/site-visit/delete-file', {
-            method: 'POST',
-            headers: {
-                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ file })
-        })
-        .then(res => res.json())
-        .then(res => {
-            if (res.success) event.target.closest('div').remove();
-            else alert('Failed to delete file');
-        });
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    file
+                })
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) event.target.closest('div').remove();
+                else alert('Failed to delete file');
+            });
     }
 </script>
 
@@ -480,9 +515,9 @@
     function openMediaViewer(src, type) {
         const viewer = document.getElementById('mediaViewer');
         const content = document.getElementById('mediaViewerContent');
-        content.innerHTML = type === 'image'
-            ? `<img src="${src}" class="max-w-full max-h-[90vh] rounded shadow-lg" />`
-            : `<video src="${src}" controls autoplay class="max-w-full max-h-[90vh] rounded shadow-lg"></video>`;
+        content.innerHTML = type === 'image' ?
+            `<img src="${src}" class="max-w-full max-h-[90vh] rounded shadow-lg" />` :
+            `<video src="${src}" controls autoplay class="max-w-full max-h-[90vh] rounded shadow-lg"></video>`;
         viewer.classList.remove('hidden');
     }
 
@@ -500,7 +535,7 @@
         document.getElementById('quotationModal').classList.remove('hidden');
 
         // Generate quotation number
-        fetch('/quotation/generate-number')
+        fetch('/quotation/generate-number?lead_id=' + document.getElementById('current_lead_id').value)
             .then(res => res.json())
             .then(data => {
                 document.getElementById('quotationNumberDisplay').textContent = data.quotation_no;
@@ -560,20 +595,20 @@
         // ✅ Collect only rows that have an item selected — no index gaps
         const validItems = [];
         allItemRows.forEach(row => {
-            const itemSelect  = row.querySelector('.q_item');
+            const itemSelect = row.querySelector('.q_item');
             const description = row.querySelector('.q_description');
-            const quantity    = row.querySelector('.q_quantity');
-            const price       = row.querySelector('.q_price');
-            const image       = row.querySelector('.q_image');
+            const quantity = row.querySelector('.q_quantity');
+            const price = row.querySelector('.q_price');
+            const image = row.querySelector('.q_image');
 
             if (!itemSelect.value) return; // skip unselected rows
 
             validItems.push({
-                item_id:     itemSelect.value,
+                item_id: itemSelect.value,
                 description: description.value,
-                quantity:    quantity.value,
-                price:       price.value,
-                imageFile:   image.files[0] ?? null
+                quantity: quantity.value,
+                price: price.value,
+                imageFile: image.files[0] ?? null
             });
         });
 
@@ -588,38 +623,43 @@
 
         // ✅ Sequential index from 0 — no gaps, Laravel won't reject
         validItems.forEach((item, index) => {
-            formData.append(`items[${index}][item_id]`,    item.item_id);
+            formData.append(`items[${index}][item_id]`, item.item_id);
             formData.append(`items[${index}][description]`, item.description);
-            formData.append(`items[${index}][quantity]`,   item.quantity);
-            formData.append(`items[${index}][price]`,      item.price);
+            formData.append(`items[${index}][quantity]`, item.quantity);
+            formData.append(`items[${index}][price]`, item.price);
             if (item.imageFile) {
                 formData.append(`items[${index}][image]`, item.imageFile);
             }
         });
 
         fetch('/sale-executive/quotation/store', {
-            method: 'POST',
-            headers: { 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content },
-            body: formData
-        })
-        .then(res => res.json())
-        .then(res => {
-            if (res.success) {
-                closeQuotationModal();
-                window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
-            } else {
-                alert(res.message ?? 'Failed to create quotation');
-            }
-        })
-        .catch(err => { console.error(err); alert('Server error'); });
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: formData
+            })
+            .then(res => res.json())
+            .then(res => {
+                if (res.success) {
+                    closeQuotationModal();
+                    window.open(`/sale-executive/quotation/${res.quotation_id}/pdf`, '_blank');
+                } else {
+                    alert(res.message ?? 'Failed to create quotation');
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert('Server error');
+            });
     }
 </script>
 
 <script>
     function addMoreQuotationItem() {
-        const wrapper   = document.getElementById('quotation_items_wrapper');
+        const wrapper = document.getElementById('quotation_items_wrapper');
         const firstItem = wrapper.querySelector('.quotation-item');
-        const clone     = firstItem.cloneNode(true);
+        const clone = firstItem.cloneNode(true);
 
         // Reset all inputs/textareas in clone
         clone.querySelectorAll('input:not([type=file]), textarea').forEach(el => el.value = '');

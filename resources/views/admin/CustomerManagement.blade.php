@@ -20,7 +20,6 @@
             </label>
             <div class="ml-4 h-6 border-l border-gray-200"></div>
         </div>
-
         <!-- Stats & Action Buttons -->
         <div class="flex flex-wrap justify-between items-center gap-4">
             <div class="flex gap-4">
@@ -34,9 +33,8 @@
             <!-- Add/Update Button -->
             <button onclick="openCustomerModal()"
                 class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-2 rounded-md font-bold uppercase tracking-wider shadow-md">
-                ADD AND UPDATE CUSTOMER
+                UPDATE CUSTOMER
             </button>
-
         </div>
     </div>
 
@@ -72,10 +70,11 @@
 
                     <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Contact NO</th>
                     <!-- <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Location</th> -->
-                    <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Company</th>
+                    <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Location</th>
 
                     <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Payment Status</th>
                     <th class="p-4 text-sm font-semibold text-gray-500 uppercase tracking-wider">Project Status</th>
+
                 </tr>
             </thead>
 
@@ -119,7 +118,7 @@
                     </td>
 
                     <td class="p-4 text-gray-600">
-                        {{ $customer->company }}
+                        {{ $customer->address }}
                     </td>
 
                     <td class="p-4">
@@ -151,112 +150,9 @@
                         </span>
                         @endif
                     </td>
+
                 </tr>
                 @endforeach
-
-                <!-- Row 1 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#15624</td>
-            <td class="p-4 font-medium text-gray-800">Priya Sharma</td>
-            <td class="p-4 text-gray-600">Apartment Interior</td>
-            <td class="p-4 text-gray-600">Beverley Hills</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr> -->
-
-                <!-- Row 2 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#14589</td>
-            <td class="p-4 font-medium text-gray-800">Anish & Rupa</td>
-            <td class="p-4 text-gray-600">Villa Interior</td>
-            <td class="p-4 text-gray-600">Cupertino, CA</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">Payment Completed</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-            </tr> -->
-
-                <!-- Row 3 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#14301</td>
-            <td class="p-4 font-medium text-gray-800">Kamal Mehta</td>
-            <td class="p-4 text-gray-600">Office Interior</td>
-            <td class="p-4 text-gray-600">San Francisco</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr> -->
-
-                <!-- Row 4 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#13987</td>
-            <td class="p-4 font-medium text-gray-800">Elger Family</td>
-            <td class="p-4 text-gray-600">Retail / Showrom</td>
-            <td class="p-4 text-gray-600">Venice, CA</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr> -->
-
-                <!-- Row 5 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#13052</td>
-            <td class="p-4 font-medium text-gray-800">Tina Kapoor</td>
-            <td class="p-4 text-gray-600">Apartment Interior</td>
-            <td class="p-4 text-gray-600">Santa Monica</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr> -->
-
-                <!-- Row 6 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#13209</td>
-            <td class="p-4 font-medium text-gray-800">Lisa Patel</td>
-            <td class="p-4 text-gray-600">Villa Interior</td>
-            <td class="p-4 text-gray-600">Pab Alto, CA</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr> -->
-
-                <!-- Row 7 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#13187</td>
-            <td class="p-4 font-medium text-gray-800">Zhang Li</td>
-            <td class="p-4 text-gray-600">Apartment Interior</td>
-            <td class="p-4 text-gray-600">Monna Del Re</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-          </tr> -->
-
-                <!-- Row 8 -->
-                <!-- <tr class="hover:bg-gray-50 transition-colors">
-            <td class="p-4"><input type="checkbox" class="w-4 h-4 border-gray-300 rounded"></td>
-            <td class="p-4 text-gray-600">#12642</td>
-            <td class="p-4 font-medium text-gray-800">Shoalb Khan</td>
-            <td class="p-4 text-gray-600">Modular Kitchen</td>
-            <td class="p-4 text-gray-600">Los Angeles,</td>
-            <td class="p-4">
-              <span class="bg-black text-white text-[14px] px-3 py-1 rounded font-bold uppercase tracking-tighter">BALANCE : 300000</span>
-            </td>
-            <td class="p-4 text-gray-600 font-mono text-sm">27ABCDE1234F2Z5.</td>
-            </tr> -->
             </tbody>
         </table>
     </div>
@@ -439,59 +335,49 @@
         </div>
     </div>
 </div>
+<!-- Credential Modal -->
+<div id="credentialModal" style="display:none;">
+    <form id="credentialForm">
+        @csrf
+        <input type="hidden" name="customer_id" id="modal_customer_id">
+
+        <label>Password</label>
+        <input type="password" name="password" required>
+
+        <button type="submit">Save</button>
+    </form>
+</div>
 <script>
     function openCustomerModal() {
         const modal = document.getElementById('customerModal');
         const form = document.getElementById('customerForm');
-
         const checked = document.querySelectorAll('.table-checkbox:checked');
 
-        // Reset form
-        form.reset();
-        form.querySelector('[name="customer_id"]').value = '';
-
-        if (checked.length > 1) {
-            alert("Please select only ONE customer to update ❌");
+        if (checked.length === 0) {
+            alert("Please select ONE customer to update ❌");
             return;
         }
 
-        if (checked.length === 1) {
-            const cb = checked[0];
-
-            // Basic Info
-            form.querySelector('[name="customer_id"]').value = cb.dataset.id || '';
-            form.querySelector('[name="name"]').value = cb.dataset.name || '';
-            form.querySelector('[name="project_type"]').value = cb.dataset.project_type || '';
-            form.querySelector('[name="contact_no"]').value = cb.dataset.contact_no || '';
-            form.querySelector('[name="email"]').value = cb.dataset.email || '';
-            form.querySelector('[name="address"]').value = cb.dataset.address || '';
-
-            // Customer Type (select)
-            if (cb.dataset.customer_type) {
-                form.querySelector('[name="customer_type"]').value = cb.dataset.customer_type;
-            }
-
-            // Company Profile
-            form.querySelector('[name="company"]').value = cb.dataset.company || '';
-            form.querySelector('[name="gst_number"]').value = cb.dataset.gst_number || '';
-
-            // Industry (select)
-            if (cb.dataset.industry) {
-                form.querySelector('[name="industry"]').value = cb.dataset.industry;
-            }
-
-            // Website (remove https:// if exists)
-            if (cb.dataset.website) {
-                form.querySelector('[name="website"]').value =
-                    cb.dataset.website.replace(/^https?:\/\//, '');
-            }
-
-            // Notes (textarea)
-            form.querySelector('[name="notes"]').value = cb.dataset.notes || '';
-
-            // Payment
-            form.querySelector('[name="payment_status"]').value = cb.dataset.payment_status || 'pending';
+        if (checked.length > 1) {
+            alert("You can update only ONE customer at a time ❌");
+            return;
         }
+
+        const cb = checked[0];
+
+        // Fill form
+        form.querySelector('[name="customer_id"]').value = cb.dataset.id || '';
+        form.querySelector('[name="name"]').value = cb.dataset.name || '';
+        form.querySelector('[name="project_type"]').value = cb.dataset.project_type || '';
+        form.querySelector('[name="contact_no"]').value = cb.dataset.contact_no || '';
+        form.querySelector('[name="email"]').value = cb.dataset.email || '';
+        form.querySelector('[name="address"]').value = cb.dataset.address || '';
+        form.querySelector('[name="customer_type"]').value = cb.dataset.customer_type || '';
+        form.querySelector('[name="company"]').value = cb.dataset.company || '';
+        form.querySelector('[name="gst_number"]').value = cb.dataset.gst_number || '';
+        form.querySelector('[name="industry"]').value = cb.dataset.industry || '';
+        form.querySelector('[name="notes"]').value = cb.dataset.notes || '';
+        form.querySelector('[name="payment_status"]').value = cb.dataset.payment_status || 'pending';
 
         modal.classList.remove('hidden');
         modal.classList.add('flex');
@@ -514,8 +400,8 @@
         });
     });
 </script>
-<script>
 
+<script>
     function switchTab(event, tabId) {
         // 1. Remove active state from all buttons
         const tabButtons = document.querySelectorAll('.tab-btn');
@@ -593,4 +479,5 @@
         }
     });
 </script>
+
 @endsection

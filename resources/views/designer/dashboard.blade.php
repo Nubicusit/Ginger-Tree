@@ -5,7 +5,6 @@
 @section('page-title', 'Welcome, Sales')
 
 @section('content')
-
 <div class="bg-[#F3F4F6]">
   <!-- Dashboard -->
     <div class="max-w-full mx-auto">
@@ -342,7 +341,7 @@
                     </div>
                 </div>
                 <!-- checkin section -->
-                <div class="bg-white rounded-xl card-shadow p-6">
+                <!-- <div class="bg-white rounded-xl card-shadow p-6">
                     <h3 class="text-gray-800 font-semibold text-base mb-6">Check In</h3>
                     <div class="space-y-6">
                         <button id="quickCheckinBtn" class="block w-full p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors text-left flex items-center">
@@ -351,109 +350,15 @@
                         </svg>
                         ⏰ Self Check-in Now
                     </button>
-                    <button id="openLeaveModal"
-                        class="block w-full p-3 bg-blue-50 border border-blue-200 rounded-lg hover:bg-blue-100 transition-colors text-left flex items-center mt-4">
-                        <svg class="w-6 h-6 mr-3 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7V3m8 4V3m-9 8h10m-11 9h12a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v11a2 2 0 002 2z" />
-                        </svg>
-                        📝 Apply Leave
-                    </button>
-                    {{-- Leave Status Section --}}
-@if(isset($leaves) && count($leaves) > 0)
-    <div class="mt-4 border-t pt-4">
-        <h4 class="text-sm font-semibold text-gray-700 mb-2">
-            Your Leave Requests
-        </h4>
-
-        @foreach($leaves as $leave)
-            <div class="flex justify-between items-center text-sm p-2 rounded-lg mb-2
-                @if($leave->status == 'approved') bg-green-50
-                @elseif($leave->status == 'rejected') bg-red-50
-                @elseif($leave->status == 'hold') bg-yellow-50
-                @else bg-blue-50
-                @endif">
-
-                <span>
-                    {{ ucfirst($leave->leave_type) }}
-                    ({{ $leave->from_date }} to {{ $leave->to_date }})
-                </span>
-
-                <span class="font-semibold capitalize
-                    @if($leave->status == 'approved') text-green-600
-                    @elseif($leave->status == 'rejected') text-red-600
-                    @elseif($leave->status == 'hold') text-yellow-600
-                    @else text-blue-600
-                    @endif">
-                    {{ $leave->status }}
-                </span>
-            </div>
-        @endforeach
-    </div>
-@endif
                     </div>
-                </div>
+                </div> -->
             </div>
         </div>
     </div>
-    <div id="leaveModal" class="fixed inset-0 bg-black/30 backdrop-blur-md z-50 hidden">
-    <div class="flex items-center justify-center min-h-screen p-6">
-        <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl">
-
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-blue-500 to-blue-600 p-6 text-white rounded-t-3xl flex justify-between items-center">
-                <h3 class="text-xl font-bold">Apply Leave</h3>
-                <button id="closeLeaveModal" class="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-xl">
-                    ✕
-                </button>
-            </div>
-
-            <!-- Body -->
-            <div class="p-6">
-                <form action="{{ route('sales.leave.store') }}" method="POST">
-                    @csrf
-
-                    <div class="mb-4">
-                        <label class="block font-medium mb-1">Leave Type</label>
-                        <select name="leave_type" class="w-full border rounded p-2" required>
-                            <option value="">Select Leave Type</option>
-                            <option value="sick">Sick</option>
-                            <option value="casual">Casual</option>
-                            <option value="annual">Annual</option>
-                            <option value="unpaid">Unpaid</option>
-                            <option value="other">Other</option>
-                        </select>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block font-medium mb-1">From Date</label>
-                        <input type="date" name="from_date" class="w-full border rounded p-2" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block font-medium mb-1">To Date</label>
-                        <input type="date" name="to_date" class="w-full border rounded p-2" required>
-                    </div>
-
-                    <div class="mb-4">
-                        <label class="block font-medium mb-1">Reason</label>
-                        <textarea name="reason" class="w-full border rounded p-2"></textarea>
-                    </div>
-
-                    <button type="submit"
-                        class="w-full bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition">
-                        Submit Leave Request
-                    </button>
-                </form>
-            </div>
-
-        </div>
-    </div>
-</div>
-        <div id="checkinModal" class="fixed inset-0 bg-black/30 backdrop-blur-md z-50 hidden">
+        <!-- <div id="checkinModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
         <div class="flex items-center justify-center min-h-screen p-6">
             <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
-                <!-- Modal Header -->
+
                 <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-8 text-white">
                     <div class="flex items-center justify-between">
                         <div>
@@ -466,17 +371,17 @@
                             </svg>
                         </button>
                     </div>
-                </div>
+                </div> -->
 
                 <!-- Modal Body -->
-                <div class="p-8">
-                    <!-- Status Check -->
+                <!-- <div class="p-8">
+
                     <div id="statusCheck" class="text-center mb-8">
                         <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
                         <p class="text-lg text-gray-600">Checking status...</p>
                     </div>
 
-                    <!-- Check-in Button -->
+
                     <div id="checkinSection" class="hidden text-center">
                         <div class="mb-8">
                             <div class="w-20 h-20 bg-orange-100 rounded-2xl mx-auto mb-4 flex items-center justify-center">
@@ -492,7 +397,7 @@
                         </button>
                     </div>
 
-                    <!-- Already Checked -->
+
                     <div id="alreadyCheckedSection" class="hidden text-center">
                         <div class="bg-green-50 rounded-2xl p-8 mb-6">
                             <div class="w-20 h-20 bg-green-100 rounded-2xl mx-auto mb-4 flex items-center justify-center">
@@ -508,33 +413,11 @@
                         </button>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-
+            </div> -->
+        <!-- </div> -->
+    <!-- </div> -->
 </div>
-<script>
-    // LEAVE MODAL
-const openLeaveModal = document.getElementById('openLeaveModal');
-const leaveModal = document.getElementById('leaveModal');
-const closeLeaveModal = document.getElementById('closeLeaveModal');
-
-openLeaveModal.addEventListener('click', function () {
-    leaveModal.classList.remove('hidden');
-});
-
-closeLeaveModal.addEventListener('click', function () {
-    leaveModal.classList.add('hidden');
-});
-
-// Close when clicking outside
-leaveModal.addEventListener('click', function (e) {
-    if (e.target === leaveModal) {
-        leaveModal.classList.add('hidden');
-    }
-});
-</script>
-<script>
+<!-- <script>
 document.addEventListener('DOMContentLoaded', function() {
 
     const quickCheckinBtn = document.getElementById('quickCheckinBtn');
@@ -614,5 +497,5 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
-</script>
+</script> -->
 @endsection

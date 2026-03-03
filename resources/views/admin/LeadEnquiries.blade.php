@@ -94,65 +94,62 @@
             ADD MARKETING / DESIGNER
         </a>
     </div>
+    
 </div>
-<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
-        <form method="GET" action="{{ route('leads') }}" class="flex flex-wrap gap-3 items-center justify-between">
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4 flex flex-wrap items-center justify-between gap-3">
+    <form method="GET" action="{{ route('leads') }}" class="flex flex-wrap gap-3 items-center justify-between">
 
-            <!-- Left Section -->
-            <div class="flex flex-wrap gap-3 items-center">
+        <!-- Left Section -->
+        <!-- <div class="flex flex-wrap gap-3 items-center"> -->
 
-                <!-- Search by Name -->
-                <input
-                    type="text"
-                    name="search"
-                    value="{{ request('search') }}"
-                    placeholder="Search by client name..."
-                    class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            <!-- Search by Name -->
+            <input
+                type="text"
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search by client name..."
+                class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
 
-                <!-- Filter by Status -->
-                <select
-                    name="status"
-                    class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            <!-- Filter by Status -->
+            <select
+                name="status"
+                class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
 
-                    <option value="">All Status</option>
-                    <option value="New" {{ request('status')=='New' ? 'selected' : '' }}>New</option>
-                    <option value="Contacted" {{ request('status')=='Contacted' ? 'selected' : '' }}>Contacted</option>
-                    <option value="Site Visit" {{ request('status')=='Site Visit' ? 'selected' : '' }}>Site Visit</option>
-                    <option value="Won" {{ request('status')=='Won' ? 'selected' : '' }}>Won</option>
-                    <option value="Lost" {{ request('status')=='Lost' ? 'selected' : '' }}>Lost</option>
-                </select>
+                <option value="">All Status</option>
+                <option value="New" {{ request('status')=='New' ? 'selected' : '' }}>New</option>
+                <option value="Contacted" {{ request('status')=='Contacted' ? 'selected' : '' }}>Contacted</option>
+                <option value="Site Visit" {{ request('status')=='Site Visit' ? 'selected' : '' }}>Site Visit</option>
+                <option value="Won" {{ request('status')=='Won' ? 'selected' : '' }}>Won</option>
+                <option value="Lost" {{ request('status')=='Lost' ? 'selected' : '' }}>Lost</option>
+            </select>
 
-                <input
-    type="date"
-    name="date"
-    value="{{ request('date') }}"
-    class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+            <input
+                type="date"
+                name="date"
+                value="{{ request('date') }}"
+                class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
 
-                <button
-                    type="submit"
-                    class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-                    Filter
-                </button>
+            <button
+                type="submit"
+                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+                Filter
+            </button>
 
-                <a href="{{ route('leads') }}"
-                    class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded">
-                    Reset
-                </a>
-            </div>
-
-            <!-- Right Section -->
-            <div>
-                <form action="{{ route('leads.import') }}" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <label class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded cursor-pointer">
-                        Import CSV
-                        <input type="file" name="csv_file" class="hidden" onchange="this.form.submit()">
-                    </label>
-                </form>
-            </div>
-
-        </form>
-    </div>
+            <a href="{{ route('leads') }}"
+                class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded">
+                Reset
+            </a>
+        <!-- </div> -->
+    </form>
+    <!-- Right Section -->
+    <form action="{{ route('leads.import') }}" method="POST" enctype="multipart/form-data">
+        @csrf
+        <label class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded cursor-pointer">
+            Import CSV
+            <input type="file" name="csv_file" class="hidden" onchange="this.form.submit()">
+        </label>
+    </form>
+</div>
 <!-- Table Section -->
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
     <div class="overflow-x-auto">
