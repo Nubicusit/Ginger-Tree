@@ -12,7 +12,8 @@ class Quotation extends Model
     'quotation_no',
     'items',
     'status',
-    'rejection_reason'
+    'rejection_reason',
+    'negotiation_reason'
 ];
 
 protected $casts = [

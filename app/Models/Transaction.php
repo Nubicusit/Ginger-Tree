@@ -15,12 +15,17 @@ class Transaction extends Model
         'payment_method',
         'reference',
         'note',
+        'employee_id',
+        'deducted_month',
+        'status',
     ];
 
     protected $casts = [
         'date'   => 'date',
         'amount' => 'decimal:2',
     ];
+
+    // ── Scopes ───────────────────────────────────────────────────────────
 
     public function scopeIncome($query)
     {
@@ -32,4 +37,23 @@ class Transaction extends Model
         return $query->where('type', 'expense');
     }
 
+    public function scopeAdvance($query)
+    {
+        return $query->where('type', 'advance');
+    }
+
+    public function scopePendingAdvances($query, $employeeId, $month)
+    {
+        return $query->where('type', 'advance')
+                     ->where('employee_id', $employeeId)
+                     ->where('status', 'pending')
+                     ->where('deducted_month', $month);
+    }
+
+    // ── Relationship ─────────────────────────────────────────────────────
+
+    public function employee()
+    {
+        return $this->belongsTo(Employee::class);
+    }
 }

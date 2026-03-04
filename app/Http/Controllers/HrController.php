@@ -7,10 +7,13 @@ use App\Models\Department;
 use App\Models\Designation;
 use Illuminate\Http\Request;
 use App\Models\Attendance;
+use App\Models\Transaction;
+use App\Models\Leave;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Log;
 
 class HRController extends Controller
 {
@@ -50,7 +53,7 @@ class HRController extends Controller
             'department_id'     => 'required|exists:departments,id',
             'joining_date'      => 'required|date',
             'salary'            => 'required|numeric|min:0',
-            'salary_type'       => 'required|in:monthly,weekly', // ✅ added
+            'salary_type'       => 'required|in:monthly,weekly',
             'status'            => 'required|in:active,inactive',
             'address'           => 'nullable|string',
             'emergency_contact' => 'nullable|string|max:20',
@@ -60,9 +63,8 @@ class HRController extends Controller
             'blood_group'       => 'nullable|string|max:5',
         ]);
 
-        // ✅ Fixed: use withTrashed()->max() to avoid duplicate employee_id
-        $lastEmployee = Employee::withTrashed()->max('employee_id');
-        $nextNumber   = $lastEmployee ? (int) substr($lastEmployee, 3) + 1 : 1;
+        $lastEmployee             = Employee::withTrashed()->max('employee_id');
+        $nextNumber               = $lastEmployee ? (int) substr($lastEmployee, 3) + 1 : 1;
         $validated['employee_id'] = 'EMP' . str_pad($nextNumber, 5, '0', STR_PAD_LEFT);
 
         Employee::create($validated);
@@ -70,41 +72,40 @@ class HRController extends Controller
         return redirect()->route('hr.employees')->with('success', 'Employee added successfully!');
     }
 
+    public function updateEmployee(Request $request, $id)
+    {
+        $employee = Employee::findOrFail($id);
 
+        $validated = $request->validate([
+            'first_name'        => 'required|string|max:255',
+            'last_name'         => 'required|string|max:255',
+            'email'             => 'required|email|unique:employees,email,' . $id,
+            'phone'             => 'nullable|string|max:20',
+            'department_id'     => 'required|exists:departments,id',
+            'joining_date'      => 'required|date',
+            'salary'            => 'required|numeric|min:0',
+            'salary_type'       => 'required|in:monthly,weekly',
+            'status'            => 'required|in:active,inactive',
+            'address'           => 'nullable|string',
+            'emergency_contact' => 'nullable|string|max:20',
+            'pan_number'        => 'nullable|string|max:10',
+            'bank_account'      => 'nullable|string|max:20',
+            'ifsc_code'         => 'nullable|string|max:11',
+            'blood_group'       => 'nullable|string|max:5',
+        ]);
 
-public function updateEmployee(Request $request, $id)
-{
-    $employee = Employee::findOrFail($id);
+        $employee->update($validated);
 
-    $validated = $request->validate([
-        'first_name'        => 'required|string|max:255',
-        'last_name'         => 'required|string|max:255',
-        'email'             => 'required|email|unique:employees,email,' . $id,
-        'phone'             => 'nullable|string|max:20',
-        'department_id'     => 'required|exists:departments,id',
-        'joining_date'      => 'required|date',
-        'salary'            => 'required|numeric|min:0',
-        'salary_type'       => 'required|in:monthly,weekly',
-        'status'            => 'required|in:active,inactive',
-        'address'           => 'nullable|string',
-        'emergency_contact' => 'nullable|string|max:20',
-        'pan_number'        => 'nullable|string|max:10',
-        'bank_account'      => 'nullable|string|max:20',
-        'ifsc_code'         => 'nullable|string|max:11',
-        'blood_group'       => 'nullable|string|max:5',
-    ]);
+        return redirect()->route('hr.employees')->with('success', 'Employee updated successfully!');
+    }
 
-    $employee->update($validated);
+    public function destroyEmployee($id)
+    {
+        Employee::findOrFail($id)->delete();
+        return redirect()->route('hr.employees')->with('success', 'Employee deleted successfully!');
+    }
 
-    return redirect()->route('hr.employees')->with('success', 'Employee updated successfully!');
-}
-
-public function destroyEmployee($id)
-{
-    Employee::findOrFail($id)->delete();
-    return redirect()->route('hr.employees')->with('success', 'Employee deleted successfully!');
-}
-    // ===== ATTENDANCE MANAGEMENT (HR VIEW) =====
+    // ===== ATTENDANCE MANAGEMENT =====
     public function attendance(Request $request)
     {
         $query = Attendance::with('employee.department');
@@ -137,6 +138,7 @@ public function destroyEmployee($id)
             'leave_type'   => 'nullable|in:annual,sick,emergency,unpaid',
             'leave_status' => 'nullable|in:approved,pending,applied',
             'late_minutes' => 'nullable|integer|min:0',
+            'ot_hours'     => 'nullable|numeric|min:0|max:24',
         ]);
 
         $existing = Attendance::where('employee_id', $request->employee_id)
@@ -157,6 +159,7 @@ public function destroyEmployee($id)
             'leave_type'   => $request->leave_type,
             'leave_status' => $request->leave_status,
             'late_minutes' => $request->late_minutes,
+            'ot_hours'     => $request->ot_hours ?? 0,
         ]);
 
         return redirect()->route('hr.attendance')->with('success', 'Attendance marked successfully!');
@@ -181,6 +184,7 @@ public function destroyEmployee($id)
             'leave_type'   => 'nullable|in:annual,sick,emergency,unpaid',
             'leave_status' => 'nullable|in:approved,pending,applied',
             'late_minutes' => 'nullable|integer|min:0',
+            'ot_hours'     => 'nullable|numeric|min:0|max:24',
         ]);
 
         $attendance = Attendance::findOrFail($id);
@@ -195,6 +199,7 @@ public function destroyEmployee($id)
             'leave_type'   => $request->leave_type,
             'leave_status' => $request->leave_status,
             'late_minutes' => $request->late_minutes,
+            'ot_hours'     => $request->ot_hours ?? 0,
         ]);
 
         return redirect()->route('hr.attendance')->with('success', 'Attendance updated successfully!');
@@ -241,7 +246,6 @@ public function destroyEmployee($id)
                            ->first();
 
             if (!$employee) {
-                // ✅ Fixed: use withTrashed()->max() here too
                 $lastEmployee = Employee::withTrashed()->max('employee_id');
                 $nextNumber   = $lastEmployee ? (int) substr($lastEmployee, 3) + 1 : 1;
 
@@ -254,7 +258,7 @@ public function destroyEmployee($id)
                     'status'        => 'active',
                     'joining_date'  => now(),
                     'salary'        => 0,
-                    'salary_type'   => 'monthly', // ✅ added default
+                    'salary_type'   => 'monthly',
                     'department_id' => Department::first()?->id ?? 1,
                 ]);
             }
@@ -283,6 +287,7 @@ public function destroyEmployee($id)
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Self Check-in Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Check-in failed: ' . $e->getMessage(),
@@ -328,6 +333,7 @@ public function destroyEmployee($id)
             ]);
 
         } catch (\Exception $e) {
+            Log::error('Self Check-out Error: ' . $e->getMessage());
             return response()->json(['success' => false, 'message' => 'Check-out failed: ' . $e->getMessage()], 500);
         }
     }
@@ -371,73 +377,218 @@ public function destroyEmployee($id)
         return 'present';
     }
 
+    // ===== PAYROLL =====
     public function payroll(Request $request)
     {
         $filter    = $request->get('filter', 'monthly');
         $month     = $request->get('month', now()->format('Y-m'));
         $weekStart = $request->get('week_start', now()->startOfWeek()->format('Y-m-d'));
 
-        $employees = Employee::with('department')->get()->map(function ($employee) use ($filter, $month, $weekStart) {
+        $otMultipliers = [
+            2 => 1.25,
+            3 => 1.50,
+            4 => 2.00,
+        ];
 
-            if ($filter === 'weekly') {
-                $start = Carbon::parse($weekStart)->startOfWeek();
-                $end   = Carbon::parse($weekStart)->endOfWeek();
-            } else {
-                $start = Carbon::parse($month . '-01')->startOfMonth();
-                $end   = Carbon::parse($month . '-01')->endOfMonth();
+        $employees = Employee::with('department')->get()->map(
+            function ($employee) use ($filter, $month, $weekStart, $otMultipliers) {
+
+                if ($filter === 'weekly') {
+                    $start = Carbon::parse($weekStart)->startOfWeek();
+                    $end   = Carbon::parse($weekStart)->endOfWeek();
+                } else {
+                    $start = Carbon::parse($month . '-01')->startOfMonth();
+                    $end   = Carbon::parse($month . '-01')->endOfMonth();
+                }
+
+                $attendanceRecords = Attendance::where('employee_id', $employee->id)
+                    ->whereBetween('date', [$start, $end])
+                    ->get();
+
+                $presentDays      = $attendanceRecords->whereIn('status', ['present', 'late', 'half_day'])->count();
+                $absentDays       = $attendanceRecords->where('status', 'absent')->count();
+                $leaveDays        = $attendanceRecords->where('status', 'leave')->count();
+                $lateDays         = $attendanceRecords->where('status', 'late')->count();
+                $totalLateMinutes = $attendanceRecords->where('status', 'late')->sum('late_minutes');
+
+                $workingDays = $employee->salary_type === 'weekly' ? 5 : 26;
+                $dailyRate   = $employee->salary / $workingDays;
+                $hourlyRate  = $dailyRate / 8;
+
+                // ── OT Calculation ──────────────────────────────────────
+                $otAmount     = 0;
+                $totalOtHours = 0;
+
+                foreach ($attendanceRecords as $record) {
+                    $otHours = (float) ($record->ot_hours ?? 0);
+                    if ($otHours > 0 && isset($otMultipliers[(int) $otHours])) {
+                        $otAmount     += $otHours * $hourlyRate * $otMultipliers[(int) $otHours];
+                        $totalOtHours += $otHours;
+                    }
+                }
+
+                // ── Advance: sum all advances for this month ────────────
+                $advanceDeduction = Transaction::where('type', 'advance')
+                    ->where('employee_id', $employee->id)
+                    ->where('deducted_month', $month)
+                    ->sum('amount');
+
+                // ── Salary calculation ──────────────────────────────────
+                $grossSalary    = $employee->salary + $otAmount;
+                $absentDeduct   = $dailyRate * $absentDays;
+                $totalDeduction = $absentDeduct + $advanceDeduction;
+                $netSalary      = $grossSalary - $totalDeduction;
+
+                return [
+                    'id'                 => $employee->id,
+                    'employee_id'        => $employee->employee_id,
+                    'name'               => $employee->first_name . ' ' . $employee->last_name,
+                    'department'         => $employee->department->name ?? '—',
+                    'salary_type'        => $employee->salary_type ?? 'monthly',
+                    'present_days'       => $presentDays,
+                    'absent_days'        => $absentDays,
+                    'leave_days'         => $leaveDays,
+                    'late_days'          => $lateDays,
+                    'total_late_minutes' => $totalLateMinutes,
+                    'ot_hours_total'     => $totalOtHours,
+                    'ot_amount'          => round($otAmount, 2),
+                    'advance_deducted'   => round($advanceDeduction, 2),
+                    'gross_salary'       => round($grossSalary, 2),
+                    'deductions'         => round($totalDeduction, 2),
+                    'net_salary'         => round($netSalary, 2),
+                ];
             }
-
-            $totalDays        = $start->diffInWeekdays($end) + 1;
-            $presentDays      = Attendance::where('employee_id', $employee->id)
-                                    ->whereBetween('date', [$start, $end])
-                                    ->whereIn('status', ['present', 'late', 'half_day'])
-                                    ->count();
-            $absentDays       = Attendance::where('employee_id', $employee->id)
-                                    ->whereBetween('date', [$start, $end])
-                                    ->where('status', 'absent')
-                                    ->count();
-            $leaveDays        = Attendance::where('employee_id', $employee->id)
-                                    ->whereBetween('date', [$start, $end])
-                                    ->where('status', 'leave')
-                                    ->count();
-            $lateDays         = Attendance::where('employee_id', $employee->id)
-                                    ->whereBetween('date', [$start, $end])
-                                    ->where('status', 'late')
-                                    ->count();
-            $totalLateMinutes = Attendance::where('employee_id', $employee->id)
-                                    ->whereBetween('date', [$start, $end])
-                                    ->where('status', 'late')
-                                    ->sum('late_minutes');
-
-            // ✅ Fixed: respect salary_type for daily rate calculation
-            $workingDays  = $employee->salary_type === 'weekly' ? 5 : 26;
-            $dailySalary  = $employee->salary / $workingDays;
-            $earnedSalary = $dailySalary * $presentDays;
-            $deductions   = $dailySalary * $absentDays;
-            $netSalary    = $earnedSalary;
-
-            return [
-                'id'                 => $employee->id,
-                'employee_id'        => $employee->employee_id,
-                'name'               => $employee->first_name . ' ' . $employee->last_name,
-                'department'         => $employee->department->name ?? '—',
-                'salary_type'        => $employee->salary_type ?? 'monthly', // ✅ added
-                'gross_salary'       => $employee->salary,
-                'daily_salary'       => round($dailySalary, 2),
-                'present_days'       => $presentDays,
-                'absent_days'        => $absentDays,
-                'leave_days'         => $leaveDays,
-                'late_days'          => $lateDays,
-                'total_late_minutes' => $totalLateMinutes,
-                'earned_salary'      => round($earnedSalary, 2),
-                'deductions'         => round($deductions, 2),
-                'net_salary'         => round($netSalary, 2),
-            ];
-        });
+        );
 
         return view('HR.payroll', compact('employees', 'filter', 'month', 'weekStart'));
     }
 
+    // ===== PAYROLL OT UPDATE =====
+    public function updateOt(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'date'        => 'required|date',
+            'ot_hours'    => 'required|numeric|min:0|max:24',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $attendance = Attendance::where('employee_id', $request->employee_id)
+                ->whereDate('date', $request->date)
+                ->first();
+
+            if (!$attendance) {
+                DB::rollBack();
+                return back()->with('error', 'No attendance record found for ' . $request->date . '. Please mark attendance first.');
+            }
+
+            $attendance->ot_hours = $request->ot_hours;
+            $attendance->save();
+
+            DB::commit();
+            return back()->with('success', 'OT updated! ' . $request->ot_hours . ' hours added for ' . $request->date . '.');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('OT Update Error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to update OT: ' . $e->getMessage());
+        }
+    }
+
+    // ===== PAYROLL ADVANCE STORE =====
+    public function storeAdvance(Request $request)
+    {
+        $request->validate([
+            'employee_id'    => 'required|exists:employees,id',
+            'amount'         => 'required|numeric|min:1|max:100000',
+            'date'           => 'required|date',
+            'deducted_month' => 'required|date_format:Y-m',
+            'note'           => 'nullable|string|max:255',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $employee = Employee::findOrFail($request->employee_id);
+
+            Transaction::create([
+                'title'          => 'Salary Advance - ' . $employee->first_name . ' ' . $employee->last_name,
+                'type'           => 'advance',
+                'category'       => 'advance',
+                'amount'         => $request->amount,
+                'date'           => $request->date,
+                'employee_id'    => $request->employee_id,
+                'deducted_month' => $request->deducted_month,
+                'status'         => 'deducted',
+                'note'           => $request->note,
+            ]);
+
+            DB::commit();
+            return back()->with('success', 'Advance of ₹' . number_format($request->amount, 2) . ' added for ' . $employee->first_name . '!');
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Advance Store Error: ' . $e->getMessage());
+            return back()->with('error', 'Failed to add advance: ' . $e->getMessage());
+        }
+    }
+
+public function leaves(Request $request)
+{
+    $status = $request->input('status', 'all');
+    $query = Leave::with('employee')->latest();
+
+    if ($status !== 'all') {
+        $query->where('status', $status);
+    }
+
+    $leaves = $query->get();
+    $employees = Employee::where('status', 'active')->get();
+
+    return view('HR.leaves', compact('leaves', 'employees', 'status'));
+}
+
+public function storeLeave(Request $request)
+{
+    $request->validate([
+        'employee_id' => 'required|exists:employees,id',
+        'leave_type'  => 'required',
+        'from_date'   => 'required|date',
+        'to_date'     => 'required|date|after_or_equal:from_date',
+        'reason'      => 'nullable|string',
+    ]);
+
+    $from = \Carbon\Carbon::parse($request->from_date);
+    $to   = \Carbon\Carbon::parse($request->to_date);
+    $days = $from->diffInDays($to) + 1;
+
+    Leave::create([
+        'employee_id' => $request->employee_id,
+        'leave_type'  => $request->leave_type,
+        'from_date'   => $request->from_date,
+        'to_date'     => $request->to_date,
+        'days'        => $days,
+        'reason'      => $request->reason,
+        'status'      => 'pending',
+    ]);
+
+    return back()->with('success', 'Leave request added successfully.');
+}
+
+public function updateLeaveStatus(Request $request, Leave $leave)
+{
+    $request->validate([
+        'status' => 'required|in:approved,rejected,hold,pending',
+        'note'   => 'nullable|string',
+    ]);
+
+    $leave->update([
+        'status' => $request->status,
+        'note'   => $request->note,
+    ]);
+
+    return back()->with('success', 'Leave status updated.');
+}
     public function clearCache()
     {
         \Artisan::call('cache:clear');

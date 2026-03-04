@@ -26,6 +26,9 @@ Route::put('/tasks/{id}', [SalesController::class, 'updateTask'])->middleware(['
 Route::put('/leads/{lead}/update', [SalesController::class, 'update'])->middleware(['auth', 'department:sales_executive']);
 Route::get('/users/create', [SalesController::class, 'create'])->name('users.create')->middleware(['auth', 'department:sales_executive']);
 
+Route::post('/sales/leave/store', [SalesController::class, 'salesLeave'])->middleware(['auth', 'department:sales_executive'])
+        ->name('sales.leave.store');
+
 // customer-admin
 Route::get('/customers', [CustomerController::class, 'index'])->middleware(['auth', 'admin'])->name('customers.index');
 Route::get('/customers/create', [CustomerController::class, 'create']);
@@ -187,6 +190,14 @@ Route::post('/self-checkout', [HRController::class, 'checkout'])->name('hr.self.
 Route::get('/hr/attendance/report', [HRController::class, 'report'])
     ->middleware(['auth', 'department:hr'])
     ->name('hr.attendance.report');
+    
+    Route::post('/hr/payroll/ot/update', [HRController::class, 'updateOt'])
+    ->middleware(['auth', 'department:hr'])
+    ->name('hr.payroll.ot.update');
+
+Route::post('/hr/payroll/advance/store', [HRController::class, 'storeAdvance'])
+    ->middleware(['auth', 'department:hr'])
+    ->name('hr.payroll.advance.store');
 
 /*
 |--------------------------------------------------------------------------
@@ -312,3 +323,13 @@ Route::patch('/accounts/invoices/{id}/approve', [AccountsController::class, 'inv
 Route::patch('/accounts/invoices/{id}/reject', [AccountsController::class, 'invoicesReject'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.invoices.reject');
+
+    
+Route::patch('/accounts/invoices/{id}/negotiate', [AccountsController::class, 'invoicesNegotiate'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.negotiate');
+    
+    
+    Route::get('/hr/leaves', [HRController::class, 'leaves'])->name('hr.leaves')->middleware(['auth', 'department:hr']);
+Route::post('/hr/leaves', [HRController::class, 'storeLeave'])->name('hr.leaves.store')->middleware(['auth', 'department:hr']);
+Route::patch('/hr/leaves/{leave}/status', [HRController::class, 'updateLeaveStatus'])->name('hr.leaves.status')->middleware(['auth', 'department:hr']);

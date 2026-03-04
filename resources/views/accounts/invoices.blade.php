@@ -71,10 +71,11 @@
                 class="w-full md:w-1/3 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
             <select name="status" class="w-full md:w-1/5 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none">
                 <option value="">All Status</option>
-                <option value="Approved" {{ request('status') == 'Approved' ? 'selected' : '' }}>Approved</option>
-                <option value="Sent"     {{ request('status') == 'Sent'     ? 'selected' : '' }}>Sent</option>
-                <option value="Rejected" {{ request('status') == 'Rejected' ? 'selected' : '' }}>Rejected</option>
-                <option value="Draft"    {{ request('status') == 'Draft'    ? 'selected' : '' }}>Draft</option>
+                <option value="Approved"    {{ request('status') == 'Approved'    ? 'selected' : '' }}>Approved</option>
+                <option value="Sent"        {{ request('status') == 'Sent'        ? 'selected' : '' }}>Sent</option>
+                <option value="Rejected"    {{ request('status') == 'Rejected'    ? 'selected' : '' }}>Rejected</option>
+                <option value="Negotiation" {{ request('status') == 'Negotiation' ? 'selected' : '' }}>Negotiation</option>
+                <option value="Draft"       {{ request('status') == 'Draft'       ? 'selected' : '' }}>Draft</option>
             </select>
             <input type="date" name="from_date" value="{{ request('from_date') }}"
                 class="w-full md:w-1/5 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none" />
@@ -107,7 +108,7 @@
                     <th class="px-6 py-4">Grand Total</th>
                     <th class="px-6 py-4">Date</th>
                     <th class="px-6 py-4">Status</th>
-                    <th class="px-6 py-4">Rejection Reason</th>
+                    <th class="px-6 py-4">Reason</th>
                     <th class="px-6 py-4 text-center">Actions</th>
                 </tr>
             </thead>
@@ -136,11 +137,12 @@
                     <td class="px-6 py-4">
                         @php
                             $badgeClass = match($invoice->status) {
-                                'Approved' => 'bg-green-100 text-green-700',
-                                'Sent'     => 'bg-blue-100 text-blue-700',
-                                'Rejected' => 'bg-red-100 text-red-700',
-                                'Draft'    => 'bg-gray-100 text-gray-600',
-                                default    => 'bg-gray-100 text-gray-600',
+                                'Approved'    => 'bg-green-100 text-green-700',
+                                'Sent'        => 'bg-blue-100 text-blue-700',
+                                'Rejected'    => 'bg-red-100 text-red-700',
+                                'Negotiation' => 'bg-orange-100 text-orange-700',
+                                'Draft'       => 'bg-gray-100 text-gray-600',
+                                default       => 'bg-gray-100 text-gray-600',
                             };
                         @endphp
                         <span class="px-3 py-1 text-xs rounded-full {{ $badgeClass }}">
@@ -148,11 +150,15 @@
                         </span>
                     </td>
 
-                    {{-- Rejection Reason --}}
+                    {{-- Reason Column (Rejection or Negotiation only) --}}
                     <td class="px-6 py-4 text-gray-500 max-w-[160px]">
                         @if($invoice->status === 'Rejected' && $invoice->rejection_reason)
                             <span class="text-red-600 text-xs" title="{{ $invoice->rejection_reason }}">
                                 {{ \Str::limit($invoice->rejection_reason, 40) }}
+                            </span>
+                        @elseif($invoice->status === 'Negotiation' && $invoice->negotiation_reason)
+                            <span class="text-orange-600 text-xs" title="{{ $invoice->negotiation_reason }}">
+                                {{ \Str::limit($invoice->negotiation_reason, 40) }}
                             </span>
                         @else
                             <span class="text-gray-300 text-xs">—</span>
@@ -177,18 +183,25 @@
 
                             {{-- Approve --}}
                             @if($invoice->status !== 'Approved')
-                                <form action="{{ route('accounts.invoices.approve', $invoice->id) }}" method="POST"
-                                      onsubmit="return confirm('Approve {{ $invoice->quotation_no }}?')" class="inline">
-                                    @csrf
-                                    @method('PATCH')
-                                    <button type="submit"
-                                        class="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 transition font-medium">
-                                        <i class="fa-solid fa-circle-check"></i> Approve
-                                    </button>
-                                </form>
+                                <button onclick="openApproveModal({{ $invoice->id }}, '{{ $invoice->quotation_no }}')"
+                                    class="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-green-50 text-green-600 hover:bg-green-100 border border-green-200 transition font-medium">
+                                    <i class="fa-solid fa-circle-check"></i> Approve
+                                </button>
                             @else
                                 <span class="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-green-500 text-white font-medium cursor-default">
                                     <i class="fa-solid fa-circle-check"></i> Approved
+                                </span>
+                            @endif
+
+                            {{-- Negotiate --}}
+                            @if($invoice->status !== 'Negotiation')
+                                <button onclick="openNegotiateModal({{ $invoice->id }}, '{{ $invoice->quotation_no }}')"
+                                    class="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-orange-50 text-orange-600 hover:bg-orange-100 border border-orange-200 transition font-medium">
+                                    <i class="fa-solid fa-handshake"></i> Negotiate
+                                </button>
+                            @else
+                                <span class="inline-flex items-center gap-1 px-3 py-1 text-xs rounded-full bg-orange-500 text-white font-medium cursor-default">
+                                    <i class="fa-solid fa-handshake"></i> Negotiation
                                 </span>
                             @endif
 
@@ -275,9 +288,7 @@
                             <th class="text-right pb-2">Total</th>
                         </tr>
                     </thead>
-                    <tbody id="modal_items_body">
-                        {{-- filled by JS --}}
-                    </tbody>
+                    <tbody id="modal_items_body"></tbody>
                 </table>
             </div>
 
@@ -305,6 +316,12 @@
                 <p id="modal_rejection_reason" class="text-sm text-red-700"></p>
             </div>
 
+            {{-- Negotiation Reason --}}
+            <div id="modal_negotiation_wrap" class="hidden bg-orange-50 border border-orange-200 rounded-lg p-4">
+                <p class="text-xs text-orange-500 uppercase font-semibold mb-1">Negotiation Notes</p>
+                <p id="modal_negotiation_reason" class="text-sm text-orange-700"></p>
+            </div>
+
         </div>
 
         <div class="p-6 border-t flex justify-end gap-3">
@@ -321,14 +338,91 @@
     </div>
 </div>
 
+{{-- ========== APPROVE MODAL ========== --}}
+<div id="approveModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+
+        <div class="flex items-center justify-between p-6 border-b">
+            <div>
+                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check text-green-600"></i> Approve Quotation
+                </h2>
+                <p id="approve_modal_subtitle" class="text-sm text-gray-500 mt-0.5"></p>
+            </div>
+            <button onclick="closeApproveModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+        </div>
+
+        <form id="approveForm" method="POST">
+            @csrf
+            @method('PATCH')
+            <div class="p-6 border-t flex justify-end gap-3">
+                <button type="button" onclick="closeApproveModal()"
+                    class="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="px-5 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition text-sm inline-flex items-center gap-2">
+                    <i class="fa-solid fa-circle-check"></i> Confirm Approve
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
+{{-- ========== NEGOTIATE MODAL ========== --}}
+<div id="negotiateModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
+
+        <div class="flex items-center justify-between p-6 border-b">
+            <div>
+                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-handshake text-orange-500"></i> Send for Negotiation
+                </h2>
+                <p id="negotiate_modal_subtitle" class="text-sm text-gray-500 mt-0.5"></p>
+            </div>
+            <button onclick="closeNegotiateModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
+        </div>
+
+        <form id="negotiateForm" method="POST">
+            @csrf
+            @method('PATCH')
+            <div class="p-6 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        Negotiation Notes <span class="text-red-500">*</span>
+                    </label>
+                    <textarea name="negotiation_reason" id="negotiation_reason_input" rows="4"
+                        placeholder="Describe what needs to be negotiated (e.g. pricing, scope, timeline)..."
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm focus:ring-2 focus:ring-orange-400 focus:outline-none resize-none"
+                        required></textarea>
+                </div>
+            </div>
+            <div class="p-6 border-t flex justify-end gap-3">
+                <button type="button" onclick="closeNegotiateModal()"
+                    class="px-5 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition text-sm">
+                    Cancel
+                </button>
+                <button type="submit"
+                    class="px-5 py-2 bg-orange-500 hover:bg-orange-600 text-white rounded-lg transition text-sm inline-flex items-center gap-2">
+                    <i class="fa-solid fa-handshake"></i> Confirm Negotiation
+                </button>
+            </div>
+        </form>
+
+    </div>
+</div>
+
 {{-- ========== REJECT MODAL ========== --}}
 <div id="rejectModal" class="hidden fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
     <div class="bg-white rounded-xl shadow-2xl w-full max-w-md">
 
         <div class="flex items-center justify-between p-6 border-b">
             <div>
-                <h2 class="text-lg font-bold text-gray-800">Reject Quotation</h2>
-                <p id="reject_modal_subtitle" class="text-sm text-gray-500"></p>
+                <h2 class="text-lg font-bold text-gray-800 flex items-center gap-2">
+                    <i class="fa-solid fa-circle-xmark text-red-600"></i> Reject Quotation
+                </h2>
+                <p id="reject_modal_subtitle" class="text-sm text-gray-500 mt-0.5"></p>
             </div>
             <button onclick="closeRejectModal()" class="text-gray-400 hover:text-gray-600 text-2xl">&times;</button>
         </div>
@@ -366,14 +460,15 @@
 
 @push('scripts')
 <script>
-const quotations = @json($invoices->getCollection());
+const quotations  = @json($invoices->getCollection());
 const printBaseUrl = "{{ url('accounts/invoices') }}";
-const rejectBaseUrl = "{{ url('accounts/invoices') }}";
+const baseUrl      = "{{ url('accounts/invoices') }}";
 
 function fmt(val) {
     return '₹' + parseFloat(val ?? 0).toLocaleString('en-IN', { minimumFractionDigits: 2 });
 }
 
+// ── VIEW MODAL ──────────────────────────────────────────────
 function openViewModal(id) {
     const q = quotations.find(q => q.id === id);
     if (!q) return;
@@ -387,10 +482,7 @@ function openViewModal(id) {
     const gst      = subtotal * 0.18;
     const grand    = subtotal + gst;
 
-    // Header
-    document.getElementById('modal_qt_id').textContent = q.quotation_no ?? ('QT-' + String(q.id).padStart(4, '0'));
-
-    // Customer
+    document.getElementById('modal_qt_id').textContent        = q.quotation_no ?? ('QT-' + String(q.id).padStart(4, '0'));
     document.getElementById('modal_client').textContent       = lead.client_name ?? '-';
     document.getElementById('modal_phone').textContent        = lead.phone ?? '';
     document.getElementById('modal_email').textContent        = lead.email ?? '';
@@ -398,7 +490,6 @@ function openViewModal(id) {
     document.getElementById('modal_project_type').textContent = lead.project_type ?? '-';
     document.getElementById('modal_budget').textContent       = lead.budget_range ?? '-';
 
-    // Items table
     const tbody = document.getElementById('modal_items_body');
     tbody.innerHTML = '';
     items.forEach((item, idx) => {
@@ -414,18 +505,17 @@ function openViewModal(id) {
         tbody.appendChild(tr);
     });
 
-    // Totals
     document.getElementById('modal_subtotal').textContent = fmt(subtotal);
     document.getElementById('modal_gst').textContent      = fmt(gst);
     document.getElementById('modal_grand').textContent    = fmt(grand);
 
-    // Status badge
     const statusEl  = document.getElementById('modal_status');
     const statusMap = {
-        Approved: 'bg-green-100 text-green-700',
-        Sent:     'bg-blue-100 text-blue-700',
-        Rejected: 'bg-red-100 text-red-700',
-        Draft:    'bg-gray-100 text-gray-600',
+        Approved:    'bg-green-100 text-green-700',
+        Sent:        'bg-blue-100 text-blue-700',
+        Rejected:    'bg-red-100 text-red-700',
+        Negotiation: 'bg-orange-100 text-orange-700',
+        Draft:       'bg-gray-100 text-gray-600',
     };
     statusEl.textContent = q.status ?? '-';
     statusEl.className   = 'px-3 py-1 text-xs rounded-full font-medium ' + (statusMap[q.status] ?? 'bg-gray-100 text-gray-600');
@@ -436,39 +526,68 @@ function openViewModal(id) {
     if (q.status === 'Rejected' && q.rejection_reason) {
         rejText.textContent = q.rejection_reason;
         rejWrap.classList.remove('hidden');
-    } else {
-        rejWrap.classList.add('hidden');
-    }
+    } else { rejWrap.classList.add('hidden'); }
 
-    // Print link
+    // Negotiation reason
+    const negWrap = document.getElementById('modal_negotiation_wrap');
+    const negText = document.getElementById('modal_negotiation_reason');
+    if (q.status === 'Negotiation' && q.negotiation_reason) {
+        negText.textContent = q.negotiation_reason;
+        negWrap.classList.remove('hidden');
+    } else { negWrap.classList.add('hidden'); }
+
     document.getElementById('modal_print_btn').href = printBaseUrl + '/' + id + '/print';
     document.getElementById('viewModal').classList.remove('hidden');
 }
-
 function closeViewModal() {
     document.getElementById('viewModal').classList.add('hidden');
 }
 
+// ── APPROVE MODAL ───────────────────────────────────────────
+function openApproveModal(id, qtLabel) {
+    document.getElementById('approveForm').action = baseUrl + '/' + id + '/approve';
+    document.getElementById('approve_modal_subtitle').textContent = 'Quotation: ' + qtLabel;
+    document.getElementById('approveModal').classList.remove('hidden');
+}
+function closeApproveModal() {
+    document.getElementById('approveModal').classList.add('hidden');
+}
+
+// ── NEGOTIATE MODAL ─────────────────────────────────────────
+function openNegotiateModal(id, qtLabel) {
+    document.getElementById('negotiateForm').action = baseUrl + '/' + id + '/negotiate';
+    document.getElementById('negotiate_modal_subtitle').textContent = 'Quotation: ' + qtLabel;
+    document.getElementById('negotiation_reason_input').value = '';
+    document.getElementById('negotiateModal').classList.remove('hidden');
+}
+function closeNegotiateModal() {
+    document.getElementById('negotiateModal').classList.add('hidden');
+}
+
+// ── REJECT MODAL ────────────────────────────────────────────
 function openRejectModal(id, qtLabel) {
-    document.getElementById('rejectForm').action = rejectBaseUrl + '/' + id + '/reject';
+    document.getElementById('rejectForm').action = baseUrl + '/' + id + '/reject';
     document.getElementById('reject_modal_subtitle').textContent = 'Quotation: ' + qtLabel;
     document.getElementById('rejection_reason_input').value = '';
     document.getElementById('rejectModal').classList.remove('hidden');
 }
-
 function closeRejectModal() {
     document.getElementById('rejectModal').classList.add('hidden');
 }
 
-document.getElementById('viewModal').addEventListener('click', function(e) {
-    if (e.target === this) closeViewModal();
+// ── CLOSE ON BACKDROP CLICK / ESC ───────────────────────────
+['viewModal','approveModal','negotiateModal','rejectModal'].forEach(id => {
+    document.getElementById(id).addEventListener('click', function(e) {
+        if (e.target === this) this.classList.add('hidden');
+    });
 });
-document.getElementById('rejectModal').addEventListener('click', function(e) {
-    if (e.target === this) closeRejectModal();
-});
-
 document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') { closeViewModal(); closeRejectModal(); }
+    if (e.key === 'Escape') {
+        closeViewModal();
+        closeApproveModal();
+        closeNegotiateModal();
+        closeRejectModal();
+    }
 });
 </script>
 @endpush
