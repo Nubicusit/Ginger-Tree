@@ -1,12 +1,12 @@
-@extends('layout.app')
+@extends('sales_executive.layout.app')
 
 @section('title', 'Dashboard')
 
-@section('page-title', 'Welcome, Admin')
+@section('page-title', 'Welcome, Sales')
 
 @section('content')
 <div class="bg-[#F3F4F6]">
-    <!-- Dashboard -->
+  <!-- Dashboard -->
     <div class="max-w-full mx-auto">
         <!-- Top Cards Section -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
@@ -117,6 +117,7 @@
                             </svg>
                         </div>
                     </div>
+
                     <div class="space-y-2 mb-6">
                         <div class="flex justify-between text-sm font-semibold">
                             <span class="text-gray-700">In Progress :</span>
@@ -132,6 +133,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="flex justify-end">
                     <button class="bg-[#2962FF] text-white px-6 py-2 rounded-full text-xs font-medium hover:bg-blue-700 transition-colors">
                         Detail
@@ -151,6 +153,7 @@
                             </svg>
                         </div>
                     </div>
+
                     <div class="space-y-2 mb-6">
                         <div class="flex justify-between text-sm font-semibold">
                             <span class="text-gray-700">Deliveries :</span>
@@ -173,75 +176,76 @@
         <!-- Charts and Notifications Section -->
         <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
             <!-- Charts Section -->
+            <!-- CHANGED HERE: Added md:grid-cols-2 so charts sit side-by-side on medium screens -->
             <div class="lg:col-span-3 grid grid-cols-1 md:grid-cols-2 gap-8">
-
                 <!-- Total Lead Conversion Chart -->
-                <div class="bg-white rounded-xl card-shadow p-4 sm:p-8 overflow-hidden">
+                <div class="bg-white rounded-xl card-shadow p-4 sm:p-8">
                     <h3 class="text-gray-900 font-bold text-lg sm:text-xl mb-4 sm:mb-8">Total Lead Conversion Chart</h3>
-                    <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-8">
-                        <!-- FIX: Added overflow-hidden and used fixed pixel size via inline style -->
-                        <div class="relative flex-shrink-0" style="width: 260px; height: 260px;">
+                    <div class="flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-12">
+                        <div class="w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 relative flex-shrink-0">
                             <canvas id="leadChart"></canvas>
                         </div>
-
                         <!-- Vertical Separator -->
-                        <div class="hidden sm:block w-px self-stretch bg-gray-300"></div>
+                        <div class="hidden sm:block w-px h-48 sm:h-56 bg-gray-300"></div>
 
-                        <div class="space-y-3 sm:space-y-4 text-xs sm:text-sm">
+                        <div class="space-y-3 sm:space-y-4 min-w-max sm:min-w-[160px] text-xs sm:text-sm">
                             <div class="flex items-center justify-end gap-3 mb-2 sm:mb-3">
                                 <span class="text-xs sm:text-sm text-gray-500">Lead Source</span>
                             </div>
                             <div class="flex items-center justify-end gap-3">
                                 <span class="text-xs sm:text-sm text-gray-600">Cold Call</span>
-                                <div class="w-4 h-4 rounded-full bg-[#FFA726] flex-shrink-0"></div>
+                                <div class="w-4 h-4 rounded-full bg-[#FFA726]"></div>
                             </div>
                             <div class="flex items-center justify-end gap-3">
                                 <span class="text-xs sm:text-sm text-gray-600">Email</span>
-                                <div class="w-4 h-4 rounded-full bg-[#FFB74D] flex-shrink-0"></div>
+                                <div class="w-4 h-4 rounded-full bg-[#FFB74D]"></div>
                             </div>
                             <div class="flex items-center justify-end gap-3">
                                 <span class="text-xs sm:text-sm text-gray-600">Email Campaign</span>
-                                <div class="w-4 h-4 rounded-full bg-[#4DD0E1] flex-shrink-0"></div>
+                                <div class="w-4 h-4 rounded-full bg-[#4DD0E1]"></div>
                             </div>
                             <div class="flex items-center justify-end gap-3">
                                 <span class="text-xs sm:text-sm text-gray-600">Web</span>
-                                <div class="w-4 h-4 rounded-full bg-[#42A5F5] flex-shrink-0"></div>
+                                <div class="w-4 h-4 rounded-full bg-[#42A5F5]"></div>
                             </div>
                             <div class="flex items-center justify-end gap-3">
                                 <span class="text-xs sm:text-sm text-gray-600">Phone Inquiry</span>
-                                <div class="w-4 h-4 rounded-full bg-[#5C6BC0] flex-shrink-0"></div>
+                                <div class="w-4 h-4 rounded-full bg-[#5C6BC0]"></div>
                             </div>
                             <div class="flex items-center justify-end gap-3">
                                 <span class="text-xs sm:text-sm text-gray-600">Referral</span>
-                                <div class="w-4 h-4 rounded-full bg-[#AB47BC] flex-shrink-0"></div>
+                                <div class="w-4 h-4 rounded-full bg-[#AB47BC]"></div>
                             </div>
                             <div class="flex items-center justify-end gap-3">
                                 <span class="text-xs sm:text-sm text-gray-600">Other</span>
-                                <div class="w-4 h-4 rounded-full bg-[#EF5350] flex-shrink-0"></div>
+                                <div class="w-4 h-4 rounded-full bg-[#EF5350]"></div>
+                            </div>
+                             <div class="flex items-center justify-end gap-3">
+                                <span class="text-xs sm:text-sm text-gray-600">Other</span>
+                                <div class="w-4 h-4 rounded-full bg-[#EF5350]"></div>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- Project Status Chart -->
-                <div class="bg-white rounded-xl card-shadow p-4 sm:p-8 overflow-hidden">
+                <div class="bg-white rounded-xl card-shadow p-4 sm:p-8">
                     <h3 class="text-gray-900 font-bold text-lg sm:text-xl mb-4 sm:mb-8 text-right">Project Status Chart</h3>
-                    <div class="flex flex-col items-center justify-center gap-6">
-                        <!-- FIX: Fixed pixel size via inline style -->
-                        <div class="relative" style="width: 260px; height: 260px;">
+                    <div class="flex flex-col items-center justify-center h-full pb-6 sm:pb-8">
+                        <div class="w-48 h-48 sm:w-64 sm:h-64 md:w-72 md:h-72 relative mb-4 sm:mb-8">
                             <canvas id="projectChart"></canvas>
                         </div>
                         <div class="flex flex-wrap justify-center gap-4 sm:gap-8 w-full">
                             <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 bg-[#9CCC65] rounded-full flex-shrink-0"></div>
+                                <div class="w-4 h-4 bg-[#9CCC65] rounded-full"></div>
                                 <span class="text-xs sm:text-sm text-gray-600">Active</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 bg-[#42A5F5] rounded-full flex-shrink-0"></div>
+                                <div class="w-4 h-4 bg-[#42A5F5] rounded-full"></div>
                                 <span class="text-xs sm:text-sm text-gray-600">In Progress</span>
                             </div>
                             <div class="flex items-center gap-2">
-                                <div class="w-4 h-4 bg-[#FFA726] rounded-full flex-shrink-0"></div>
+                                <div class="w-4 h-4 bg-[#FFA726] rounded-full"></div>
                                 <span class="text-xs sm:text-sm text-gray-600">Completed</span>
                             </div>
                         </div>
@@ -258,7 +262,7 @@
                         <div class="flex items-start gap-4">
                             <div class="bg-blue-100 rounded-full p-3 shrink-0">
                                 <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+                                    <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z"/>
                                 </svg>
                             </div>
                             <div>
@@ -270,7 +274,7 @@
                         <div class="flex items-start gap-4">
                             <div class="bg-green-100 rounded-full p-3 shrink-0">
                                 <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" />
+                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/>
                                 </svg>
                             </div>
                             <div>
@@ -282,8 +286,8 @@
                         <div class="flex items-start gap-4">
                             <div class="bg-purple-100 rounded-full p-3 shrink-0">
                                 <svg class="w-5 h-5 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z" />
-                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" />
+                                    <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                    <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z"/>
                                 </svg>
                             </div>
                             <div>
@@ -301,7 +305,7 @@
                         <div class="flex items-start gap-4">
                             <div class="bg-red-100 rounded-full p-3 shrink-0">
                                 <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
                                 </svg>
                             </div>
                             <div>
@@ -313,7 +317,7 @@
                         <div class="flex items-start gap-4">
                             <div class="bg-yellow-100 rounded-full p-3 shrink-0">
                                 <svg class="w-5 h-5 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
                                 </svg>
                             </div>
                             <div>
@@ -325,8 +329,8 @@
                         <div class="flex items-start gap-4">
                             <div class="bg-blue-100 rounded-full p-3 shrink-0">
                                 <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
-                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                                    <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z"/>
+                                    <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
                                 </svg>
                             </div>
                             <div>
@@ -336,74 +340,162 @@
                         </div>
                     </div>
                 </div>
+                <!-- checkin section -->
+                <!-- <div class="bg-white rounded-xl card-shadow p-6">
+                    <h3 class="text-gray-800 font-semibold text-base mb-6">Check In</h3>
+                    <div class="space-y-6">
+                        <button id="quickCheckinBtn" class="block w-full p-3 bg-orange-50 border border-orange-200 rounded-lg hover:bg-orange-100 transition-colors text-left flex items-center">
+                        <svg class="w-6 h-6 mr-3 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                        ⏰ Self Check-in Now
+                    </button>
+                    </div>
+                </div> -->
             </div>
         </div>
-
     </div>
+        <!-- <div id="checkinModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
+        <div class="flex items-center justify-center min-h-screen p-6">
+            <div class="bg-white rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-hidden shadow-2xl">
+
+                <div class="bg-gradient-to-r from-orange-500 to-orange-600 p-8 text-white">
+                    <div class="flex items-center justify-between">
+                        <div>
+                            <h3 class="text-2xl font-bold">Self Check-in</h3>
+                            <p class="text-orange-100 mt-1">{{ now()->format('M d, Y - h:i A') }}</p>
+                        </div>
+                        <button id="closeCheckinModal" class="text-white hover:bg-white hover:bg-opacity-20 p-2 rounded-xl">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div> -->
+
+                <!-- Modal Body -->
+                <!-- <div class="p-8">
+
+                    <div id="statusCheck" class="text-center mb-8">
+                        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-orange-500 mx-auto mb-4"></div>
+                        <p class="text-lg text-gray-600">Checking status...</p>
+                    </div>
+
+
+                    <div id="checkinSection" class="hidden text-center">
+                        <div class="mb-8">
+                            <div class="w-20 h-20 bg-orange-100 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10h14M5 14h14"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-gray-900 mb-2">Ready to Check-in</h3>
+                            <p class="text-gray-600">Click below to record your attendance</p>
+                        </div>
+                        <button id="performCheckin" class="w-full bg-gradient-to-r from-orange-500 to-orange-600 text-white py-4 px-8 rounded-2xl text-lg font-bold hover:from-orange-600 hover:to-orange-700 transition-all shadow-xl hover:shadow-2xl transform hover:-translate-y-1">
+                            Check-in Now
+                        </button>
+                    </div>
+
+
+                    <div id="alreadyCheckedSection" class="hidden text-center">
+                        <div class="bg-green-50 rounded-2xl p-8 mb-6">
+                            <div class="w-20 h-20 bg-green-100 rounded-2xl mx-auto mb-4 flex items-center justify-center">
+                                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <h3 class="text-2xl font-bold text-green-800 mb-2">Already Checked-in!</h3>
+                            <p id="checkinTimeDisplay" class="text-lg font-semibold text-green-700"></p>
+                        </div>
+                        <button id="performCheckout" class="w-full bg-gradient-to-r from-red-500 to-red-600 text-white py-4 px-8 rounded-2xl text-lg font-bold hover:from-red-600 hover:to-red-700 transition-all shadow-xl">
+                            Check-out Now
+                        </button>
+                    </div>
+                </div>
+            </div> -->
+        <!-- </div> -->
+    <!-- </div> -->
 </div>
-<!-- end section -->
+<!-- <script>
+document.addEventListener('DOMContentLoaded', function() {
 
-@push('scripts')
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    // Lead Conversion Chart
-    const leadCtx = document.getElementById('leadChart').getContext('2d');
-    new Chart(leadCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Cold Call', 'Email', 'Email Campaign', 'Web', 'Phone Inquiry', 'Referral', 'Other'],
-            datasets: [{
-                data: [15, 12, 10, 18, 10, 20, 15],
-                backgroundColor: [
-                    '#FFA726', '#FFB74D', '#4DD0E1',
-                    '#42A5F5', '#5C6BC0', '#AB47BC', '#EF5350'
-                ],
-                borderWidth: 0,
-                hoverOffset: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false, // KEY FIX
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: true
-                }
-            }
-        }
+    const quickCheckinBtn = document.getElementById('quickCheckinBtn');
+    const checkinModal = document.getElementById('checkinModal');
+    const closeCheckinModal = document.getElementById('closeCheckinModal');
+    const statusCheck = document.getElementById('statusCheck');
+    const checkinSection = document.getElementById('checkinSection');
+    const alreadyCheckedSection = document.getElementById('alreadyCheckedSection');
+    const performCheckin = document.getElementById('performCheckin');
+    const performCheckout = document.getElementById('performCheckout');
+    const checkinTimeDisplay = document.getElementById('checkinTimeDisplay');
+
+    // OPEN MODAL
+    quickCheckinBtn.addEventListener('click', function() {
+        checkinModal.classList.remove('hidden');
+        loadCheckinStatus();
     });
 
-    // Project Status Chart
-    const projectCtx = document.getElementById('projectChart').getContext('2d');
-    new Chart(projectCtx, {
-        type: 'doughnut',
-        data: {
-            labels: ['Active', 'In Progress', 'Completed'],
-            datasets: [{
-                data: [40, 35, 25],
-                backgroundColor: ['#9CCC65', '#42A5F5', '#FFA726'],
-                borderWidth: 0,
-                hoverOffset: 6
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false, // KEY FIX
-            cutout: '70%',
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    enabled: true
-                }
+    // CLOSE MODAL
+    closeCheckinModal.addEventListener('click', closeModal);
+
+    function closeModal() {
+        checkinModal.classList.add('hidden');
+        statusCheck.classList.remove('hidden');
+        checkinSection.classList.add('hidden');
+        alreadyCheckedSection.classList.add('hidden');
+    }
+
+    function loadCheckinStatus() {
+        fetch('{{ route("sales.attendance.status") }}', {
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
             }
-        }
+        })
+        .then(res => res.json())
+        .then(data => {
+            statusCheck.classList.add('hidden');
+            if (data.checked_in_today) {
+                checkinTimeDisplay.textContent = `Checked-in at ${data.checkin_time}`;
+                alreadyCheckedSection.classList.remove('hidden');
+            } else {
+                checkinSection.classList.remove('hidden');
+            }
+        });
+    }
+
+    // ✅ CHECK-IN
+    performCheckin.addEventListener('click', function () {
+        fetch('{{ route("sales.attendance.self-check-in") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        });
     });
-</script>
-@endpush
+
+    // ✅ CHECK-OUT
+    performCheckout.addEventListener('click', function () {
+        fetch('{{ route("sales.attendance.self-check-out") }}', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            alert(data.message);
+            location.reload();
+        });
+    });
+});
+</script> -->
 @endsection

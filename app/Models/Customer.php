@@ -20,6 +20,7 @@ class Customer extends Model
         'gst_number',
         'notes',
         'payment_status',
+        'project_status',
     ];
     protected static function booted()
 {
@@ -31,6 +32,20 @@ class Customer extends Model
         };
     });
 }
+protected static function boot()
+{
+    parent::boot();
 
+    static::creating(function ($customer) {
+
+        $lastCustomer = self::latest()->first();
+
+        $nextNumber = $lastCustomer
+            ? ((int) filter_var($lastCustomer->customer_id, FILTER_SANITIZE_NUMBER_INT)) + 1
+            : 1;
+
+        $customer->customer_id = 'CUST-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    });
+}
 }
 

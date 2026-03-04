@@ -16,7 +16,7 @@
 }" class="bg-white rounded-lg shadow border border-gray-200">
 
     <!-- Header -->
-    <div class="flex items-center justify-between px-6 py-4 border-b">
+    <div class="flex items-center justify-between px-6 py-4 ">
         <h2 class="text-lg font-semibold text-gray-800">Inventory Stocks</h2>
 
         <a href="#"
@@ -36,7 +36,33 @@
             Add Stock
         </a>
     </div>
+<div class="px-6 py-4  bg-gray-50">
+    <form method="GET" action="{{ route('inventory.index') }}"
+          class="flex items-center justify-end flex-wrap gap-4">
 
+        <div class="flex-1 max-w-sm">
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Search by item name..."
+                   class="w-full border border-gray-300 rounded-lg px-4 py-2 text-sm
+                          focus:ring-2 focus:ring-red-200 focus:outline-none">
+        </div>
+
+        <div class="flex gap-2">
+            <button type="submit"
+                class="px-4 py-2 text-sm font-medium text-white bg-red-800 rounded-lg hover:bg-red-900 transition">
+                Search
+            </button>
+
+            <a href="{{ route('inventory.index') }}"
+               class="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition">
+                Reset
+            </a>
+        </div>
+
+    </form>
+</div>
     <!-- Table -->
     <div class="overflow-x-auto">
         <table class="min-w-full border border-gray-200 rounded-lg overflow-hidden">

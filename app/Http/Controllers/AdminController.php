@@ -12,65 +12,66 @@ use App\Models\Department;
 use App\Models\InventoryStock;
 
 
+
 class AdminController extends Controller
 {
     public function index(Request $request)
     {
         $query = Lead::query();
 
-    // Search by name
-    if ($request->search) {
-        $query->where('client_name', 'like', '%' . $request->search . '%');
-    }
+        // Search by name
+        if ($request->search) {
+            $query->where('client_name', 'like', '%' . $request->search . '%');
+        }
 
-    // Filter by status
-    if ($request->status) {
-        $query->where('status', $request->status);
-    }
+        // Filter by status
+        if ($request->status) {
+            $query->where('status', $request->status);
+        }
 
-    $leads = $query->latest()->get();
-        return view('Dashboard',compact('leads'));
+        $leads = $query->latest()->get();
+        return view('Dashboard', compact('leads'));
     }
 
     public function leads(Request $request)
-{
-    $query = Lead::query();
+    {
+        $query = Lead::query();
 
-    if ($request->filled('search')) {
-        $query->where('client_name', 'like', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $query->where('client_name', 'like', '%' . $request->search . '%');
+        }
+
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        if ($request->filled('date')) {
+            $query->whereDate('created_at', $request->date);
+        }
+
+        $leads = $query->latest()->get();
+
+        $totalLeads = Lead::count();
+        $convertedLeads = Lead::where('status', 'Won')->count();
+        $failedLeads = Lead::where('status', 'Lost')->count();
+
+        $designers = User::whereHas('department', function ($q) {
+            $q->where('slug', 'designer');
+        })->orderBy('name')->get();
+
+        $salesExecutives = User::whereHas('department', function ($q) {
+            $q->where('slug', 'sales_executive');
+        })->orderBy('name')->get();
+
+        return view('admin.LeadEnquiries', compact(
+            'leads',
+            'totalLeads',
+            'convertedLeads',
+            'failedLeads',
+            'designers',
+            'salesExecutives'
+        ));
     }
-
-    if ($request->filled('status')) {
-        $query->where('status', $request->status);
-    }
-
-    if ($request->filled('date')) {
-        $query->whereDate('created_at', $request->date);
-    }
-
-    $leads = $query->latest()->get();
-
-    $totalLeads = Lead::count();
-    $convertedLeads = Lead::where('status', 'Won')->count();
-    $failedLeads = Lead::where('status', 'Lost')->count();
-
-    $designers = User::whereHas('department', function ($q) {
-        $q->where('slug', 'designer');
-    })->orderBy('name')->get();
-
-    $salesExecutives = User::whereHas('department', function ($q) {
-        $q->where('slug', 'sales_executive');
-    })->orderBy('name')->get();
-
-    return view('admin.LeadEnquiries', compact(
-        'leads',
-        'totalLeads',
-        'convertedLeads',
-        'failedLeads',
-        'designers',
-        'salesExecutives'
-    ));
-}
 
     public function create()
     {
@@ -137,7 +138,6 @@ class AdminController extends Controller
                 'success' => true,
                 'message' => 'Lead assigned successfully'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,
@@ -187,41 +187,52 @@ class AdminController extends Controller
     //     ]);
     // }
 
-    public function useraccounts()
+    public function useraccounts(Request $request)
     {
-         $users = User::with('department')
-        ->latest()
-        ->get();
+        $query = User::with('department');
+
+        // 🔎 Search by name
+        if ($request->filled('search')) {
+            $query->where('name', 'like', '%' . $request->search . '%');
+        }
+
+        // 🏢 Filter by department
+        if ($request->filled('department')) {
+            $query->where('department_id', $request->department);
+        }
+
+        $users = $query->latest()->get();
+
         $departments = Department::orderBy('name')->get();
 
-        return view('admin.Masters.useraccounts', compact('users','departments'));
+        return view('admin.Masters.useraccounts', compact('users', 'departments'));
     }
 
     public function storeUser(Request $request)
-{
+    {
 
-    $request->validate([
-        'name'       => 'required|string|max:255',
-        'email'      => 'required|email|unique:users,email',
-        'password'   => 'required|min:6',
-        'department_id' => 'required|exists:departments,id',
-        'contact_no' => 'nullable|string|max:15',
-    ]);
+        $request->validate([
+            'name'       => 'required|string|max:255',
+            'email'      => 'required|email|unique:users,email',
+            'password'   => 'required|min:6',
+            'department_id' => 'required|exists:departments,id',
+            'contact_no' => 'nullable|string|max:15',
+        ]);
 
-    User::create([
-        'name'             => $request->name,
-        'email'            => $request->email,
-        'password'         => bcrypt($request->password),
-        'visible_password' => $request->password,
-        'department_id'    => $request->department_id,
-        'contact_no'       => $request->contact_no,
-        'status'           => 1,
-    ]);
+        User::create([
+            'name'             => $request->name,
+            'email'            => $request->email,
+            'password'         => bcrypt($request->password),
+            'visible_password' => $request->password,
+            'department_id'    => $request->department_id,
+            'contact_no'       => $request->contact_no,
+            'status'           => 1,
+        ]);
 
-    return redirect()
-        ->route('useraccounts')
-        ->with('success', 'User created successfully');
-}
+        return redirect()
+            ->route('useraccounts')
+            ->with('success', 'User created successfully');
+    }
 
     public function toggleUserStatus(Request $request, User $user)
     {
@@ -239,160 +250,175 @@ class AdminController extends Controller
         ]);
     }
     public function destroyUser(User $user)
-{
-    $user->delete();
+    {
+        $user->delete();
 
-    return redirect()
-        ->route('useraccounts')
-        ->with('success', 'User deleted successfully');
-}
+        return redirect()
+            ->route('useraccounts')
+            ->with('success', 'User deleted successfully');
+    }
 
-public function storeDepartment(Request $request)
-{
-    $request->validate([
-        'name' => 'required|unique:departments,name'
-    ]);
+    public function storeDepartment(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|unique:departments,name'
+        ]);
 
-    Department::create([
-        'name' => $request->name,
-        'slug' => Str::slug($request->name, '_'),
-    ]);
+        Department::create([
+            'name' => $request->name,
+            'slug' => Str::slug($request->name, '_'),
+        ]);
 
-    return back()->with('success', 'Department added');
-}
-   public function stocks()
-        {
+        return back()->with('success', 'Department added');
+    }
+    public function stocks(Request $request)
+    {
+        $query = InventoryStock::query();
 
-            $stocks = InventoryStock::latest()->get();
-            return view('admin.Masters.inventory',compact('stocks'));
+        // 🔎 Search by item name
+        if ($request->filled('search')) {
+            $query->where('item_name', 'like', '%' . $request->search . '%');
         }
-        public function getInventoryItems()
-{
-    return response()->json(
-        InventoryStock::select('item_name', 'price')->orderBy('item_name')->get()
-    );
-}
-public function storestock(Request $request)
-{
-    $request->validate([
-        'item_name' => 'required',
-        'price'     => 'required|numeric',
-        'quantity'  => 'required|numeric',
-        'gst_percentage'  => 'required|numeric',
-    ]);
 
-    InventoryStock::create([
-        'item_name' => $request->item_name,
-        'category'  => $request->category,
-        'unit'      => $request->unit,
-        'price'     => $request->price,
-        'gst_percentage'     => $request->gst_percentage,
-        'quantity'  => $request->quantity,
-    ]);
+        $stocks = $query->latest()->get();
 
-    return redirect()->back()->with('success', 'Stock added successfully');
-}
-public function editstock($id)
-{
-    return InventoryStock::findOrFail($id);
-}
-public function updatestock(Request $request, $id)
-{
-    $stock = InventoryStock::findOrFail($id);
+        return view('admin.Masters.inventory', compact('stocks'));
+    }
+    public function getInventoryItems()
+    {
+        return response()->json(
+            InventoryStock::select('item_name', 'price')->orderBy('item_name')->get()
+        );
+    }
+    public function storestock(Request $request)
+    {
+        $request->validate([
+            'item_name' => 'required',
+            'price'     => 'required|numeric',
+            'quantity'  => 'required|numeric',
+            'gst_percentage'  => 'required|numeric',
+        ]);
 
-    $stock->update([
-        'item_name' => $request->item_name,
-        'category'  => $request->category,
-        'unit'      => $request->unit,
-        'price'     => $request->price,
-        'gst_percentage'  => $request->gst_percentage,
-        'quantity'  => $request->quantity,
-        'status'    => $request->quantity > 0 ? 'In Stock' : 'Out of Stock',
-    ]);
+        InventoryStock::create([
+            'item_name' => $request->item_name,
+            'category'  => $request->category,
+            'unit'      => $request->unit,
+            'price'     => $request->price,
+            'gst_percentage'     => $request->gst_percentage,
+            'quantity'  => $request->quantity,
+        ]);
 
-    return redirect()->route('inventory.index')->with('success', 'Stock updated');
-}
+        return redirect()->back()->with('success', 'Stock added successfully');
+    }
+    public function editstock($id)
+    {
+        return InventoryStock::findOrFail($id);
+    }
+    public function updatestock(Request $request, $id)
+    {
+        $stock = InventoryStock::findOrFail($id);
 
-public function destroystock($id)
-{
-    InventoryStock::findOrFail($id)->delete();
+        $stock->update([
+            'item_name' => $request->item_name,
+            'category'  => $request->category,
+            'unit'      => $request->unit,
+            'price'     => $request->price,
+            'gst_percentage'  => $request->gst_percentage,
+            'quantity'  => $request->quantity,
+            'status'    => $request->quantity > 0 ? 'In Stock' : 'Out of Stock',
+        ]);
 
-    return redirect()->route('inventory.index')->with('success', 'Stock deleted');
-}
-public function services(){
+        return redirect()->route('inventory.index')->with('success', 'Stock updated');
+    }
 
-    $stocks = Service::latest()->get();
-    return view('admin.Masters.services',compact('stocks'));
-}
+    public function destroystock($id)
+    {
+        InventoryStock::findOrFail($id)->delete();
 
-public function storeservice(Request $request)
-{
-    $request->validate([
-        'service_name' => 'required',
-        'price'     => 'required|numeric',
-        'category_service'  => 'nullable|string',
-        'gst_percentage' => 'nullable|numeric|min:0',
-        'service_tax' => 'nullable|numeric|min:0',
-    ]);
+        return redirect()->route('inventory.index')->with('success', 'Stock deleted');
+    }
+    public function services()
+    {
 
-    Service::create([
-        'service_name' => $request->service_name,
-        'category_service'  => $request->category_service,
-        'price'     => $request->price,
-        'gst_percentage'     => $request->gst_percentage,
-        'service_tax'  => $request->service_tax,
-    ]);
+        $stocks = Service::latest()->get();
+        return view('admin.Masters.services', compact('stocks'));
+    }
 
-    return redirect()->back()->with('success', 'Stock added successfully');
-}
+    public function storeservice(Request $request)
+    {
+        $request->validate([
+            'service_name' => 'required',
+            'price'     => 'required|numeric',
+            'category_service'  => 'nullable|string',
+            'gst_percentage' => 'nullable|numeric|min:0',
+            'service_tax' => 'nullable|numeric|min:0',
+        ]);
 
-public function editservice($id)
-{
-    return Service::findOrFail($id);
-}
+        Service::create([
+            'service_name' => $request->service_name,
+            'category_service'  => $request->category_service,
+            'price'     => $request->price,
+            'gst_percentage'     => $request->gst_percentage,
+            'service_tax'  => $request->service_tax,
+        ]);
 
-public function updateservice(Request $request, $id)
-{
-    $stock = Service::findOrFail($id);
+        return redirect()->back()->with('success', 'Stock added successfully');
+    }
 
-    $stock->update([
-        'service_name' => $request->service_name,
-        'category_service'  => $request->category_service,
+    public function editservice($id)
+    {
+        return Service::findOrFail($id);
+    }
 
-        'price'     => $request->price,
-        'gst_percentage'  => $request->gst_percentage,
-        'service_tax'  => $request->service_tax,
+    public function updateservice(Request $request, $id)
+    {
+        $stock = Service::findOrFail($id);
 
-    ]);
-    return redirect()->route('services.index')->with('success', 'Service updated');
-}
+        $stock->update([
+            'service_name' => $request->service_name,
+            'category_service'  => $request->category_service,
 
-public function destroyservice($id)
-{
-    Service::findOrFail($id)->delete();
+            'price'     => $request->price,
+            'gst_percentage'  => $request->gst_percentage,
+            'service_tax'  => $request->service_tax,
 
-    return redirect()->route('services.index')->with('success', 'Service deleted');
-}
-public function import(Request $request)
+        ]);
+        return redirect()->route('services.index')->with('success', 'Service updated');
+    }
+
+    public function destroyservice($id)
+    {
+        Service::findOrFail($id)->delete();
+
+        return redirect()->route('services.index')->with('success', 'Service deleted');
+    }
+    public function import(Request $request)
 {
     $request->validate([
         'csv_file' => 'required|mimes:csv,txt'
     ]);
 
-
     $file = fopen($request->file('csv_file'), 'r');
+
+    fgetcsv($file);
 
     while (($row = fgetcsv($file)) !== false) {
 
-        Lead::create([
-            'client_name' => $row[0],
-            'phone' => $row[1],
-            'email' => $row[2],
-            'location' => $row[3],
-            'lead_source' => $row[4],
-            'project_type' => $row[5],
-            'status' => 'New',
-        ]);
+        if (!empty($row[0]) && !empty($row[1])) {
+
+            Lead::create([
+                'client_name'         => $row[0] ?? null,
+                'phone'               => $row[1] ?? null,
+                'email'               => $row[2] ?? null,
+                'location'            => $row[3] ?? null,
+                'project_address'     => $row[4] ?? null,
+                'lead_source'         => $row[5] ?? null,
+                'project_type'        => $row[6] ?? null,
+                'budget_range'        => $row[7] ?? null,
+                'expected_start_date' => $row[8] ?? null,
+                'status'              => 'New',
+            ]);
+        }
     }
 
     fclose($file);

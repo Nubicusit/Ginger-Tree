@@ -50,6 +50,8 @@ Route::get('inventory/{id}/edit', [AdminController::class, 'editstock'])->name('
 Route::put('inventory/{id}', [AdminController::class, 'updatestock'])->name('inventory.update');
 Route::delete('inventory/{id}', [AdminController::class, 'destroystock'])->name('inventory.destroy');
 Route::get('/inventory/items', [AdminController::class, 'getInventoryItems'])->name('inventory.items');
+// Route::post('/customer/create-credentials', [CustomerController::class, 'createCredentials'])
+//     ->name('customer.create.credentials');
 
 Route::get('/services', [AdminController::class, 'services'])->name('services.index');
 Route::get('services/create', [AdminController::class, 'createservice'])->name('services.create');
@@ -107,6 +109,7 @@ Route::get('/sale-executive/quotations/{lead}', [QuotationController::class, 'in
 
 Route::post('/sale-executive/quotation/store', [QuotationController::class, 'storequotation'])->name('sale.quotations.store');
 Route::get('/sale-executive/quotation/{quotation}/pdf', [QuotationController::class, 'generatePdf'])->name('sale.quotations.pdf');
+Route::post('/quotation/{id}/update-status', [QuotationController::class, 'updateStatus']);
 /*
 |--------------------------------------------------------------------------
 | HR Routes
@@ -260,6 +263,8 @@ Route::get('/sales/attendance/status', [SalesController::class, 'attendanceStatu
     ->middleware(['auth', 'department:sales_executive'])
     ->name('sales.attendance.status');
 
+Route::post('/sales/leave/store', [SalesController::class, 'salesLeave'])->middleware(['auth', 'department:sales_executive'])
+        ->name('sales.leave.store');
 
 
 
@@ -333,3 +338,18 @@ Route::patch('/accounts/invoices/{id}/negotiate', [AccountsController::class, 'i
     Route::get('/hr/leaves', [HRController::class, 'leaves'])->name('hr.leaves')->middleware(['auth', 'department:hr']);
 Route::post('/hr/leaves', [HRController::class, 'storeLeave'])->name('hr.leaves.store')->middleware(['auth', 'department:hr']);
 Route::patch('/hr/leaves/{leave}/status', [HRController::class, 'updateLeaveStatus'])->name('hr.leaves.status')->middleware(['auth', 'department:hr']);
+Route::patch('/accounts/invoices/{id}/negotiate', [AccountsController::class, 'invoicesNegotiate'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.invoices.negotiate');
+
+Route::post('/hr/payroll/ot/update', [HRController::class, 'updateOt'])
+    ->middleware(['auth', 'department:hr'])
+    ->name('hr.payroll.ot.update');
+Route::post('/hr/payroll/advance/store', [HRController::class, 'storeAdvance'])
+    ->middleware(['auth', 'department:hr'])
+    ->name('hr.payroll.advance.store');
+
+Route::get('/hr/leaves', [HRController::class, 'leaves'])->name('hr.leaves')->middleware(['auth', 'department:hr']);
+Route::post('/hr/leaves', [HRController::class, 'storeLeave'])->name('hr.leaves.store')->middleware(['auth', 'department:hr']);
+Route::patch('/hr/leaves/{leave}/status', [HRController::class, 'updateLeaveStatus'])->name('hr.leaves.status')->middleware(['auth', 'department:hr']);
+

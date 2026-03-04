@@ -25,6 +25,54 @@
         <p class="text-gray-500 text-sm">Salary summary based on attendance</p>
     </div>
 </div>
+<!-- Summary Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-users text-blue-600 text-lg"></i>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 uppercase font-semibold">Total Employees</p>
+            <p class="text-2xl font-bold text-gray-800 mt-1">{{ count($employees) }}</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-money-bill-wave text-green-600 text-lg"></i>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 uppercase font-semibold">Total Gross</p>
+            <p class="text-2xl font-bold text-green-600 mt-1">₹{{ number_format($employees->sum('gross_salary'), 2) }}</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-orange-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-clock text-orange-500 text-lg"></i>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 uppercase font-semibold">Total OT</p>
+            <p class="text-2xl font-bold text-orange-500 mt-1">₹{{ number_format($employees->sum('ot_amount'), 2) }}</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-red-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-circle-minus text-red-500 text-lg"></i>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 uppercase font-semibold">Total Deductions</p>
+            <p class="text-2xl font-bold text-red-500 mt-1">₹{{ number_format($employees->sum('deductions'), 2) }}</p>
+        </div>
+    </div>
+    <div class="bg-white rounded-xl shadow p-5 flex items-center gap-4">
+        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center flex-shrink-0">
+            <i class="fa-solid fa-wallet text-blue-600 text-lg"></i>
+        </div>
+        <div>
+            <p class="text-xs text-gray-500 uppercase font-semibold">Total Net Payable</p>
+            <p class="text-2xl font-bold text-blue-600 mt-1">₹{{ number_format($employees->sum('net_salary'), 2) }}</p>
+        </div>
+    </div>
+</div>
 
 <!-- Filters -->
 <div class="bg-white rounded-xl shadow p-4 mb-6">
@@ -268,10 +316,11 @@
             </div>
 
             <div class="flex gap-3">
-                <button type="submit"
-                    class="flex-1 bg-purple-600 hover:bg-purple-700 text-white py-2 rounded-lg font-semibold transition">
-                    <i class="fa-solid fa-check mr-1"></i> Save Advance
-                </button>
+              <button type="submit"
+    class="flex-1 py-2 rounded-lg font-semibold transition"
+    style="background-color: #9333ea; color: #ffffff;">
+    <i class="fa-solid fa-check mr-1"></i> Save Advance
+</button>
                 <button type="button" onclick="closeModal('advanceModal')"
                     class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 py-2 rounded-lg font-semibold transition">
                     Cancel

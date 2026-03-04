@@ -22,8 +22,8 @@ return new class extends Migration
             // ✅ JSON array for storing multiple items
             $table->json('items');
 
-            $table->enum('status', ['Draft', 'Approved', 'Rejected'])
-                  ->default('Draft');
+            $table->enum('status', ['Submitted', 'Negotiation','Approved', 'Rejected']);
+
             $table->timestamps();
         });
     }
