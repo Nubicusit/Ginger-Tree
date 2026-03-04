@@ -5,22 +5,62 @@
 @section('page-title', 'User Accounts')
 
 @section('content')
-<div class="flex items-center justify-end mb-4 space-x-3">
+<div class="flex items-center justify-end mb-6">
+    <div class="flex items-center gap-3">
+        <button onclick="openDeptModal()"
+            class="inline-flex items-center px-4 py-2 bg-gray-700 text-white text-sm font-medium rounded-lg
+                   hover:bg-gray-800 transition shadow-sm">
+            <i class="fas fa-building mr-2"></i>
+            Add Department
+        </button>
 
-    <!-- Add Department -->
-    <button onclick="openDeptModal()"
-        class="inline-flex items-center px-4 py-2 bg-gray-600 text-white text-sm font-medium rounded-lg
-           hover:bg-gray-700 transition shadow">
-        <i class="fas fa-building mr-2"></i>
-        + ADD DEPARTMENT
-    </button>
+        <button onclick="openModal()"
+            class="inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg
+                   hover:bg-indigo-700 transition shadow-sm">
+            <i class="fas fa-user-plus mr-2"></i>
+            Add User
+        </button>
+    </div>
+</div>
+<div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+    <form method="GET" action="{{ route('useraccounts') }}"
+          class="flex flex-wrap items-center gap-4">
 
-    <!-- Add User -->
-    <button onclick="openModal()"
-        class="inline-flex items-center px-4 py-2 bg-indigo-500 text-white text-sm font-medium rounded-lg
-              hover:bg-indigo-700 transition shadow">
-        + ADD NEW USER
-    </button>
+        <div class="flex-1 min-w-[220px]">
+            <input type="text"
+                   name="search"
+                   value="{{ request('search') }}"
+                   placeholder="Search by name..."
+                   class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
+                          focus:ring-2 focus:ring-indigo-200 focus:outline-none">
+        </div>
+
+        <div class="min-w-[200px]">
+            <select name="department"
+                    class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
+                           focus:ring-2 focus:ring-indigo-200 focus:outline-none">
+                <option value="">All Departments</option>
+                @foreach($departments as $department)
+                    <option value="{{ $department->id }}"
+                        {{ request('department') == $department->id ? 'selected' : '' }}>
+                        {{ $department->name }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <div class="flex gap-2">
+            <button type="submit"
+                class="px-4 py-2 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700 transition">
+                Filter
+            </button>
+
+            <a href="{{ route('useraccounts') }}"
+               class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">
+                Reset
+            </a>
+        </div>
+    </form>
 </div>
 <!-- Table Section -->
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
@@ -156,7 +196,7 @@
                     @endforeach
                 </select>
             </div>
-            
+
             <!-- Footer -->
             <div class="flex justify-end gap-3 pt-5 border-t">
                 <button type="button" onclick="closeModal()"

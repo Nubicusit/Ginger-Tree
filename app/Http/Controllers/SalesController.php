@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Lead;
 use Illuminate\Http\Request;
 use App\Models\Task;
+use App\Models\Leave;
 use App\Models\Department;
 use App\Models\Attendance;
 use App\Models\Employee;
@@ -13,10 +14,23 @@ use Illuminate\Support\Facades\Auth;
 
 class SalesController extends Controller
 {
-    public function dashboard()
-        {
-            return view('sales_executive.dashboard');
-        }
+public function dashboard()
+{
+    $user = Auth::user();
+
+    // Match employee using email instead
+    $employee = Employee::where('email', $user->email)->first();
+
+    $leaves = [];
+
+    if ($employee) {
+        $leaves = Leave::where('employee_id', $employee->id)
+                        ->latest()
+                        ->get();
+    }
+
+    return view('sales_executive.dashboard', compact('leaves'));
+}
 
     public function leads()
         {
@@ -156,7 +170,7 @@ class SalesController extends Controller
                     $data['status'] = 'Contacted';
                 }
             }
- 
+
             if (!empty($data)) {
                 $lead->update($data);
             }
@@ -302,5 +316,43 @@ class SalesController extends Controller
                 'checkin_time'     => $attendance?->check_in ? Carbon::parse($attendance->check_in)->format('H:i') : null,
             ]);
         }
+
+public function salesLeave(Request $request)
+{
+    $request->validate([
+        'leave_type' => 'required|in:sick,casual,annual,unpaid,other',
+        'from_date'  => 'required|date',
+        'to_date'    => 'required|date|after_or_equal:from_date',
+        'reason'     => 'nullable|string'
+    ]);
+
+    $user = Auth::user();
+
+    $employee = $user->employee
+        ?? Employee::where('email', $user->email)
+                   ->orWhere('user_id', $user->id)
+                   ->first();
+
+    if (!$employee) {
+        return back()->with('error', 'Employee profile not found.');
+    }
+
+    $from = Carbon::parse($request->from_date);
+    $to   = Carbon::parse($request->to_date);
+
+    $days = $from->diffInDays($to) + 1;
+
+    Leave::create([
+        'employee_id' => $employee->id,
+        'leave_type'  => $request->leave_type,
+        'from_date'   => $request->from_date,
+        'to_date'     => $request->to_date,
+        'days'        => $days,
+        'reason'      => $request->reason,
+        'status'      => 'pending',
+    ]);
+
+    return back()->with('success', 'Leave request submitted successfully.');
+}
 
 }
