@@ -347,14 +347,41 @@ class AccountsController extends Controller
         ]);
 
         $quotation->update([
-            'status'             => 'Rejected',
-            'rejection_reason'   => $request->rejection_reason,
+            'status'               => 'Rejected',
+            'rejection_reason'     => $request->rejection_reason,
+        'approval_reason'    => null,
+        'negotiation_reason' => null,
             'approval_reason'    => null,
             'negotiation_reason' => null,
         ]);
 
         return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been rejected.');
     }
+
+/**
+ * Mark a quotation for negotiation with notes.
+ */
+public function invoicesNegotiate(Request $request, $id)
+{
+    $quotation = Quotation::findOrFail($id);
+
+    $request->validate([
+        'negotiation_reason' => 'required|string|max:500',
+    ], [
+        'negotiation_reason.required' => 'Please provide negotiation notes.',
+        'negotiation_reason.max'      => 'Notes must not exceed 500 characters.',
+    ]);
+
+    $quotation->update([
+        'status'             => 'Negotiation',
+        'negotiation_reason' => $request->negotiation_reason,
+        'approval_reason'    => null,
+        'rejection_reason'   => null,
+    ]);
+
+    return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been sent for negotiation.');
+}
+    
 
     /**
      * Mark a quotation for negotiation with notes.

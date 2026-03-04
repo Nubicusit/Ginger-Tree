@@ -102,6 +102,31 @@
         <a href="{{ route('hr.payroll') }}" class="bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition">Reset</a>
     </form>
 </div>
+
+<!-- Summary Cards -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+    <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-500 uppercase font-semibold">Total Employees</p>
+        <p class="text-2xl font-bold text-gray-800 mt-1">{{ count($employees) }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-500 uppercase font-semibold">Total Gross</p>
+        <p class="text-2xl font-bold text-green-600 mt-1">₹{{ number_format($employees->sum('gross_salary'), 2) }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-500 uppercase font-semibold">Total OT</p>
+        <p class="text-2xl font-bold text-orange-500 mt-1">₹{{ number_format($employees->sum('ot_amount'), 2) }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-500 uppercase font-semibold">Total Deductions</p>
+        <p class="text-2xl font-bold text-red-500 mt-1">₹{{ number_format($employees->sum('deductions'), 2) }}</p>
+    </div>
+    <div class="bg-white rounded-xl shadow p-4">
+        <p class="text-xs text-gray-500 uppercase font-semibold">Total Net Payable</p>
+        <p class="text-2xl font-bold text-blue-600 mt-1">₹{{ number_format($employees->sum('net_salary'), 2) }}</p>
+    </div>
+</div>
+
 <!-- Payroll Table -->
 <div class="bg-white rounded-xl shadow overflow-hidden">
     <div class="overflow-x-auto">
