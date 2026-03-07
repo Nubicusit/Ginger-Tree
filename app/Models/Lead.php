@@ -59,6 +59,10 @@ public function latestQuotation()
     return $this->hasOne(Quotation::class)
         ->latestOfMany();
 }
+public function project()
+{
+    return $this->hasOne(Project::class);
+}
 // public function latestQuotation()
 // {
 //     return $this->hasOne(Quotation::class)

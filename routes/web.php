@@ -10,6 +10,9 @@ use App\Http\Controllers\SiteVisitController;
 use App\Http\Controllers\Sales\QuotationController;
 use App\Http\Controllers\HRController;
 use App\Http\Controllers\AccountsController;
+use App\Http\Controllers\DesignerController;
+use App\Http\Controllers\EstimationController;
+
 Route::get('/', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
@@ -26,6 +29,8 @@ Route::put('/tasks/{id}', [SalesController::class, 'updateTask'])->middleware(['
 Route::put('/leads/{lead}/update', [SalesController::class, 'update'])->middleware(['auth', 'department:sales_executive']);
 Route::get('/users/create', [SalesController::class, 'create'])->name('users.create')->middleware(['auth', 'department:sales_executive']);
 
+
+Route::get('/sale-executive/estimators', [SalesController::class, 'getEstimators']);
 // customer-admin
 Route::get('/customers', [CustomerController::class, 'index'])->middleware(['auth', 'admin'])->name('customers.index');
 Route::get('/customers/create', [CustomerController::class, 'create']);
@@ -105,7 +110,6 @@ Route::post('/leads/{lead}/site-visit', [SiteVisitController::class, 'saveSiteVi
 Route::get('/sale-executive/quotations/{lead}', [QuotationController::class, 'index'])->name('sale.quotations.index');
 
 Route::post('/sale-executive/quotation/store', [QuotationController::class, 'storequotation'])->name('sale.quotations.store');
-Route::get('/sale-executive/quotation/{quotation}/pdf', [QuotationController::class, 'generatePdf'])->name('sale.quotations.pdf');
 Route::post('/quotation/{id}/update-status', [QuotationController::class, 'updateStatus']);
 /*
 |--------------------------------------------------------------------------
@@ -256,12 +260,18 @@ Route::post('/sales/leave/store', [SalesController::class, 'salesLeave'])->middl
         ->name('sales.leave.store');
 
 
+Route::get('/sales/projects', [SalesController::class, 'salesProject'])->middleware(['auth', 'department:sales_executive'])
+        ->name('sales.projects');
+Route::get('/sales/projects/{id}', [SalesController::class, 'showProject'])
+    ->name('sales.projects.show');
+Route::put('/sales/projects/{id}', [SalesController::class, 'updateProject'])
+    ->name('sales.projects.update');
+Route::get('/inventory-items', function () {
+    return \App\Models\InventoryStock::select('id','item_name','price')->get();
+});
+
 
 //accounts
-
-
-
-
 Route::get('/accounts/dashboard', [AccountsController::class, 'dashboard'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.dashboard');
@@ -333,3 +343,41 @@ Route::get('/hr/leaves', [HRController::class, 'leaves'])->name('hr.leaves')->mi
 Route::post('/hr/leaves', [HRController::class, 'storeLeave'])->name('hr.leaves.store')->middleware(['auth', 'department:hr']);
 Route::patch('/hr/leaves/{leave}/status', [HRController::class, 'updateLeaveStatus'])->name('hr.leaves.status')->middleware(['auth', 'department:hr']);
 
+Route::get('/designer/dashboard', [DesignerController::class, 'dashboard'])
+    ->middleware(['auth', 'designer'])
+    ->name('designer.dashboard');
+
+Route::get('/design-status', [DesignerController::class, 'index'])
+    ->middleware(['auth', 'designer'])
+    ->name('design-status.index');
+
+Route::get('/design-status/create', [DesignerController::class, 'create'])
+    ->middleware(['auth', 'designer'])
+    ->name('design-status.create');
+
+Route::post('/design-status', [DesignerController::class, 'store'])
+    ->middleware(['auth', 'designer'])
+    ->name('design-status.store');
+
+Route::get('/design-status/{id}/edit', [DesignerController::class, 'edit'])
+    ->middleware(['auth', 'designer'])
+    ->name('design-status.edit');
+
+Route::put('/design-status/{id}', [DesignerController::class, 'update'])
+    ->middleware(['auth', 'designer'])
+    ->name('design-status.update');
+
+Route::delete('/design-status/{id}', [DesignerController::class, 'destroy'])
+    ->middleware(['auth', 'designer'])
+    ->name('design-status.destroy');
+
+Route::get('/estimator/dashboard', [EstimationController::class,'dashboard'])->middleware(['auth', 'estimator'])->name('estimator.dashboard');
+Route::get('/estimations', [EstimationController::class, 'estimation'])->middleware(['auth', 'estimator'])->name('estimations.index');
+Route::get('/estimator/quotation/create/{lead}', [EstimationController::class, 'createQuotation'])->name('estimator.quotation.create');
+Route::post('/estimator/quotation/store', [EstimationController::class, 'storeQuotation'])->middleware(['auth', 'estimator'])->name('estimator.quotation.store');
+// Inside your estimator auth group
+Route::get('/estimator/quotation/{quotation}/pdf', [EstimationController::class, 'generatePdf'])->middleware(['auth', 'estimator'])->name('estimator.quotation.pdf');
+Route::get('/estimator/estimations', [EstimationController::class, 'estimation'])->middleware(['auth', 'estimator'])->name('estimator.estimation');
+Route::get('/estimator/item-details', [EstimationController::class, 'getItemDetails'])
+    ->middleware(['auth','estimator'])
+    ->name('estimator.item.details');

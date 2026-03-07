@@ -313,6 +313,12 @@ class AccountsController extends Controller
     ]);
 
     if ($quotation->lead) {
+    $quotation->lead->update([
+        'status' => 'Won'
+    ]);
+}
+
+    if ($quotation->lead) {
 
         $existingCustomer = Customer::where('email', $quotation->lead->email)->first();
 
@@ -353,6 +359,12 @@ class AccountsController extends Controller
             'negotiation_reason' => null,
         ]);
 
+        if ($quotation->lead) {
+    $quotation->lead->update([
+        'status' => 'Lost'
+    ]);
+}
+
         return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been rejected.');
     }
 
@@ -376,7 +388,11 @@ class AccountsController extends Controller
             'approval_reason'    => null,
             'rejection_reason'   => null,
         ]);
-
+        if ($quotation->lead) {
+        $quotation->lead->update([
+            'status' => 'Negotiation'
+        ]);
+    }
         return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been sent for negotiation.');
     }
 }

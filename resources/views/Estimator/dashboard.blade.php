@@ -1,8 +1,8 @@
-@extends('designer.layout.app')
+@extends('Estimator.layout.app')
 
-@section('title', 'Designer Dashboard')
+@section('title', 'Estimator Dashboard')
 
-@section('page-title', 'Welcome, Designer')
+@section('page-title', 'Welcome, Estimator')
 
 @section('content')
 <div class="bg-[#F3F4F6]">

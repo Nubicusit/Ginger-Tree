@@ -94,7 +94,6 @@
             ADD MARKETING / DESIGNER
         </a>
     </div>
-    
 </div>
 <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4 flex flex-wrap items-center justify-between gap-3">
     <form method="GET" action="{{ route('leads') }}" class="flex flex-wrap gap-3 items-center justify-between">
@@ -150,6 +149,7 @@
         </label>
     </form>
 </div>
+
 <!-- Table Section -->
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
     <div class="overflow-x-auto">
@@ -295,7 +295,7 @@
             </div>
 
             <!-- FOLLOW UPS -->
-            <div class="mt-5">
+            <!-- <div class="mt-5">
                 <div class="flex items-center justify-between mb-2">
                     <h4 class="font-semibold text-sm">Follow-up Tasks</h4>
                     <button onclick="openTaskModal()"
@@ -307,7 +307,7 @@
                 <div class="text-xs text-gray-400">
                     No follow-ups yet
                 </div>
-            </div>
+            </div> -->
         </div>
 
         <!-- PROJECT INFORMATION -->
@@ -341,7 +341,7 @@
             </div>
 
             <!-- Assign Designer -->
-            <div class="mb-3">
+            <!-- <div class="mb-3">
                 <label class="label">Assigned Designer</label>
                 <select class="input" id="assigned_designer" name="designer_id">
                     <option value="">Assign Designer</option>
@@ -352,7 +352,7 @@
                     </option>
                     @endforeach
                 </select>
-            </div>
+            </div> -->
 
             <!-- Assign Marketing -->
             <div class="mb-4">
@@ -675,7 +675,7 @@
                     'X-CSRF-TOKEN': '{{ csrf_token() }}'
                 },
                 body: JSON.stringify({
-                    designer_id: document.getElementById('assigned_designer').value,
+                    // designer_id: document.getElementById('assigned_designer').value,
                     sales_executive_id: document.getElementById('assigned_sales').value
                 })
             })
@@ -818,7 +818,7 @@
                 document.getElementById('budget_range').value = data.budget_range ?? '';
                 document.getElementById('expected_start_date').value = data.expected_start_date ?? '';
 
-                document.getElementById('assigned_designer').value = data.designer_id ?? '';
+                // document.getElementById('assigned_designer').value = data.designer_id ?? '';
                 document.getElementById('assigned_sales').value = data.sales_executive_id ?? '';
 
                 setAvatarInitials(data.client_name);

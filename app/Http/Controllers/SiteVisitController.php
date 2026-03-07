@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Lead;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Models\SiteVisit;
 use Illuminate\Support\Facades\Auth;
@@ -73,19 +74,20 @@ class SiteVisitController extends Controller
         ]);
     }
 
-    public function show(Lead $lead)
-    {
-        // $lead->load('siteVisit');
+public function show(Lead $lead)
+{
+    $estimators = User::where('department_id', 6)
+        ->where('status', 1)
+        ->select('id', 'name')
+        ->get();
 
-        return response()->json([
-            'client_name' => $lead->client_name,
-            'email'       => $lead->email,
-            'first_name'  => $lead->first_name,
-            'last_name'   => $lead->last_name,
-            'site_visit'  => $lead->siteVisit
-
-        ]);
-    }
+    return response()->json([
+        'client_name' => $lead->client_name,
+        'email'       => $lead->email,
+        'site_visit'  => $lead->siteVisit,
+        'estimators'  => $estimators,
+    ]);
+}
 
     public function storeOrUpdate(Request $request)
     {

@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>@yield('title', 'Ginger Tree - Designer')</title>
+  <meta name="csrf-token" content="{{ csrf_token() }}">
+  <title>@yield('title', 'Ginger Tree - Estimator')</title>
 
   <link rel="icon" type="image/x-icon" href="{{ asset('img/Boltoni-Favicon.png') }}">
 
@@ -33,13 +34,13 @@
     <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-black/50 z-40 md:hidden"></div>
 
     <!-- Designer Sidebar -->
-   @include('designer.partials.sidebar')
+   @include('Estimator.partials.sidebar')
 
     <!-- Main Content Wrapper -->
     <div class="md:ml-64 flex flex-col min-h-screen transition-all duration-300">
 
         <!-- Designer Navbar -->
-        @include('designer.partials.navbar')
+        @include('Estimator.partials.navbar')
 
         <!-- Page Content -->
         <main class="flex-1 p-4 sm:p-6 lg:p-8 bg-gray-200 overflow-y-auto">

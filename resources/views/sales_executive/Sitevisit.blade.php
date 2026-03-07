@@ -251,9 +251,16 @@
                         <option value="Hold">Hold</option>
                     </select>
                 </div>
-                <div id="quotationAction" class="mt-3 hidden">
-                    <button onclick="openQuotationModal()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">Make Quotation</button>
+
+                <div class="mt-3">
+                    <label class="label">Assigned Staff</label>
+                    <select id="assigned_staff" class="input">
+                        <option value="">Select Estimator</option>
+                    </select>
                 </div>
+                <!-- <div id="quotationAction" class="mt-3 hidden">
+                    <button onclick="openQuotationModal()" class="bg-green-600 hover:bg-green-700 text-white text-sm px-4 py-2 rounded">Make Quotation</button>
+                </div> -->
             </div>
         </div>
     </div>
@@ -335,70 +342,84 @@
 
         fetch(`/sale-executive/site-visit/${leadId}`)
             .then(res => res.json())
-            .then(data => {
-                document.getElementById('client_name').innerText = data.client_name ?? '-';
-                document.getElementById('email').innerText = data.email ?? '-';
+           .then(data => {
+    document.getElementById('client_name').innerText = data.client_name ?? '-';
+    document.getElementById('email').innerText = data.email ?? '-';
 
-                const nameParts = (data.client_name ?? '').trim().split(' ');
-                document.getElementById('first_name').value = nameParts[0] ?? '';
-                document.getElementById('last_name').value = nameParts.slice(1).join(' ') ?? '';
+    const nameParts = (data.client_name ?? '').trim().split(' ');
+    document.getElementById('first_name').value = nameParts[0] ?? '';
+    document.getElementById('last_name').value = nameParts.slice(1).join(' ') ?? '';
 
-                const initials = `${(nameParts[0] ?? ' ')[0]}${(nameParts[1] ?? ' ')[0]}`.toUpperCase();
-                document.getElementById('avatar_initials').innerText = initials;
+    const initials = `${(nameParts[0] ?? ' ')[0]}${(nameParts[1] ?? ' ')[0]}`.toUpperCase();
+    document.getElementById('avatar_initials').innerText = initials;
 
-                if (data.site_visit) {
-                    // document.getElementById('assigned_staff').value = data.site_visit.assigned_staff ?? '';
-                    document.getElementById('visit_datetime').value = data.site_visit.visit_datetime ? data.site_visit.visit_datetime.replace(' ', 'T') : '';
-                    document.getElementById('site_condition_notes').value = data.site_visit.site_condition_notes ?? '';
-                    document.getElementById('space_details').value = data.site_visit.space_details ?? '';
-                    document.getElementById('materials_finishes').value = data.site_visit.materials_finishes ?? '';
-                    document.getElementById('style_preferences').value = data.site_visit.style_preferences ?? '';
-                    document.getElementById('appliances_accessories').value = data.site_visit.appliances_accessories ?? '';
-                    document.getElementById('brand_preferences').value = data.site_visit.brand_preferences ?? '';
-                    document.getElementById('finish_preferences').value = data.site_visit.finish_preferences ?? '';
-                    document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
-                    document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
-                    document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
-                    const quotationBox = document.getElementById('quotationAction');
-                    quotationBox.classList.toggle('hidden', data.site_visit.approval_status !== 'Yes');
+    // ✅ Always populate estimator dropdown (outside site_visit check)
+    const staffSelect = document.getElementById('assigned_staff');
+    staffSelect.innerHTML = '<option value="">Select Estimator</option>';
+    if (Array.isArray(data.estimators)) {
+        data.estimators.forEach(user => {
+            const option = document.createElement('option');
+            option.value = user.id;
+            option.textContent = user.name;
+            staffSelect.appendChild(option);
+        });
+    }
 
-                    const preview = document.getElementById('measurement_preview');
-                    preview.innerHTML = '';
+    if (data.site_visit) {
+        document.getElementById('visit_datetime').value = data.site_visit.visit_datetime ? data.site_visit.visit_datetime.replace(' ', 'T') : '';
+        document.getElementById('site_condition_notes').value = data.site_visit.site_condition_notes ?? '';
+        document.getElementById('space_details').value = data.site_visit.space_details ?? '';
+        document.getElementById('materials_finishes').value = data.site_visit.materials_finishes ?? '';
+        document.getElementById('style_preferences').value = data.site_visit.style_preferences ?? '';
+        document.getElementById('appliances_accessories').value = data.site_visit.appliances_accessories ?? '';
+        document.getElementById('brand_preferences').value = data.site_visit.brand_preferences ?? '';
+        document.getElementById('finish_preferences').value = data.site_visit.finish_preferences ?? '';
+        document.getElementById('budget_sensitivity').value = data.site_visit.budget_sensitivity ?? '';
+        document.getElementById('initial_cost_estimate').value = data.site_visit.initial_cost_estimate ?? '';
+        document.getElementById('approval_status').value = data.site_visit.approval_status ?? '';
 
-                    if (Array.isArray(data.site_visit.measurement_files)) {
-                        data.site_visit.measurement_files.forEach(file => {
-                            const ext = file.split('.').pop().toLowerCase();
-                            if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
-                                preview.innerHTML += `
-                                    <div class="relative">
-                                        <img src="/${file}" onclick="openMediaViewer('/${file}', 'image')"
-                                            class="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80" />
-                                        <button onclick="removeExistingFile('${file}', event)"
-                                            class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">✕</button>
-                                    </div>`;
-                            } else {
-                                preview.innerHTML += `
-                                    <div class="relative">
-                                        <video class="w-full h-24 rounded border cursor-pointer" onclick="openMediaViewer('/${file}', 'video')">
-                                            <source src="/${file}">
-                                        </video>
-                                        <button onclick="removeExistingFile('${file}', event)"
-                                            class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded hidden group-hover:block">✕</button>
-                                    </div>`;
-                            }
-                        });
-                    }
+        // ✅ Set selected estimator if already saved
+        if (data.site_visit.assigned_staff) {
+            staffSelect.value = data.site_visit.assigned_staff;
+        }
 
-                    if (scrollToFiles) {
-                        setTimeout(() => {
-                            document.getElementById('measurement_preview').scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center'
-                            });
-                        }, 300);
-                    }
+        const preview = document.getElementById('measurement_preview');
+        preview.innerHTML = '';
+
+        if (Array.isArray(data.site_visit.measurement_files)) {
+            data.site_visit.measurement_files.forEach(file => {
+                const ext = file.split('.').pop().toLowerCase();
+                if (['jpg', 'jpeg', 'png', 'webp'].includes(ext)) {
+                    preview.innerHTML += `
+                        <div class="relative">
+                            <img src="/${file}" onclick="openMediaViewer('/${file}', 'image')"
+                                class="w-full h-24 object-cover rounded border cursor-pointer hover:opacity-80" />
+                            <button onclick="removeExistingFile('${file}', event)"
+                                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded">✕</button>
+                        </div>`;
+                } else {
+                    preview.innerHTML += `
+                        <div class="relative">
+                            <video class="w-full h-24 rounded border cursor-pointer" onclick="openMediaViewer('/${file}', 'video')">
+                                <source src="/${file}">
+                            </video>
+                            <button onclick="removeExistingFile('${file}', event)"
+                                class="absolute top-1 right-1 bg-red-600 text-white text-xs px-1 rounded">✕</button>
+                        </div>`;
                 }
-            })
+            });
+        }
+
+        if (scrollToFiles) {
+            setTimeout(() => {
+                document.getElementById('measurement_preview').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center'
+                });
+            }, 300);
+        }
+    }
+})
             .catch(err => {
                 console.error(err);
                 alert('Failed to load site visit details');
@@ -413,7 +434,7 @@
         const leadId = document.getElementById('current_lead_id').value;
         const formData = new FormData();
         formData.append('lead_id', leadId);
-        // formData.append('assigned_staff', document.getElementById('assigned_staff').value);
+        formData.append('assigned_staff', document.getElementById('assigned_staff').value);
         formData.append('visit_datetime', document.getElementById('visit_datetime').value);
         formData.append('site_condition_notes', document.getElementById('site_condition_notes').value);
         formData.append('space_details', document.getElementById('space_details').value);

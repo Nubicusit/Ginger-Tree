@@ -15,9 +15,9 @@
         <nav class="space-y-1">
 
             <!-- Dashboard -->
-            <a href="{{ route('designer.dashboard') }}"
+            <a href="{{ route('estimator.dashboard') }}"
                 class="nav-item flex items-center space-x-3 px-4 py-3 rounded-lg transition-colors
-                {{ request()->is('designer/dashboard*')
+                {{ request()->is('estimation/dashboard*')
                 ? 'bg-gray-300 text-gray-900 shadow-md'
                 : 'text-gray-700 hover:bg-gray-200' }}">
                 <i class="fas fa-th-large text-lg w-6 text-center"></i>
@@ -26,31 +26,19 @@
 
             <!-- Designer Section -->
             <div class="pt-4 mt-4 border-t border-gray-100">
-                <h3 class="text-gray-600 font-bold text-xs uppercase tracking-wider mb-2 px-4">Design</h3>
+                <h3 class="text-gray-600 font-bold text-xs uppercase tracking-wider mb-2 px-4">Management</h3>
                 <ul class="space-y-1">
+                     <li>
+            <a href="{{ url('estimations') }}"
+               class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
+               {{ request()->is('leads*')
+                  ? 'bg-gray-300 text-gray-900 shadow-md'
+                  : 'text-gray-700 hover:bg-gray-200' }}">
+              <i class="fas fa-clipboard-list text-lg w-6 text-center"></i>
+              <span>Estimation</span>
+            </a>
+          </li>
 
-                    <!-- My Projects -->
-                    <li>
-                        <a href="{{ route('design-status.index') }}"
-                            class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
-                            {{ request()->is('design-status*')
-                            ? 'bg-gray-300 text-gray-900 shadow-md'
-                            : 'text-gray-700 hover:bg-gray-200' }}">
-                            <i class="fas fa-paint-brush text-lg w-6 text-center"></i>
-                            <span>2D Design</span>
-                        </a>
-                    </li>
-
-                    <li>
-                        <a href=""
-                            class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
-                            {{ request()->is('')
-                            ? 'bg-gray-300 text-gray-900 shadow-md'
-                            : 'text-gray-700 hover:bg-gray-200' }}">
-                            <i class="fas fa-paint-brush text-lg w-6 text-center"></i>
-                            <span>3D Design</span>
-                        </a>
-                    </li>
                 </ul>
             </div>
 

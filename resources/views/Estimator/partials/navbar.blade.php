@@ -8,7 +8,7 @@
 
     <!-- Page Title -->
     <div class="flex items-center space-x-2">
-        <h1 class="text-lg font-bold text-gray-800">@yield('page-title', 'Designer Portal')</h1>
+        <h1 class="text-lg font-bold text-gray-800">@yield('page-title', 'Estimator Portal')</h1>
     </div>
 
     <!-- Right Side -->
@@ -20,9 +20,9 @@
             </div>
             <div class="hidden sm:block">
                 <p class="text-sm font-semibold text-gray-800">{{ Auth::user()->name }}</p>
-                <p class="text-xs text-gray-500">Designer</p>
+                <p class="text-xs text-gray-500">Estimator</p>
             </div>
         </div>
     </div>
-
 </header>
+

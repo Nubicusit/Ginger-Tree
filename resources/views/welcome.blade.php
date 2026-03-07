@@ -26,7 +26,6 @@
       z-index: 50;
       background: black;
     }
-
     .video-screen video {
       width: 100%;
       height: 100%;

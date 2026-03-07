@@ -129,6 +129,50 @@
             </div>
         </div>
     </div>
+    <!-- FILTER SECTION -->
+<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4 flex flex-wrap items-center justify-between gap-3">
+<form method="GET" action="{{ route('sales.leads') }}" class="flex flex-wrap gap-3 items-center justify-between">
+
+    <!-- Search Name -->
+    <input
+        type="text"
+        name="search"
+        value="{{ request('search') }}"
+        placeholder="Search Name..."
+        class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+    >
+
+    <!-- Created Date -->
+    <input
+        type="date"
+        name="created_date"
+        value="{{ request('created_date') }}"
+        class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+    >
+
+    <!-- Status -->
+    <select name="status" class="border px-3 py-2 rounded text-sm">
+        <option value="">All Status</option>
+        <option value="New" {{ request('status')=='New'?'selected':'' }}>New</option>
+        <option value="Contacted" {{ request('status')=='Contacted'?'selected':'' }}>Contacted</option>
+        <option value="Proposal" {{ request('status')=='Proposal'?'selected':'' }}>Proposal</option>
+        <option value="Negotiation" {{ request('status')=='Negotiation'?'selected':'' }}>Negotiation</option>
+        <option value="Site Visit" {{ request('status')=='Site Visit'?'selected':'' }}>Site Visit</option>
+        <option value="Won" {{ request('status')=='Won'?'selected':'' }}>Won</option>
+        <option value="Lost" {{ request('status')=='Lost'?'selected':'' }}>Lost</option>
+    </select>
+
+    <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+        Filter
+    </button>
+
+    <a href="{{ route('sales.leads') }}"
+       class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded">
+        Reset
+    </a>
+
+</form>
+</div>
     <!-- Table Section -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
         <div class="overflow-x-auto">
@@ -178,6 +222,10 @@
                                     bg-green-500 text-white
                                 @elseif($lead->status == 'Lost')
                                     bg-red-500 text-white
+                                    @elseif($lead->status == 'Negotiation')
+                                    bg-indigo-500 text-white
+                                @elseif($lead->status == 'Proposal')
+                                    bg-gray-500 text-white
                                 @elseif($lead->status == 'Contacted')
                                     bg-yellow-400 text-white
                                     @elseif($lead->status == 'Site Visit')
@@ -206,7 +254,6 @@
             </table>
         </div>
     </div>
-
 </div>
 <div id="leadDrawer"
     class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center">
