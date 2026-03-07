@@ -43,11 +43,27 @@
                     </td>
                     <td class="px-6 py-4">{{ Str::limit($lead->siteVisit->site_condition_notes ?? '-', 30) }}</td>
                     <td class="px-6 py-4">{{ $lead->siteVisit->initial_cost_estimate ?? '-' }}</td>
-                    <td class="px-6 py-4">
-                        <span class="px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                         <td class="px-6 py-4">
+@if($lead->latestQuotation && $lead->latestQuotation->status)
 
-                        </span>
-                    </td>
+@php
+$status = $lead->latestQuotation->status;
+@endphp
+
+<span class="px-3 py-1 rounded-full text-xs font-semibold
+@if($status == 'Submitted') bg-gray-100 text-gray-700
+@elseif($status == 'Negotiation') bg-blue-100 text-blue-700
+@elseif($status == 'Approved') bg-green-100 text-green-700
+@elseif($status == 'Rejected') bg-red-100 text-red-700
+@endif">
+{{ $status }}
+</span>
+
+@else
+<span class="text-gray-400 text-xs">Not Created</span>
+@endif
+</td>
+
                     <td class="px-6 py-4">
                         <button onclick="openDetailModal({{ $lead->id }})"
                             class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
@@ -108,7 +124,7 @@
                     <p class="font-bold text-gray-900 text-base truncate" id="modal_client_name">-</p>
                     <p class="text-sm text-gray-500 truncate" id="modal_email">-</p>
                 </div>
-                <span class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">✅ Approved</span>
+                <span class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">{{ $lead->latestQuotation?->status ?? 'Pending' }}</span>
             </div>
 
             <!-- Key Info Grid -->

@@ -13,11 +13,21 @@ class EstimationController extends Controller
         {
             return view('Estimator.dashboard');
         }
-    public function estimation()
-        {
-            $userId = Auth::id();
+public function estimation()
+{
+    $user = Auth::user();
 
-        // Get leads where this estimator is assigned AND approval_status is 'Yes'
+    if ($user->role === 'admin') {
+        // Admin sees all estimations
+        $leads = Lead::with(['siteVisit', 'latestQuotation'])
+            ->whereHas('siteVisit', function ($query) {
+                $query->where('approval_status', 'Yes');
+            })
+            ->latest()
+            ->get();
+    } else {
+        // Estimator sees only their assigned leads
+        $userId = $user->id;
         $leads = Lead::with(['siteVisit', 'latestQuotation'])
             ->whereHas('siteVisit', function ($query) use ($userId) {
                 $query->where('assigned_staff', $userId)
@@ -25,10 +35,10 @@ class EstimationController extends Controller
             })
             ->latest()
             ->get();
+    }
 
-        $totalAssigned = $leads->count();
-            return view('Estimator.estimations',compact('leads', 'totalAssigned'));
-        }
+    $totalAssigned = $leads->count();
+return view('Estimator.estimations', compact('leads', 'totalAssigned'));}
 public function createQuotation(Lead $lead)
 {
     $siteVisit = $lead->siteVisit;
@@ -164,15 +174,24 @@ public function storeQuotation(Request $request)
             ];
         }
 
-        $quotation = \App\Models\Quotation::updateOrCreate(
-                [
-                    'lead_id' => $leadId,   // ← find by lead_id
-                ],
-                [
-                    'quotation_no' => $request->quotation_no,
-                    'items'        => $itemsToSave,
-                ]
-            );
+        $quotation = \App\Models\Quotation::where('lead_id', $leadId)->first();
+
+if ($quotation) {
+
+    // UPDATE existing quotation
+    $quotation->quotation_no = $request->quotation_no;
+    $quotation->items = $itemsToSave;
+    $quotation->save();
+
+} else {
+
+    // CREATE new quotation
+    $quotation = \App\Models\Quotation::create([
+        'lead_id' => $leadId,
+        'quotation_no' => $request->quotation_no,
+        'items' => $itemsToSave,
+    ]);
+}
 
         return response()->json([
             'success' => true,

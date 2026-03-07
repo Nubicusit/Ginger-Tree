@@ -69,15 +69,13 @@
                      <li>
                         <a href="{{ route('estimator.dashboard') }}"
                             class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
-        {{ request()->is('estimator*')
-           ? 'bg-gray-300 text-gray-900 shadow-md'
-           : 'text-gray-700 hover:bg-gray-200' }}">
+                            {{ request()->is('estimator*')
+                            ? 'bg-gray-300 text-gray-900 shadow-md'
+                            : 'text-gray-700 hover:bg-gray-200' }}">
                             <i class="fas fa-drafting-compass text-lg w-6 text-center"></i>
                             <span>Estimation</span>
                         </a>
                     </li>
-
-
                     <!-- Production -->
                     <li>
                         <a href="{{ url('production') }}"
