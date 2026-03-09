@@ -21,11 +21,15 @@ class SiteVisitController extends Controller
     ->whereHas('siteVisit')
     ->latest()
     ->get();
-        $totalSiteVisits = Lead::where('sales_executive_id', $userId)
+    $totalSiteVisits = $leads->whereNotNull('siteVisit')->count();
+    $completedSiteVisits = $leads->filter(function($lead){
+        return $lead->siteVisit && $lead->siteVisit->approval_status === 'Yes';
+    })->count();
+        $assignSiteVisits = Lead::where('sales_executive_id', $userId)
         ->whereHas('siteVisit')
         ->count();
 
-        return view('sales_executive.Sitevisit', compact('leads','totalSiteVisits'));
+        return view('sales_executive.Sitevisit', compact('leads','assignSiteVisits','totalSiteVisits','completedSiteVisits'));
     }
 
     public function store(Request $request)

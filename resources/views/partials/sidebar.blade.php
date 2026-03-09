@@ -72,7 +72,7 @@
                             {{ request()->is('estimator*')
                             ? 'bg-gray-300 text-gray-900 shadow-md'
                             : 'text-gray-700 hover:bg-gray-200' }}">
-                            <i class="fas fa-drafting-compass text-lg w-6 text-center"></i>
+                            <i class="fas fa-ruler-combined text-lg w-6 text-center"></i>
                             <span>Estimation</span>
                         </a>
                     </li>
@@ -148,9 +148,9 @@
                             <li>
                                 <a href="{{ url('inventory') }}"
                                     class="flex items-center space-x-3 px-4 py-2 text-sm rounded-lg
-                {{ request()->is('inventory*')
-                    ? 'bg-gray-300 text-gray-900 shadow-md'
-                    : 'text-gray-700 hover:bg-gray-200' }}">
+                                {{ request()->is('inventory*')
+                                    ? 'bg-gray-300 text-gray-900 shadow-md'
+                                    : 'text-gray-700 hover:bg-gray-200' }}">
                                     <i class="fas fa-boxes-stacked w-5 text-center"></i>
                                     <span>Inventory</span>
                                 </a>

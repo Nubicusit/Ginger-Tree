@@ -71,6 +71,7 @@ public function storeQuotation(Request $request)
     try {
 
         $leadId = $request->lead_id;
+        $quotationId = $request->quotation_id;
 
         if (!$leadId) {
             return response()->json([

@@ -22,7 +22,7 @@
                 <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">Completed Site Visits</span>
             </div>
             <div class="text-right">
-                <span class="text-4xl font-bold text-white">12</span>
+                <span class="text-4xl font-bold text-white">{{ $completedSiteVisits }}</span>
             </div>
         </div>
     </div>
@@ -33,7 +33,7 @@
                 <span class="block text-xs font-bold text-white/80 uppercase tracking-wider" style="font-size: 16px;">Assigned Site visit</span>
             </div>
             <div class="text-right">
-                <span class="text-4xl font-bold text-white">12</span>
+                <span class="text-4xl font-bold text-white">{{ $assignSiteVisits }}</span>
             </div>
         </div>
     </div>
@@ -141,24 +141,6 @@
                             class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
                             View
                         </button>
-
-                        @if($lead->latestQuotation)
-                        @php
-                        $status = $lead->latestQuotation->status;
-                        @endphp
-
-                        <a href="{{ route('sale.quotations.pdf', $lead->latestQuotation->id) }}"
-                            target="_blank"
-                            class="text-white text-[10px] font-bold py-2 px-4 rounded uppercase
-    @if($status == 'Negotiation') bg-red-600 hover:bg-red-700
-    @elseif($status == 'Rejected') bg-gray-600 hover:bg-gray-700
-    @elseif($status == 'Approved') bg-green-600 hover:bg-green-700
-    @else bg-blue-600 hover:bg-blue-700
-    @endif">
-                            PDF
-                        </a>
-
-                        @endif
                     </td>
                 </tr>
                 @empty

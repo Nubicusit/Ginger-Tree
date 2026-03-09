@@ -63,6 +63,7 @@
                 <p class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-1">Quotation No.</p>
                 <p class="text-2xl font-bold text-blue-600 tracking-wider">{{ $quotationNo }}</p>
                 <input type="hidden" id="quotationNumber" value="{{ $quotationNo }}">
+                <input type="hidden" id="quotationId" value="{{ $existingQuotation->id ?? '' }}">
             </div>
 
             <!-- Site Notes Summary -->
@@ -266,30 +267,37 @@
 <script>
     const allInventoryItems = @json($inventoryItems);
 
-    function updatePrice(select) {
+ function updatePrice(select) {
 
-        const item = select.closest('.quotation-item');
-        const priceInput = item.querySelector('.q_price');
-        const gstInput = item.querySelector('.q_gst');
+    const item = select.closest('.quotation-item');
 
-        const selected = select.options[select.selectedIndex];
+    const priceInput = item.querySelector('.q_price');
+    const gstInput = item.querySelector('.q_gst');
 
-        priceInput.value = selected.dataset.price || '';
-        gstInput.value = selected.dataset.gst || 0;
+    const selected = select.options[select.selectedIndex];
 
-        // category
-        const categoryRow = item.querySelector('.q_category_row');
-        const categoryDisplay = item.querySelector('.q_category_display');
-        const category = selected.dataset.category || '';
+    const price = selected.dataset.price || '';
+    const gst = selected.dataset.gst || 0;
+    const category = selected.dataset.category || '';
 
-        if (category) {
-            categoryDisplay.value = category;
-            categoryRow.classList.remove('hidden');
-        } else {
-            categoryDisplay.value = '';
-            categoryRow.classList.add('hidden');
-        }
+    priceInput.value = price;
+    if (gstInput) gstInput.value = gst;
+
+    // CATEGORY UPDATE
+    const categoryRow = item.querySelector('.q_category_row');
+    const categoryDisplay = item.querySelector('.q_category_display');
+
+    if (categoryDisplay) {
+        categoryDisplay.value = category;
     }
+
+    if (category) {
+        categoryRow?.classList.remove('hidden');
+    } else {
+        categoryRow?.classList.add('hidden');
+    }
+
+}
 
     function syncCustomPrice(input) {
         const item = input.closest('.quotation-item');
@@ -475,6 +483,7 @@
 
     function submitQuotation() {
         const quotationNo = document.getElementById('quotationNumber').value;
+        const quotationId = document.getElementById('quotationId').value;
         const validItems = [];
 
         document.querySelectorAll('.quotation-item').forEach(row => {
@@ -515,7 +524,7 @@
                     length: row.querySelector('.q_length')?.value || '',
                     breadth: row.querySelector('.q_breadth')?.value || '',
                     area: (parseFloat(row.querySelector('.q_length')?.value || 0) * parseFloat(row.querySelector('.q_breadth')?.value || 0)).toFixed(2),
-                    gst_percentage: row.querySelector('.q_gst').value || 0,
+                    gst_percentage: row.querySelector('.q_gst')?.value || 0,
                 });
             }
         });
@@ -528,6 +537,7 @@
         const formData = new FormData();
         formData.append('lead_id', '{{ $lead->id }}');
         formData.append('quotation_no', quotationNo);
+        formData.append('quotation_id', quotationId);
 
         validItems.forEach((item, index) => {
             formData.append(`items[${index}][item_id]`, item.item_id);
@@ -552,11 +562,17 @@
                 },
                 body: formData
             })
-            .then(res => res.text()) // ← text() not json()
-            .then(text => {
-                console.log('RAW RESPONSE:', text); // ← check browser console
-                alert(text);
-            })
+            .then(res => res.json())
+.then(data => {
+
+    if(data.success){
+        alert('Quotation saved successfully');
+        location.reload();
+    }else{
+        alert(data.message);
+    }
+
+})
             .catch(err => alert('Fetch error: ' + err.message));
     }
 
@@ -615,7 +631,6 @@
                 if (customGst) customGst.value = item.gst_percentage || 0;
 
             } else if (item.item_id) {
-
                 // ── INVENTORY ITEM ──
                 const select = row.querySelector('.q_item');
                 select.value = item.item_id;
@@ -659,7 +674,7 @@
     if(e.target.classList.contains('q_custom_name')){
 
         let itemName = e.target.value;
-        let row = e.target.closest('.q-item');
+        let row = e.target.closest('.quotation-item');
 
         if(itemName.length < 2) return;
 
