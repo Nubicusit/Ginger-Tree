@@ -126,7 +126,6 @@ $status = $lead->latestQuotation->status;
                 </div>
                 <span class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">{{ $lead->latestQuotation?->status ?? 'Pending' }}</span>
             </div>
-
             <!-- Key Info Grid -->
             <div class="grid grid-cols-3 gap-3">
                 <div class="rounded-xl p-4 border border-gray-100" style="background:#f8fafc;">

@@ -376,8 +376,39 @@ Route::get('/estimations', [EstimationController::class, 'estimation'])->middlew
 Route::get('/estimator/quotation/create/{lead}', [EstimationController::class, 'createQuotation'])->name('estimator.quotation.create');
 Route::post('/estimator/quotation/store', [EstimationController::class, 'storeQuotation'])->middleware(['auth', 'estimator'])->name('estimator.quotation.store');
 // Inside your estimator auth group
-Route::get('/estimator/quotation/{quotation}/pdf', [EstimationController::class, 'generatePdf'])->middleware(['auth', 'estimator'])->name('estimator.quotation.pdf');
+Route::get('/estimator/estimation/{id}/pdf', [EstimationController::class, 'estimationPdf'])
+    ->middleware(['auth', 'estimator'])
+    ->name('estimator.estimation.pdf');
+// Route::get('/estimator/quotation/{quotation}/pdf', [EstimationController::class, 'generatePdf'])->middleware(['auth', 'estimator'])->name('estimator.quotation.pdf');
 Route::get('/estimator/estimations', [EstimationController::class, 'estimation'])->middleware(['auth', 'estimator'])->name('estimator.estimation');
 Route::get('/estimator/item-details', [EstimationController::class, 'getItemDetails'])
     ->middleware(['auth','estimator'])
     ->name('estimator.item.details');
+
+    Route::get('/accounts/estimations', [AccountsController::class, 'estimations'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.estimations');
+
+Route::post('/accounts/estimations', [AccountsController::class, 'estimationStore'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.estimations.store');
+
+Route::put('/accounts/estimations/{id}', [AccountsController::class, 'estimationUpdate'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.estimations.update');
+
+Route::delete('/accounts/estimations/{id}', [AccountsController::class, 'estimationDestroy'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.estimations.destroy');
+
+Route::get('/accounts/estimations/{id}/edit-data', [AccountsController::class, 'estimationEditData'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.estimations.edit-data');
+
+Route::get('/accounts/estimations/{id}/view-data', [AccountsController::class, 'estimationViewData'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.estimations.view-data');
+
+Route::get('/accounts/estimations/{id}/pdf', [AccountsController::class, 'estimationPdf'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.estimations.pdf');

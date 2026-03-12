@@ -33,6 +33,18 @@
 
                 <ul class="space-y-1">
 
+                    <!-- Estimation -->
+                    <li>
+                        <a href="{{ url('/accounts/estimations') }}"
+                           class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
+                           {{ request()->is('accounts/estimations*')
+                                ? 'bg-gray-300 text-gray-900 shadow-md'
+                                : 'text-gray-700 hover:bg-gray-200' }}">
+                            <i class="fas fa-calculator text-lg w-6 text-center"></i>
+                            <span>Estimation</span>
+                        </a>
+                    </li>
+
                     <!-- Income & Expenses -->
                     <li>
                         <a href="{{ url('/accounts/income-expenses') }}"
@@ -54,6 +66,18 @@
                                 : 'text-gray-700 hover:bg-gray-200' }}">
                             <i class="fas fa-file-invoice text-lg w-6 text-center"></i>
                             <span>Invoices</span>
+                        </a>
+                    </li>
+
+                    <!-- Project Payments -->
+                    <li>
+                        <a href="{{ url('/accounts/projects') }}"
+                           class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
+                           {{ request()->is('accounts/projects*')
+                                ? 'bg-gray-300 text-gray-900 shadow-md'
+                                : 'text-gray-700 hover:bg-gray-200' }}">
+                            <i class="fas fa-building text-lg w-6 text-center"></i>
+                            <span>Project Payments</span>
                         </a>
                     </li>
 

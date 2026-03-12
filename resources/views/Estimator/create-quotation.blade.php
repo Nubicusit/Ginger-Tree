@@ -5,7 +5,6 @@
 @section('content')
 
 <div class="max-w-4xl mx-auto">
-
     <!-- Page Header -->
     <div class="flex items-center gap-4 mb-6">
         <a href="{{ url()->previous() }}"
@@ -245,20 +244,31 @@
                         <button onclick="submitQuotation()"
                             class="px-8 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
                             style="background: linear-gradient(135deg, #2563eb, #1d4ed8); box-shadow: 0 4px 12px rgba(37,99,235,0.3);">
-                            Save Quotation
+                            Save Estimation
                         </button>
-                        @if($existingQuotation)
-                        <a href="{{ route('estimator.quotation.pdf', $existingQuotation->id) }}"
-                            class="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg">
-                            📄 Generate PDF
-                        </a>
-                        @endif
+                       <a id="pdf_after_save"
+        href="#"
+        target="_blank"
+        class="hidden px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all items-center gap-2"
+        style="background: linear-gradient(135deg, #dc2626, #b91c1c); box-shadow: 0 4px 12px rgba(220,38,38,0.3);">
+        📄 Generate PDF
+    </a>
+
+
+    @if($existingQuotation && $existingQuotation->estimation)
+<a href="{{ route('estimator.estimation.pdf', $existingQuotation->estimation->id) }}"
+    target="_blank"
+    class="px-6 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+    style="background: linear-gradient(135deg, #dc2626, #b91c1c);">
+    📄 Generate PDF
+</a>
+@endif
+    
                     </div>
 
                 </div>
             </div>
         </div>
-
     </div>
 </div>
 <script>
@@ -436,6 +446,14 @@
                     <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">Unit Price</label>
                     <input type="number" class="q_price w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50" readonly>
                 </div>
+                <div>
+                    <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide block mb-1">GST %</label>
+                    <input type="number"
+                    class="q_gst w-full border border-gray-200 rounded-lg px-3 py-2 text-sm bg-gray-50"
+                    placeholder="GST %"
+                    min="0"
+                    max="100">
+                    </div>
                 <div class="col-span-2">
                     <div class="flex items-center justify-between mb-1">
                         <label class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Measurements <span class="text-gray-300 font-normal normal-case">(optional)</span></label>
@@ -564,14 +582,17 @@
             })
             .then(res => res.json())
 .then(data => {
-
-    if(data.success){
-        alert('Quotation saved successfully');
-        location.reload();
-    }else{
+    if (data.success) {
+        // PDF button show ആക്കുക
+        const pdfBtn = document.getElementById('pdf_after_save');
+        if (pdfBtn) {
+            pdfBtn.href = '/estimator/estimation/' + data.estimation_id + '/pdf';
+            pdfBtn.classList.remove('hidden');
+        }
+        alert('Estimation saved! Click "Generate PDF" to download.');
+    } else {
         alert(data.message);
     }
-
 })
             .catch(err => alert('Fetch error: ' + err.message));
     }
@@ -613,41 +634,41 @@
 
             const row = wrapper.querySelectorAll('.quotation-item')[index];
 
-            // ── CUSTOM ITEM ──
-            if (item.custom_name && item.custom_name.trim() !== '') {
 
-                const toggle = row.querySelector('.custom_toggle');
-                toggle.checked = true;
-                toggleCustomItem(toggle);
+           // ── CUSTOM ITEM ──
+if (item.custom_name && item.custom_name.trim() !== '') {
 
-                row.querySelector('.q_custom_name').value = item.item_name || '';
-                row.querySelector('.q_custom_price').value = item.price || '';
-                row.querySelector('.q_price').value = item.price || '';
+    const toggle = row.querySelector('.custom_toggle');
+    toggle.checked = true;
+    toggleCustomItem(toggle);
 
-                const customCat = row.querySelector('.q_custom_category');
-                if (customCat) customCat.value = item.category || '';
+    row.querySelector('.q_custom_name').value = item.custom_name || '';  // ← item_name അല്ല, custom_name
+    row.querySelector('.q_custom_price').value = item.price || '';
+    row.querySelector('.q_price').value = item.price || '';
 
-                const customGst = row.querySelector('.q_custom_gst');
-                if (customGst) customGst.value = item.gst_percentage || 0;
+    const customCat = row.querySelector('.q_custom_category');
+    if (customCat) customCat.value = item.category || '';
 
-            } else if (item.item_id) {
-                // ── INVENTORY ITEM ──
-                const select = row.querySelector('.q_item');
-                select.value = item.item_id;
+    const customGst = row.querySelector('.q_custom_gst');
+    if (customGst) customGst.value = item.gst_percentage || 0;
 
-                // restore category display WITHOUT calling updatePrice()
-                const categoryRow = row.querySelector('.q_category_row');
-                const categoryDisplay = row.querySelector('.q_category_display');
-                if (categoryDisplay && item.category) {
-                    categoryDisplay.value = item.category;
-                    categoryRow.classList.remove('hidden');
-                }
+} else if (item.item_id) {
+    // ── INVENTORY ITEM ──
+    const select = row.querySelector('.q_item');
+    select.value = item.item_id;
 
-                row.querySelector('.q_price').value = item.price || '';
+    const categoryRow = row.querySelector('.q_category_row');
+    const categoryDisplay = row.querySelector('.q_category_display');
+    if (categoryDisplay && item.category) {
+        categoryDisplay.value = item.category;
+        categoryRow.classList.remove('hidden');
+    }
 
-                const gstInput = row.querySelector('.q_gst');
-                if (gstInput) gstInput.value = item.gst_percentage || 0;
-            }
+    row.querySelector('.q_price').value = item.price || '';
+
+    const gstInput = row.querySelector('.q_gst');
+    if (gstInput) gstInput.value = item.gst_percentage || 0;
+}
 
             // ── COMMON FIELDS (always restore these) ──
             row.querySelector('.q_description').value = item.description || '';
@@ -655,6 +676,7 @@
 
             const unitSelect = row.querySelector('.q_unit');
             if (unitSelect) unitSelect.value = item.unit || '';
+
 
             // ── MEASUREMENTS ──
             if (item.length || item.breadth) {
@@ -688,11 +710,8 @@
                 row.querySelector('.q_unit').value = data.unit || '';
                 row.querySelector('.q_price').value = data.price || '';
                 row.querySelector('.q_gst').value = data.gst_percentage || '';
-
             }
-
         });
-
     }
 
 });

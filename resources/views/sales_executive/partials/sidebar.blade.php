@@ -65,7 +65,7 @@
               <span>Sitevisit and Requirements</span>
             </a>
           </li>
-          <li>
+          <!-- <li>
             <a href="{{ url('/sales/projects') }}"
                class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
                {{ request()->is('projects*')
@@ -74,7 +74,7 @@
               <i class="fas fa-folder  text-lg w-6 text-center"></i>
               <span>Projects</span>
             </a>
-          </li>
+          </li> -->
 
           <!-- Design Status -->
           <!-- <li>

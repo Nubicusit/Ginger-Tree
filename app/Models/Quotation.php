@@ -15,7 +15,6 @@ class Quotation extends Model
     'rejection_reason',
     'negotiation_reason'
 ];
-
 protected $casts = [
     'items' => 'array'
 ];

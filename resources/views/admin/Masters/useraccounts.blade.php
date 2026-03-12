@@ -24,27 +24,27 @@
 </div>
 <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
     <form method="GET" action="{{ route('useraccounts') }}"
-          class="flex flex-wrap items-center gap-4">
+        class="flex flex-wrap items-center gap-4">
 
         <div class="flex-1 min-w-[220px]">
             <input type="text"
-                   name="search"
-                   value="{{ request('search') }}"
-                   placeholder="Search by name..."
-                   class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
+                name="search"
+                value="{{ request('search') }}"
+                placeholder="Search by name..."
+                class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
                           focus:ring-2 focus:ring-indigo-200 focus:outline-none">
         </div>
 
         <div class="min-w-[200px]">
             <select name="department"
-                    class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
+                class="w-full border border-gray-200 rounded-lg px-4 py-2 text-sm
                            focus:ring-2 focus:ring-indigo-200 focus:outline-none">
                 <option value="">All Departments</option>
                 @foreach($departments as $department)
-                    <option value="{{ $department->id }}"
-                        {{ request('department') == $department->id ? 'selected' : '' }}>
-                        {{ $department->name }}
-                    </option>
+                <option value="{{ $department->id }}"
+                    {{ request('department') == $department->id ? 'selected' : '' }}>
+                    {{ $department->name }}
+                </option>
                 @endforeach
             </select>
         </div>
@@ -56,7 +56,7 @@
             </button>
 
             <a href="{{ route('useraccounts') }}"
-               class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">
+                class="px-4 py-2 bg-gray-200 text-gray-700 text-sm rounded-lg hover:bg-gray-300 transition">
                 Reset
             </a>
         </div>
@@ -84,10 +84,35 @@
                     <td class="px-6 py-4 capitalize">
                         {{ $user->department->name ?? '—' }}
                     </td>
-                    <td class="px-6 py-4">{{ $user->email }}</td>
-                    <td class="px-6 py-4 font-mono ">
-                        {{ $user->visible_password ?? '—' }}
-                    </td>
+                    <td class="px-6 py-4">
+
+<div class="flex items-center gap-2">
+
+<span id="email-{{ $user->id }}">
+{{ $user->email }}
+</span>
+
+<button onclick="copyText('email-{{ $user->id }}')"
+class="text-blue-500 hover:text-blue-700 text-xs">
+<i class="fas fa-copy"></i>
+</button>
+
+</div>
+
+</td>
+        <td class="px-6 py-4 font-mono">
+<div class="flex items-center gap-2">
+
+<span id="password-{{ $user->id }}">
+{{ $user->visible_password ?? '—' }}
+</span>
+
+<button onclick="copyText('password-{{ $user->id }}')"
+class="text-blue-500 hover:text-blue-700 text-xs">
+<i class="fas fa-copy"></i>
+</button>
+</div>
+</td>
                     <td class="px-6 py-4">
                         {{ $user->contact_no ?? '—' }}
                     </td>
@@ -108,6 +133,7 @@
                         </label>
                     </td>
                     <td class="px-6 py-4">
+
                         <form action="{{ route('users.destroy', $user->id) }}"
                             method="POST"
                             onsubmit="return confirm('Are you sure you want to delete this user?')">
@@ -120,6 +146,7 @@
                    rounded-md hover:bg-red-400 transition">
                                 DELETE
                             </button>
+
                         </form>
                     </td>
                 </tr>
@@ -280,6 +307,26 @@
 
     function closeDeptModal() {
         document.getElementById('departmentModal').classList.add('hidden');
+    }
+
+    function copyText(elementId) {
+
+        const element = document.getElementById(elementId);
+
+        if (!element) {
+            alert("Text not found");
+            return;
+        }
+
+        const text = element.innerText;
+
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                alert("Copied: " + text);
+            })
+            .catch(() => {
+                alert("Copy failed");
+            });
     }
 </script>
 @endsection
