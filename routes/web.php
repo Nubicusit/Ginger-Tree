@@ -107,10 +107,10 @@ Route::get('/sale-executive/site-visit/{lead}', [SiteVisitController::class, 'sh
 Route::post('/sale-executive/site-visit/delete-file', [SiteVisitController::class, 'deleteMeasurementFile']);
 Route::post('/leads/{lead}/site-visit', [SiteVisitController::class, 'saveSiteVisit']);
 
-Route::get('/sale-executive/quotations/{lead}', [QuotationController::class, 'index'])->name('sale.quotations.index');
+// Route::get('/sale-executive/quotations/{lead}', [QuotationController::class, 'index'])->name('sale.quotations.index');
 
-Route::post('/sale-executive/quotation/store', [QuotationController::class, 'storequotation'])->name('sale.quotations.store');
-Route::post('/quotation/{id}/update-status', [QuotationController::class, 'updateStatus']);
+// Route::post('/sale-executive/quotation/store', [QuotationController::class, 'storequotation'])->name('sale.quotations.store');
+// Route::post('/quotation/{id}/update-status', [QuotationController::class, 'updateStatus']);
 /*
 |--------------------------------------------------------------------------
 | HR Routes
@@ -243,8 +243,8 @@ Route::get('/sales/attendance/status', [SalesController::class, 'attendanceStatu
 //     ->middleware(['auth', 'department:sales_executive'])
 //     ->name('sales.self.checkin');
 
-Route::get('/quotation/generate-number', [QuotationController::class, 'generateNumber'])->name('quotation.generate-number');
-Route::get('/inventory/items', [QuotationController::class, 'getItems']);
+// Route::get('/quotation/generate-number', [QuotationController::class, 'generateNumber'])->name('quotation.generate-number');
+// Route::get('/inventory/items', [QuotationController::class, 'getItems']);
 Route::post('sales/attendance/self-check-in', [SalesController::class, 'selfCheckIn'])
     ->middleware(['auth','department:sales_executive'])
     ->name('sales.attendance.self-check-in');
@@ -351,25 +351,25 @@ Route::get('/design-status', [DesignerController::class, 'index'])
     ->middleware(['auth', 'designer'])
     ->name('design-status.index');
 
-Route::get('/design-status/create', [DesignerController::class, 'create'])
-    ->middleware(['auth', 'designer'])
-    ->name('design-status.create');
+// Route::get('/design-status/create', [DesignerController::class, 'create'])
+//     ->middleware(['auth', 'designer'])
+//     ->name('design-status.create');
 
-Route::post('/design-status', [DesignerController::class, 'store'])
-    ->middleware(['auth', 'designer'])
-    ->name('design-status.store');
+// Route::post('/design-status', [DesignerController::class, 'store'])
+//     ->middleware(['auth', 'designer'])
+//     ->name('design-status.store');
 
-Route::get('/design-status/{id}/edit', [DesignerController::class, 'edit'])
-    ->middleware(['auth', 'designer'])
-    ->name('design-status.edit');
+// Route::get('/design-status/{id}/edit', [DesignerController::class, 'edit'])
+//     ->middleware(['auth', 'designer'])
+//     ->name('design-status.edit');
 
-Route::put('/design-status/{id}', [DesignerController::class, 'update'])
-    ->middleware(['auth', 'designer'])
-    ->name('design-status.update');
+// Route::put('/design-status/{id}', [DesignerController::class, 'update'])
+//     ->middleware(['auth', 'designer'])
+//     ->name('design-status.update');
 
-Route::delete('/design-status/{id}', [DesignerController::class, 'destroy'])
-    ->middleware(['auth', 'designer'])
-    ->name('design-status.destroy');
+// Route::delete('/design-status/{id}', [DesignerController::class, 'destroy'])
+//     ->middleware(['auth', 'designer'])
+//     ->name('design-status.destroy');
 
 Route::get('/estimator/dashboard', [EstimationController::class,'dashboard'])->middleware(['auth', 'estimator'])->name('estimator.dashboard');
 Route::get('/estimations', [EstimationController::class, 'estimation'])->middleware(['auth', 'estimator'])->name('estimations.index');
@@ -412,3 +412,29 @@ Route::get('/accounts/estimations/{id}/view-data', [AccountsController::class, '
 Route::get('/accounts/estimations/{id}/pdf', [AccountsController::class, 'estimationPdf'])
     ->middleware(['auth', 'department:accounts'])
     ->name('accounts.estimations.pdf');
+
+
+Route::prefix('three-d-design')->name('three-d-design.')->middleware(['auth'])->group(function () {
+
+    // Resource routes
+    Route::get('/',                    [ThreeDesignerController::class, 'index'])      ->name('index');
+    Route::get('/create',              [ThreeDesignerController::class, 'create'])     ->name('create');
+    Route::post('/',                   [ThreeDesignerController::class, 'store'])      ->name('store');
+    Route::get('/{threeDDesign}',      [ThreeDesignerController::class, 'show'])       ->name('show');
+    Route::get('/{threeDDesign}/edit', [ThreeDesignerController::class, 'edit'])       ->name('edit');
+    Route::put('/{threeDDesign}',      [ThreeDesignerController::class, 'update'])     ->name('update');
+    Route::delete('/{threeDDesign}',   [ThreeDesignerController::class, 'destroy'])    ->name('destroy');
+
+    // Quick Action routes
+    Route::patch('/{threeDDesign}/submit',      [ThreeDesignerController::class, 'submit'])     ->name('submit');
+    Route::patch('/{threeDDesign}/approve',     [ThreeDesignerController::class, 'approve'])    ->name('approve');
+    Route::patch('/{threeDDesign}/freeze',      [ThreeDesignerController::class, 'freeze'])     ->name('freeze');
+    Route::patch('/{threeDDesign}/revise',      [ThreeDesignerController::class, 'revise'])     ->name('revise');
+
+    // Utility
+    Route::get('/{threeDDesign}/can-proceed',   [ThreeDesignerController::class, 'canProceed']) ->name('can-proceed');
+    Route::get('/{threeDDesign}/change-log',    [ThreeDesignerController::class, 'changeLog'])  ->name('change-log');
+});
+
+Route::post('accounts/estimations/{id}/approve', [AccountsController::class, 'estimationApprove'])
+     ->name('accounts.estimations.approve');

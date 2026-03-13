@@ -18,7 +18,6 @@ class Service extends Model
         'gst_percentage',
         'service_tax',
     ];
-
     /**
      * Accessor: GST amount
      */

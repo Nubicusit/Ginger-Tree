@@ -592,7 +592,6 @@ function removeSection(sid) {
     document.getElementById(sid)?.remove();
     recalcTotals();
 }
-
 function addRow(sid, sc, data) {
     data = data || {};
     rowCount++;
@@ -606,6 +605,7 @@ function addRow(sid, sc, data) {
     const tr = document.createElement('tr');
     tr.id = rid;
     tr.innerHTML = `
+       
         <td><input type="text"   name="sections[${sc}][items][${rowCount}][description]" value="${escHtml(data.description||data.item_name||'')}" placeholder="Description"></td>
         <td><input type="text"   name="sections[${sc}][items][${rowCount}][category]"    value="${escHtml(data.category||'')}" placeholder="Category"></td>
         <td><select name="sections[${sc}][items][${rowCount}][unit]">${unitOpts}</select></td>

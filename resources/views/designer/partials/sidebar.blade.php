@@ -37,10 +37,10 @@
                             ? 'bg-gray-300 text-gray-900 shadow-md'
                             : 'text-gray-700 hover:bg-gray-200' }}">
                             <i class="fas fa-paint-brush text-lg w-6 text-center"></i>
-                            <span>2D Design</span>
+                            <span>3D Design</span>
                         </a>
                     </li>
-
+                    
                     <li>
                         <a href=""
                             class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
@@ -48,7 +48,7 @@
                             ? 'bg-gray-300 text-gray-900 shadow-md'
                             : 'text-gray-700 hover:bg-gray-200' }}">
                             <i class="fas fa-paint-brush text-lg w-6 text-center"></i>
-                            <span>3D Design</span>
+                            <span>2D Design</span>
                         </a>
                     </li>
                 </ul>

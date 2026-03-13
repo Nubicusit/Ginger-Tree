@@ -46,6 +46,26 @@ protected static function boot()
         ]);
     });
 }
+
+protected static function booted()
+{
+    static::updated(function ($estimation) {
+
+        if ($estimation->status == 'Approved') {
+            $estimation->lead()->update(['status' => 'Won']);
+        }
+
+        if ($estimation->status == 'Rejected') {
+            $estimation->lead()->update(['status' => 'Lost']);
+        }
+
+    });
+}
+
+public function lead()
+{
+    return $this->belongsTo(Lead::class, 'lead_id');
+}
 }
 
 
