@@ -404,7 +404,6 @@ class EstimationController extends Controller
             Lead::where('id', $estimation->lead_id)
                 ->update(['status' => 'Lost']);
         }
-
     }
 
     return response()->json([

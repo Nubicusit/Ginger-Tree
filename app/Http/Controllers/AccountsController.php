@@ -11,10 +11,10 @@ use App\Models\Customer;
 use App\Models\Project;
 use App\Models\Payment;
 use App\Models\SiteVisit;
-use App\Models\Lead;
 use Illuminate\Support\Facades\Storage;
 use App\Models\Estimation;
 use App\Models\EstimationItem;
+use App\Models\Lead;                     // ← added for leads dropdown
 
 class AccountsController extends Controller
 {
@@ -141,6 +141,12 @@ class AccountsController extends Controller
         ));
     }
 
+    /*
+    |--------------------------------------------------------------------------
+    | Quotations / Invoices
+    |--------------------------------------------------------------------------
+    */
+
     public function invoicesIndex(Request $request)
     {
         $query = Quotation::with('lead')->orderByDesc('id');
@@ -165,9 +171,76 @@ class AccountsController extends Controller
             $query->whereDate('created_at', '<=', $request->to_date);
         }
 
+        // ── Summary stats across ALL filtered results (not just current page) ──
+        $allFiltered = $query->get();
+
+        $totalCount    = $allFiltered->count();
+        $approvedCount = $allFiltered->where('status', 'Approved')->count();
+        $totalValue    = $allFiltered->sum(function ($q) {
+            $items = is_array($q->items) ? $q->items : json_decode($q->items, true) ?? [];
+            return collect($items)->sum(fn($i) => floatval($i['total'] ?? 0));
+        });
+
+        // ── Paginate after summary ──
         $invoices = $query->paginate(10);
 
-        return view('accounts.invoices', compact('invoices'));
+        // ── Leads for the "New Quotation" modal dropdown ──
+        $leads = Lead::orderBy('client_name')->get();
+
+        return view('accounts.invoices', compact(
+            'invoices',
+            'leads',
+            'totalCount',
+            'approvedCount',
+            'totalValue'
+        ));
+    }
+
+    /**
+     * Store a new Quotation created from the modal.
+     * Handles both "Save as Draft" and "Save & Send" actions.
+     */
+    public function invoicesStoreQuotation(Request $request)
+    {
+        $request->validate([
+            'lead_id'        => 'required|exists:leads,id',
+            'quotation_date' => 'required|date',
+            'valid_until'    => 'nullable|date|after_or_equal:quotation_date',
+            'status'         => 'required|in:Draft,Sent',
+            'items'          => 'required|array|min:1',
+            'items.*.description' => 'required|string|max:500',
+            'items.*.quantity'    => 'required|numeric|min:1',
+            'items.*.price'       => 'required|numeric|min:0',
+            'items.*.total'       => 'required|numeric|min:0',
+        ]);
+
+        // ── Determine status from the submit button clicked ──
+        $status = $request->action === 'send' ? 'Sent' : $request->status;
+
+        // ── Generate next quotation number: QT-0001, QT-0002 … ──
+        $lastNo  = Quotation::orderByDesc('id')->value('quotation_no');
+        $nextSeq = 1;
+        if ($lastNo && preg_match('/(\d+)$/', $lastNo, $m)) {
+            $nextSeq = (int) $m[1] + 1;
+        }
+        $quotationNo = 'QT-' . str_pad($nextSeq, 4, '0', STR_PAD_LEFT);
+
+        Quotation::create([
+            'lead_id'        => $request->lead_id,
+            'quotation_no'   => $quotationNo,
+            'items'          => json_encode(array_values($request->items)),
+            'status'         => $status,
+            'notes'          => $request->notes,
+            'valid_until'    => $request->valid_until,
+            'quotation_date' => $request->quotation_date,
+        ]);
+
+        $message = $status === 'Sent'
+            ? "Quotation {$quotationNo} created and sent to customer."
+            : "Quotation {$quotationNo} saved as Draft.";
+
+        return redirect()->route('accounts.invoices.index')
+            ->with('success', $message);
     }
 
     public function invoicesCreate()
@@ -289,22 +362,22 @@ class AccountsController extends Controller
             'rejection_reason' => null,
         ]);
 
-        // if ($quotation->lead) {
-        //     $existingCustomer = Customer::where('email', $quotation->lead->email)->first();
+        if ($quotation->lead) {
+            $existingCustomer = Customer::where('email', $quotation->lead->email)->first();
 
-        //     if (!$existingCustomer) {
-        //         Customer::create([
-        //             'name'           => $quotation->lead->client_name,
-        //             'email'          => $quotation->lead->email,
-        //             'contact_no'     => $quotation->lead->phone ?? '0000000000',
-        //             'address'        => $quotation->lead->location ?? null,
-        //             'payment_status' => 'pending',
-        //             'project_type'   => $quotation->lead->project_type ?? null,
-        //         ]);
-        //     }
-        // }
+            if (!$existingCustomer) {
+                Customer::create([
+                    'name'           => $quotation->lead->client_name,
+                    'email'          => $quotation->lead->email,
+                    'contact_no'     => $quotation->lead->phone ?? '0000000000',
+                    'address'        => $quotation->lead->location ?? null,
+                    'payment_status' => 'pending',
+                    'project_type'   => $quotation->lead->project_type ?? null,
+                ]);
+            }
+        }
 
-        return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been approved.');
+        return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been approved and customer created.');
     }
 
     public function invoicesReject(Request $request, $id)
@@ -625,7 +698,7 @@ class AccountsController extends Controller
 
         if (in_array($filePath, $paths)) {
             @unlink(public_path($filePath));
-            $paths          = array_values(array_filter($paths, fn($p) => $p !== $filePath));
+            $paths              = array_values(array_filter($paths, fn($p) => $p !== $filePath));
             $payment->$fileType = json_encode($paths);
             $payment->save();
         }
@@ -701,31 +774,17 @@ class AccountsController extends Controller
                 $subtotal += $amount;
 
                 EstimationItem::create([
-    'estimation_id' => $estimation->id,
-
-    'item_id'   => $item['item_id'] ?? null,
-    'name'      => $item['name'] ?? $item['item_name'] ?? null,
-
-    'section'   => $item['section'] ?? 'General',
-
-    'description' => $item['description'] ?? null,
-
-    'category'  => $item['category'] ?? null,
-    'unit'      => $item['unit'] ?? 'Nos',
-
-    'qty'       => $qty,
-    'unit_price'=> $unitPrice,
-    'amount'    => $amount,
-
-    'gst'       => $item['gst'] ?? null,
-    'gst_amount'=> $item['gst_amount'] ?? null,
-
-    'length'    => $item['length'] ?? null,
-    'breadth'   => $item['breadth'] ?? null,
-    'area'      => $item['area'] ?? null,
-
-    'sort_order'=> $item['sort_order'] ?? $index
-]);
+                    'estimation_id' => $estimation->id,
+                    'section'       => $item['section']                                      ?? null,
+                    'description'   => $item['description'] ?? $item['item_name']
+                                       ?? $item['custom_name']                               ?? null,
+                    'category'      => $item['category']                                     ?? null,
+                    'unit'          => $item['unit']                                         ?? 'Nos',
+                    'qty'           => $qty,
+                    'unit_price'    => $unitPrice,
+                    'amount'        => $amount,
+                    'sort_order'    => $item['sort_order'] ?? $index,
+                ]);
             }
 
             // ── Recalculate totals ──
@@ -793,7 +852,7 @@ class AccountsController extends Controller
             'discount'      => 'nullable|numeric|min:0',
             'status'        => 'nullable|in:Draft,Sent,Approved,Rejected,Revised',
         ]);
-         $oldStatus = $estimation->status;
+        $oldStatus = $estimation->status;
 
         $estimation->update([
             'lead_id'       => $request->lead_id    ?: null,
@@ -816,8 +875,8 @@ class AccountsController extends Controller
         ]);
 
         if ($request->status === 'Approved' && $oldStatus !== 'Approved') {
-        $this->createCustomerFromEstimation($estimation);
-    }
+            $this->createCustomerFromEstimation($estimation);
+        }
 
         EstimationItem::where('estimation_id', $id)->delete();
         $items = $this->saveEstimationItems($id, $request->sections ?? []);
@@ -857,19 +916,12 @@ class AccountsController extends Controller
         ));
     }
 
-    /*
-    |--------------------------------------------------------------------------
-    | Estimation View Data
-    | — Estimation fields + items sections + site visit details
-    |--------------------------------------------------------------------------
-    */
     public function estimationViewData($id)
     {
         $estimation = Estimation::findOrFail($id);
         $items      = EstimationItem::where('estimation_id', $id)->orderBy('sort_order')->get();
         $sections   = $this->groupItemsBySections($items);
 
-        // ── Site Visit data (always included; null if no lead / no visit) ──
         $siteVisitData = null;
 
         if ($estimation->lead_id) {
@@ -894,7 +946,7 @@ class AccountsController extends Controller
             $estimation->toArray(),
             [
                 'sections'   => array_values($sections),
-                'site_visit' => $siteVisitData,   // null if no lead/visit → JS handles gracefully
+                'site_visit' => $siteVisitData,
             ]
         ));
     }
@@ -953,56 +1005,33 @@ class AccountsController extends Controller
                 $amount    = floatval($item['amount']      ?? ($qty * $unitPrice));
 
                 EstimationItem::create([
-    'estimation_id' => $estimationId,
+                    'estimation_id' => $estimationId,
+                    'section'       => $sectionName,
+                    'description'   => $item['description'],
+                    'category'      => $item['category'] ?? null,
+                    'unit'          => $item['unit']      ?? 'nos',
+                    'qty'           => $qty,
+                    'unit_price'    => $unitPrice,
+                    'amount'        => $amount,
+                    'sort_order'    => $sortOrder,
+                ]);
 
-    'item_id'   => $item['item_id'] ?? null,
-    'name'      => $item['name'] ?? $item['description'] ?? null,
-
-    'section'   => $sectionName,
-
-    'description' => $item['description'] ?? null,
-    'category'    => $item['category'] ?? null,
-
-    'unit'        => $item['unit'] ?? 'nos',
-    'qty'         => $qty,
-    'unit_price'  => $unitPrice,
-    'amount'      => $amount,
-
-    'gst'         => $item['gst'] ?? 0,
-    'gst_amount'  => $item['gst_amount'] ?? 0,
-
-    'length'      => $item['length'] ?? null,
-    'breadth'     => $item['breadth'] ?? null,
-    'area'        => $item['area'] ?? null,
-
-    'sort_order'  => $sortOrder,
-]);
-$flatItems[] = [
-    'item_id'     => $item['item_id'] ?? null,
-    'name'        => $item['name'] ?? $item['description'] ?? null,
-    'section'     => $sectionName,
-    'description' => $item['description'],
-    'category'    => $item['category'] ?? null,
-    'unit'        => $item['unit'] ?? 'nos',
-    'qty'         => $qty,
-    'unit_price'  => $unitPrice,
-    'amount'      => $amount,
-    'gst'         => $item['gst'] ?? 0,
-    'gst_amount'  => $item['gst_amount'] ?? 0,
-    'sort_order'  => $sortOrder,
-];
+                $flatItems[] = [
+                    'section'     => $sectionName,
+                    'description' => $item['description'],
+                    'category'    => $item['category'] ?? null,
+                    'unit'        => $item['unit']      ?? 'nos',
+                    'qty'         => $qty,
+                    'unit_price'  => $unitPrice,
+                    'amount'      => $amount,
+                    'sort_order'  => $sortOrder,
+                ];
             }
         }
 
         return $flatItems;
     }
 
-    /**
-     * Group EstimationItem collection by section.
-     *
-     * $asObjects = true  → Eloquent objects (PDF blade)
-     * $asObjects = false → plain arrays    (JSON API → JS view/edit modal)
-     */
     private function groupItemsBySections($items, bool $asObjects = false): array
     {
         $sections = [];
@@ -1015,9 +1044,7 @@ $flatItems[] = [
             }
 
             $sections[$secName]['items'][] = $asObjects ? $item : [
-                // ── Primary fields ──
                 'id'          => $item->id,
-                'item_name' => $item->name,
                 'description' => $item->description,
                 'category'    => $item->category,
                 'unit'        => $item->unit,
@@ -1025,63 +1052,61 @@ $flatItems[] = [
                 'unit_price'  => $item->unit_price,
                 'amount'      => $item->amount,
                 'sort_order'  => $item->sort_order,
-                // ── Measurement fields ──
                 'length'      => $item->length  ?? null,
                 'breadth'     => $item->breadth ?? null,
                 'area'        => $item->area    ?? null,
-                // ── Aliases so JS view modal works with either naming ──
-                'item_name'   => $item->description, // quotation alias
-                'price'       => $item->unit_price,  // quotation alias
-                'quantity'    => $item->qty,          // quotation alias
+                'item_name'   => $item->description,
+                'price'       => $item->unit_price,
+                'quantity'    => $item->qty,
             ];
         }
 
         return $sections;
     }
     private function createCustomerFromEstimation(Estimation $estimation): void
-{
-    // Already a customer with this email? Skip
-    if (Customer::where('email', $estimation->client_email)->exists()) {
-        return;
+    {
+        // Already a customer with this email? Skip
+        if (Customer::where('email', $estimation->client_email)->exists()) {
+            return;
+        }
+
+        // Need at least an email to create customer
+        if (empty($estimation->client_email)) {
+            return;
+        }
+
+        // Generate CUST-XXXX code
+        $lastCustomer = Customer::orderBy('id', 'desc')->first();
+        $lastNumber   = ($lastCustomer && $lastCustomer->customer_id)
+            ? (int) str_replace('CUST-', '', $lastCustomer->customer_id)
+            : 0;
+        $customerCode = 'CUST-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+
+        // Pull data from estimation (lead_id undo linked lead details also check)
+        $name    = $estimation->client_name;
+        $phone   = $estimation->client_phone ?? '0000000000';
+        $address = $estimation->site_address ?? null;
+        $project = $estimation->title        ?? null;
+
+        $lead = Lead::find($estimation->lead_id);
+
+        if ($lead) {
+            $name    = $lead->client_name ?? $name;
+            $phone   = $lead->phone ?? $phone;
+            $address = $lead->location ?? $address;
+            $project = $lead->project_type ?? $project;
+        }
+
+        Customer::create([
+            'customer_id'    => $customerCode,
+            'name'           => $name,
+            'email'          => $estimation->client_email,
+            'contact_no'     => $phone,
+            'address'        => $address,
+            'project_type'   => $project,
+            'payment_status' => 'pending',
+            'project_status' => 'pending',
+            'notes'          => 'Auto-created from Estimation #' . $estimation->estimation_no,
+        ]);
     }
-
-    // Need at least an email to create customer
-    if (empty($estimation->client_email)) {
-        return;
-    }
-
-    // Generate CUST-XXXX code
-    $lastCustomer = Customer::orderBy('id', 'desc')->first();
-    $lastNumber   = ($lastCustomer && $lastCustomer->customer_id)
-        ? (int) str_replace('CUST-', '', $lastCustomer->customer_id)
-        : 0;
-    $customerCode = 'CUST-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-
-    // Pull data from estimation (lead_id undo linked lead details also check)
-    $name    = $estimation->client_name;
-    $phone   = $estimation->client_phone ?? '0000000000';
-    $address = $estimation->site_address ?? null;
-    $project = $estimation->title        ?? null;
-
-    $lead = Lead::find($estimation->lead_id);
-
-if ($lead) {
-    $name    = $lead->client_name ?? $name;
-    $phone   = $lead->phone ?? $phone;
-    $address = $lead->location ?? $address;
-    $project = $lead->project_type ?? $project;
-}
-
-    Customer::create([
-        'customer_id'    => $customerCode,
-        'name'           => $name,
-        'email'          => $estimation->client_email,
-        'contact_no'     => $phone,
-        'address'        => $address,
-        'project_type'   => $project,
-        'payment_status' => 'pending',
-        'project_status' => 'pending',
-        'notes'          => 'Auto-created from Estimation #' . $estimation->estimation_no,
-    ]);
-}
 }

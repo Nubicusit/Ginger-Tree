@@ -53,18 +53,6 @@
                         </a>
                     </li>
 
-                     <!-- Designer -->
-                    <li>
-                        <a href="{{ route('designer.dashboard') }}"
-                            class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
-        {{ request()->is('designer*')
-           ? 'bg-gray-300 text-gray-900 shadow-md'
-           : 'text-gray-700 hover:bg-gray-200' }}">
-                            <i class="fas fa-drafting-compass text-lg w-6 text-center"></i>
-                            <span>Designer</span>
-                        </a>
-                    </li>
-
                     <!-- estimation -->
                      <li>
                         <a href="{{ route('estimator.dashboard') }}"
@@ -74,6 +62,29 @@
                             : 'text-gray-700 hover:bg-gray-200' }}">
                             <i class="fas fa-ruler-combined text-lg w-6 text-center"></i>
                             <span>Estimation</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="{{ route('projects.payments') }}"
+                            class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
+                            {{ request()->is('projects/payments*')
+                            ? 'bg-gray-300 text-gray-900 shadow-md'
+                            : 'text-gray-700 hover:bg-gray-200' }}">
+
+                            <i class="fas fa-money-bill-wave text-lg w-6 text-center"></i>
+                            <span>Project Payments</span>
+                        </a>
+                    </li>
+
+                    <!-- Designer -->
+                    <li>
+                        <a href="{{ route('designer.dashboard') }}"
+                            class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors
+        {{ request()->is('designer*')
+           ? 'bg-gray-300 text-gray-900 shadow-md'
+           : 'text-gray-700 hover:bg-gray-200' }}">
+                            <i class="fas fa-drafting-compass text-lg w-6 text-center"></i>
+                            <span>Designer</span>
                         </a>
                     </li>
                     <!-- Production -->

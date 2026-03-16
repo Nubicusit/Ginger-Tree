@@ -2,38 +2,44 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Project extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
-        'lead_id',
-        'project_code',
+        'name',
+        'client',
+        'client_gst',
+        'company_gst',
+        'sales_rep',
+        'sales_phone',
+        'scope',
+        'timeline',
+        'start_date',
+        'end_date',
+        'total_value',
+        'gst_rate',
+        'po_number',
+        'payment_terms',
+        'notes',
         'status',
-        'expected_start_date',
-        'expected_end_date',
-        'materials'
+        'lead_id',
     ];
+
+    protected $casts = [
+        'start_date'  => 'date',
+        'end_date'    => 'date',
+        'total_value' => 'float',
+        'gst_rate'    => 'float',
+    ];
+
+    public function payments()
+    {
+        return $this->hasMany(Payment::class);
+    }
 
     public function lead()
     {
         return $this->belongsTo(Lead::class);
-    }
-    public function materials()
-    {
-        return $this->hasMany(InventoryStock::class);
-    }
-
-    public function getTotalMaterialCostAttribute()
-    {
-        return $this->materials->sum('total');
-    }
-
-    public function isCompleted()
-    {
-        return $this->status === 'Completed';
     }
 }

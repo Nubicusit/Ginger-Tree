@@ -16,6 +16,7 @@
                     <th class="px-6 py-4">Site Notes</th>
                     <th class="px-6 py-4">Initial Cost Estimate</th>
                     <th class="px-6 py-4">Status</th>
+                    <th class="px-6 py-4">Admin Approval</th>
                     <th class="px-6 py-4">Action</th>
                 </tr>
             </thead>
@@ -63,7 +64,58 @@ $status = $lead->latestQuotation->status;
 <span class="text-gray-400 text-xs">Not Created</span>
 @endif
 </td>
+<td class="px-6 py-4">
+    @php
+        $estimation = \App\Models\Estimation::where('lead_id', $lead->id)->first();
+        $adminStatus = $estimation?->admin_status;
+    @endphp
 
+    @if($estimation)
+        @if(Auth::user()->role === 'admin')
+            {{-- Admin can approve/reject --}}
+            <div class="flex items-center gap-2">
+                <span id="admin-status-badge-{{ $estimation->id }}"
+                    class="px-3 py-1 rounded-full text-xs font-semibold
+                    @if($adminStatus == 'Approved') bg-green-100 text-green-700
+                    @elseif($adminStatus == 'Rejected') bg-red-100 text-red-700
+                    @else hidden
+                    @endif">
+                    {{ $adminStatus ?? '' }}
+                </span>
+
+                <button
+                    onclick="updateAdminStatus({{ $estimation->id }}, 'Approved')"
+                    id="approve-btn-{{ $estimation->id }}"
+                    {{ $adminStatus === 'Approved' ? 'disabled' : '' }}
+                    class="px-3 py-1.5 rounded text-xs font-bold text-white bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    Approve
+                </button>
+
+                <button
+                    onclick="updateAdminStatus({{ $estimation->id }}, 'Rejected')"
+                    id="reject-btn-{{ $estimation->id }}"
+                    {{ $adminStatus === 'Rejected' ? 'disabled' : '' }}
+                    class="px-3 py-1.5 rounded text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
+                    Reject
+                </button>
+            </div>
+        @else
+            {{-- Estimator/Accounts: read-only badge --}}
+            @if($adminStatus)
+                <span class="px-3 py-1 rounded-full text-xs font-semibold
+                    @if($adminStatus == 'Approved') bg-green-100 text-green-700
+                    @elseif($adminStatus == 'Rejected') bg-red-100 text-red-700
+                    @endif">
+                    {{ $adminStatus }}
+                </span>
+            @else
+                <span class="text-gray-400 text-xs">Pending</span>
+            @endif
+        @endif
+    @else
+        <span class="text-gray-400 text-xs">No Estimation</span>
+    @endif
+</td>
                     <td class="px-6 py-4">
                         <button onclick="openDetailModal({{ $lead->id }})"
                             class="bg-blue-600 text-white text-[10px] font-bold py-2 px-4 rounded uppercase">
@@ -383,5 +435,33 @@ $status = $lead->latestQuotation->status;
     }
 }
 </script>
+<script>
+function updateAdminStatus(id, status) {
+    if (!confirm(`Mark this estimation as ${status}?`)) return;
 
+    fetch(`/admin/estimations/${id}/status`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ admin_status: status })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) return alert('Something went wrong.');
+
+        const badge = document.getElementById(`admin-status-badge-${id}`);
+        badge.className = `px-3 py-1 rounded-full text-xs font-semibold ${
+            status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+        }`;
+        badge.textContent = status;
+        badge.classList.remove('hidden');
+
+        document.getElementById(`approve-btn-${id}`).disabled = (status === 'Approved');
+        document.getElementById(`reject-btn-${id}`).disabled  = (status === 'Rejected');
+    })
+    .catch(() => alert('Network error. Please try again.'));
+}
+</script>
 @endsection

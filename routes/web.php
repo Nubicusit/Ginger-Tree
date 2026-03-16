@@ -10,7 +10,7 @@ use App\Http\Controllers\SiteVisitController;
 use App\Http\Controllers\Sales\QuotationController;
 use App\Http\Controllers\HRController;
 use App\Http\Controllers\AccountsController;
-use App\Http\Controllers\DesignerController;
+use App\Http\Controllers\ThreeDesignerController;
 use App\Http\Controllers\EstimationController;
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
@@ -72,6 +72,10 @@ Route::delete('/useraccounts/{user}', [AdminController::class, 'destroyUser'])->
 Route::post('/leads/import', [AdminController::class, 'import'])->name('leads.import');
 // Route::post('/marketing/store', [MarketingController::class, 'store'])->name('marketing.store');
 
+
+// projects payments
+Route::get('/projects/payments', [AdminController::class, 'payments'])
+    ->name('projects.payments');
 /*
 |--------------------------------------------------------------------------
 | Sales Routes
@@ -97,6 +101,8 @@ Route::get('/lead/{id}', [AdminController::class, 'getLead']);
 */
 Route::post('/marketing-store', [AdminController::class, 'storeMarketing'])->name('admin.marketing.store');
 
+Route::get('/admin/estimations', [AdminController::class, 'estimations'])->name('admin.estimations');
+Route::post('/admin/estimations/{id}/status', [AdminController::class, 'updateEstimationStatus'])->name('admin.estimation.status');
 /*
 |--------------------------------------------------------------------------
 | Site Visit Routes
@@ -343,13 +349,13 @@ Route::get('/hr/leaves', [HRController::class, 'leaves'])->name('hr.leaves')->mi
 Route::post('/hr/leaves', [HRController::class, 'storeLeave'])->name('hr.leaves.store')->middleware(['auth', 'department:hr']);
 Route::patch('/hr/leaves/{leave}/status', [HRController::class, 'updateLeaveStatus'])->name('hr.leaves.status')->middleware(['auth', 'department:hr']);
 
-Route::get('/designer/dashboard', [DesignerController::class, 'dashboard'])
-    ->middleware(['auth', 'designer'])
-    ->name('designer.dashboard');
+// Route::get('/designer/dashboard', [DesignerController::class, 'dashboard'])
+//     ->middleware(['auth', 'designer'])
+//     ->name('designer.dashboard');
 
-Route::get('/design-status', [DesignerController::class, 'index'])
-    ->middleware(['auth', 'designer'])
-    ->name('design-status.index');
+// Route::get('/design-status', [DesignerController::class, 'index'])
+//     ->middleware(['auth', 'designer'])
+//     ->name('design-status.index');
 
 // Route::get('/design-status/create', [DesignerController::class, 'create'])
 //     ->middleware(['auth', 'designer'])
@@ -414,27 +420,69 @@ Route::get('/accounts/estimations/{id}/pdf', [AccountsController::class, 'estima
     ->name('accounts.estimations.pdf');
 
 
-Route::prefix('three-d-design')->name('three-d-design.')->middleware(['auth'])->group(function () {
 
     // Resource routes
-    Route::get('/',                    [ThreeDesignerController::class, 'index'])      ->name('index');
-    Route::get('/create',              [ThreeDesignerController::class, 'create'])     ->name('create');
-    Route::post('/',                   [ThreeDesignerController::class, 'store'])      ->name('store');
-    Route::get('/{threeDDesign}',      [ThreeDesignerController::class, 'show'])       ->name('show');
-    Route::get('/{threeDDesign}/edit', [ThreeDesignerController::class, 'edit'])       ->name('edit');
-    Route::put('/{threeDDesign}',      [ThreeDesignerController::class, 'update'])     ->name('update');
-    Route::delete('/{threeDDesign}',   [ThreeDesignerController::class, 'destroy'])    ->name('destroy');
+    Route::get('designer/dashboard',[ThreeDesignerController::class, 'dashboard'])->name('designer.dashboard');
+    Route::get('designer/3D',[ThreeDesignerController::class, 'index'])->name('design-status.index');
+    Route::get('/create',              [ThreeDesignerController::class, 'create'])->name('three-d-design.create');
+    Route::post('/',                   [ThreeDesignerController::class, 'store'])->name('three-d-design.store');
+    Route::get('/{threeDDesign}',      [ThreeDesignerController::class, 'show'])->name('three-d-design.show');
+    Route::get('/{threeDDesign}/edit', [ThreeDesignerController::class, 'edit'])->name('three-d-design.edit');
+    Route::put('/{threeDDesign}',      [ThreeDesignerController::class, 'update'])->name('three-d-design.update');
+    Route::delete('/{threeDDesign}',   [ThreeDesignerController::class, 'destroy'])->name('three-d-design.destroy');
 
     // Quick Action routes
-    Route::patch('/{threeDDesign}/submit',      [ThreeDesignerController::class, 'submit'])     ->name('submit');
-    Route::patch('/{threeDDesign}/approve',     [ThreeDesignerController::class, 'approve'])    ->name('approve');
-    Route::patch('/{threeDDesign}/freeze',      [ThreeDesignerController::class, 'freeze'])     ->name('freeze');
-    Route::patch('/{threeDDesign}/revise',      [ThreeDesignerController::class, 'revise'])     ->name('revise');
+    Route::patch('/{threeDDesign}/submit',      [ThreeDesignerController::class, 'submit'])->name('submit');
+    Route::patch('/{threeDDesign}/approve',     [ThreeDesignerController::class, 'approve'])->name('approve');
+    Route::patch('/{threeDDesign}/freeze',      [ThreeDesignerController::class, 'freeze'])->name('freeze');
+    Route::patch('/{threeDDesign}/revise',      [ThreeDesignerController::class, 'revise'])->name('revise');
 
     // Utility
-    Route::get('/{threeDDesign}/can-proceed',   [ThreeDesignerController::class, 'canProceed']) ->name('can-proceed');
-    Route::get('/{threeDDesign}/change-log',    [ThreeDesignerController::class, 'changeLog'])  ->name('change-log');
-});
+    Route::get('/{threeDDesign}/can-proceed',   [ThreeDesignerController::class, 'canProceed'])->name('can-proceed');
+    Route::get('/{threeDDesign}/change-log',    [ThreeDesignerController::class, 'changeLog']) ->name('change-log');
+
 
 Route::post('accounts/estimations/{id}/approve', [AccountsController::class, 'estimationApprove'])
      ->name('accounts.estimations.approve');
+
+
+     /*
+|--------------------------------------------------------------------------
+| Accounts – Project Payments
+|--------------------------------------------------------------------------
+*/
+
+Route::get('/accounts/projects', [AccountsController::class, 'projectsIndex'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.index');
+
+Route::get('/accounts/projects/{project}', [AccountsController::class, 'projectShow'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.show');
+
+Route::post('/accounts/projects/{project}/payments', [AccountsController::class, 'paymentStore'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.payments.store');
+
+Route::get('/accounts/projects/{project}/payments/{payment}', [AccountsController::class, 'paymentShow'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.payments.show');
+
+Route::put('/accounts/projects/{project}/payments/{payment}', [AccountsController::class, 'paymentUpdate'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.payments.update');
+
+Route::delete('/accounts/projects/{project}/payments/{payment}', [AccountsController::class, 'paymentDestroy'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.payments.destroy');
+
+Route::patch('/accounts/projects/{project}/payments/{payment}/approve', [AccountsController::class, 'paymentApprove'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.payments.approve');
+
+Route::patch('/accounts/projects/{project}/payments/{payment}/reject', [AccountsController::class, 'paymentReject'])
+    ->middleware(['auth', 'department:accounts'])
+    ->name('accounts.projects.payments.reject');
+
+Route::patch('accounts/projects/{project}/total', [AccountsController::class, 'projectUpdateTotal'])
+     ->name('accounts.projects.update-total');

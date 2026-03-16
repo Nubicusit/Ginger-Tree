@@ -425,4 +425,45 @@ class AdminController extends Controller
 
     return redirect()->back()->with('success', 'CSV Imported Successfully');
 }
+public function payments()
+{
+    $projects = \App\Models\Project::latest()->get()->map(function ($project) {
+
+        $payments = \App\Models\Payment::where('project_id', $project->id)->get();
+
+        $received = $payments->where('status', 'Cleared')->sum('total_payable');
+        $balance  = $project->total_value - $received;
+        $pct      = $project->total_value > 0
+            ? min(100, round($received / $project->total_value * 100))
+            : 0;
+
+        $project->received       = $received;
+        $project->balance        = $balance;
+        $project->pct            = $pct;
+        $project->cleared_count  = $payments->where('status', 'Cleared')->count();
+        $project->pending_count  = $payments->where('status', 'Pending')->count();
+        $project->rejected_count = $payments->where('status', 'Rejected')->count();
+
+        return $project;
+    });
+
+    return view('admin.project_payments', compact('projects'));
+}
+public function updateEstimationStatus(Request $request, $id)
+{
+    $estimation = \App\Models\Estimation::findOrFail($id);
+    $estimation->admin_status = $request->admin_status;
+    $estimation->save();
+
+    if ($estimation->lead_id) {
+        if ($request->admin_status === 'Approved') {
+            \App\Models\Lead::where('id', $estimation->lead_id)->update(['status' => 'Won']);
+        }
+        if ($request->admin_status === 'Rejected') {
+            \App\Models\Lead::where('id', $estimation->lead_id)->update(['status' => 'Lost']);
+        }
+    }
+
+    return response()->json(['success' => true]);
+}
 }

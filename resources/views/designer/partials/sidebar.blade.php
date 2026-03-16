@@ -40,7 +40,7 @@
                             <span>3D Design</span>
                         </a>
                     </li>
-                    
+
                     <li>
                         <a href=""
                             class="nav-item flex items-center space-x-3 px-4 py-2.5 text-sm font-medium rounded-lg transition-colors

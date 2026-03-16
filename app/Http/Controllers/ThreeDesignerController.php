@@ -11,11 +11,14 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class DesignerController extends Controller
+class ThreeDesignerController extends Controller
 {
     // ─────────────────────────────────────────────
     // INDEX  —  GET /three-d-design
     // ─────────────────────────────────────────────
+    public function dashboard(){
+        return view('designer.dashboard');
+    }
     public function index(Request $request)
     {
         $query = ThreeDDesign::with('project')
@@ -32,7 +35,7 @@ class DesignerController extends Controller
             return $record;
         });
 
-        return view('stages.three-d-design.index', compact('records'));
+        return view('designer.3D_index', compact('records'));
     }
 
     // ─────────────────────────────────────────────
@@ -41,7 +44,7 @@ class DesignerController extends Controller
     public function create()
     {
         $projects = Project::orderBy('name')->get();
-        return view('stages.three-d-design.form', compact('projects'));
+        return view('designer.form', compact('projects'));
     }
 
     // ─────────────────────────────────────────────
@@ -90,7 +93,7 @@ class DesignerController extends Controller
     public function edit(ThreeDDesign $threeDDesign)
     {
         $projects = Project::orderBy('name')->get();
-        return view('stages.three-d-design.form', [
+        return view('designer.form', [
             'record'   => $threeDDesign,
             'projects' => $projects,
         ]);
@@ -161,7 +164,7 @@ class DesignerController extends Controller
             : null;
 
         return redirect()
-            ->route('three-d-design.index')
+            ->route('design-status.index')
             ->with('success', $warning ?? '3D Design record updated successfully.');
     }
 
@@ -271,7 +274,7 @@ class DesignerController extends Controller
         $threeDDesign->delete();
 
         return redirect()
-            ->route('three-d-design.index')
+            ->route('design-status.index')
             ->with('success', '3D Design record deleted.');
     }
 }

@@ -19,6 +19,7 @@ class Estimation extends Model
         'site_address',
         'title',
         'status',
+        'admin_status',
         'subtotal',
         'discount',
         'gst_pct',
