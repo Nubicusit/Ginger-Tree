@@ -3,7 +3,45 @@
 @section('title', 'Estimations')
 
 @section('content')
+{{-- Search & Filter Bar --}}
+<div class="mb-4 flex flex-wrap gap-3 items-center">
+    <div class="relative flex-1 min-w-[200px]">
+    <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 0 5 11a6 6 0 0 0 12 0z"/>
+    </svg>
 
+    <input
+        type="text"
+        id="search_name"
+        placeholder="Search client name..."
+        oninput="applyFilters()"
+        class="w-full pl-9 pr-4 py-2.5 text-sm border border-gray-200 rounded-xl bg-white focus:outline-none focus:ring-2 focus:ring-blue-300"
+    >
+</div>
+
+    <select id="filter_status" onchange="applyFilters()"
+        class="py-2.5 px-4 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white min-w-[160px]">
+        <option value="">All Statuses</option>
+        <option value="Sent">Sent</option>
+        <option value="Negotiation">Negotiation</option>
+        <option value="Approved">Approved</option>
+        <option value="Rejected">Rejected</option>
+        <option value="not_created">Not Created</option>
+    </select>
+
+    <select id="filter_budget" onchange="applyFilters()"
+        class="py-2.5 px-4 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white min-w-[180px]">
+        <option value="">All Budgets</option>
+        <option value="low">Low</option>
+        <option value="medium">Medium</option>
+        <option value="high">High</option>
+    </select>
+
+    <button onclick="clearFilters()"
+        class="py-2.5 px-4 text-sm font-semibold text-gray-500 border border-gray-200 rounded-xl hover:bg-gray-50 transition">
+        Clear
+    </button>
+</div>
 <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
     <div class="overflow-x-auto">
         <table class="w-full text-left border-collapse">
@@ -22,7 +60,14 @@
             </thead>
             <tbody class="divide-y divide-gray-100">
                 @forelse($leads as $lead)
-                <tr class="hover:bg-gray-50 text-sm">
+                {{-- FIND this line: --}}
+<tr class="hover:bg-gray-50 text-sm">
+
+
+<tr class="hover:bg-gray-50 text-sm lead-row"
+    data-name="{{ strtolower($lead->client_name) }}"
+    data-status="{{ strtolower($lead->latestQuotation?->status ?? 'not_created') }}"
+    data-budget="{{ strtolower($lead->siteVisit?->budget_sensitivity ?? '') }}">
                     <td class="px-6 py-4">{{ $lead->client_name }}</td>
                     <td class="px-6 py-4">{{ $lead->project_type }}</td>
                     <td class="px-6 py-4">
@@ -52,7 +97,7 @@ $status = $lead->latestQuotation->status;
 @endphp
 
 <span class="px-3 py-1 rounded-full text-xs font-semibold
-@if($status == 'Submitted') bg-gray-100 text-gray-700
+@if($status == 'Sent') bg-blue-100 text-gray-700
 @elseif($status == 'Negotiation') bg-blue-100 text-blue-700
 @elseif($status == 'Approved') bg-green-100 text-green-700
 @elseif($status == 'Rejected') bg-red-100 text-red-700
@@ -462,6 +507,43 @@ function updateAdminStatus(id, status) {
         document.getElementById(`reject-btn-${id}`).disabled  = (status === 'Rejected');
     })
     .catch(() => alert('Network error. Please try again.'));
+}
+</script>
+<script>
+function applyFilters() {
+    const name   = document.getElementById('search_name').value.toLowerCase().trim();
+    const status = document.getElementById('filter_status').value.toLowerCase();
+    const budget = document.getElementById('filter_budget').value.toLowerCase();
+
+    document.querySelectorAll('.lead-row').forEach(row => {
+        const rowName   = row.dataset.name   ?? '';
+        const rowStatus = row.dataset.status ?? '';
+        const rowBudget = row.dataset.budget ?? '';
+
+        const matchName   = !name   || rowName.includes(name);
+        const matchStatus = !status || rowStatus === status;
+        const matchBudget = !budget || rowBudget === budget;
+
+        row.style.display = (matchName && matchStatus && matchBudget) ? '' : 'none';
+    });
+
+    // Show "no results" message if all rows hidden
+    const visible = document.querySelectorAll('.lead-row:not([style*="display: none"])').length;
+    let noResults = document.getElementById('no_filter_results');
+    if (!noResults) {
+        noResults = document.createElement('tr');
+        noResults.id = 'no_filter_results';
+        noResults.innerHTML = `<td colspan="9" class="text-center py-6 text-gray-400">No matching records found</td>`;
+        document.querySelector('tbody').appendChild(noResults);
+    }
+    noResults.style.display = visible === 0 ? '' : 'none';
+}
+
+function clearFilters() {
+    document.getElementById('search_name').value  = '';
+    document.getElementById('filter_status').value = '';
+    document.getElementById('filter_budget').value = '';
+    applyFilters();
 }
 </script>
 @endsection

@@ -23,29 +23,34 @@ class Customer extends Model
         'project_status',
     ];
     protected static function booted()
-{
-    static::saving(function ($customer) {
-        $customer->project_status = match ($customer->payment_status) {
-            'paid'    => 'completed',
-            'balance' => 'in_progress',
-            default   => 'pending',
-        };
-    });
-}
-protected static function boot()
-{
-    parent::boot();
+    {
+        static::saving(function ($customer) {
+            $customer->project_status = match ($customer->payment_status) {
+                'paid'    => 'completed',
+                'balance' => 'in_progress',
+                default   => 'pending',
+            };
+        });
+    }
+    protected static function boot()
+    {
+        parent::boot();
 
-    static::creating(function ($customer) {
+        static::creating(function ($customer) {
+            // Only auto-generate if not already set
+            if (!empty($customer->customer_id)) return;
 
-        $lastCustomer = self::latest()->first();
+            $last = self::orderBy('id', 'desc')->first();
 
-        $nextNumber = $lastCustomer
-            ? ((int) filter_var($lastCustomer->customer_id, FILTER_SANITIZE_NUMBER_INT)) + 1
-            : 1;
+            $nextNumber = 1;
+            if ($last && $last->customer_id) {
+                // Extract digits from e.g. "CUST-0042" → 42
+                preg_match('/(\d+)$/', $last->customer_id, $matches);
+                $nextNumber = isset($matches[1]) ? (int)$matches[1] + 1 : 1;
+            }
 
-        $customer->customer_id = 'CUST-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-    });
-}
+            $customer->customer_id = 'CUST-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+        });
+    }
 }
 

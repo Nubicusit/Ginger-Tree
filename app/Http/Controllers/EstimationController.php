@@ -77,10 +77,13 @@ class EstimationController extends Controller
                 ];
             })->toArray();
         } else {
-            $lastQuotation = \App\Models\Quotation::latest()->first();
-            $nextNumber = $lastQuotation ? (intval(substr($lastQuotation->quotation_no, -4)) + 1) : 1;
-            $quotationNo = 'QT-' . date('y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-            $items = [];
+             $lastEstimation = \App\Models\Estimation::latest()->first();
+    $nextNumber = $lastEstimation
+        ? (intval(substr($lastEstimation->estimation_no, -4)) + 1)
+        : 1;
+    // Use 4-digit year (Y not y) to match EST-2026-XXXX format
+    $quotationNo = 'QT-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+    $items = [];
         }
 
         return view('Estimator.create-quotation', compact(

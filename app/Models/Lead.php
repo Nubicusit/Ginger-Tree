@@ -56,9 +56,13 @@ public function latestFinalQuotation()
 }
 public function latestQuotation()
 {
-    return $this->hasOne(Quotation::class)
+    return $this->hasOne(Estimation::class)
         ->latestOfMany();
 }
+  public function estimation()
+    {
+        return $this->hasOne(\App\Models\Estimation::class);
+    }
 public function project()
 {
     return $this->hasOne(Project::class);

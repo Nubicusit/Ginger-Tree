@@ -1076,11 +1076,11 @@ class AccountsController extends Controller
         }
 
         // Generate CUST-XXXX code
-        $lastCustomer = Customer::orderBy('id', 'desc')->first();
-        $lastNumber   = ($lastCustomer && $lastCustomer->customer_id)
-            ? (int) str_replace('CUST-', '', $lastCustomer->customer_id)
-            : 0;
-        $customerCode = 'CUST-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
+        // $lastCustomer = Customer::orderBy('id', 'desc')->first();
+        // $lastNumber   = ($lastCustomer && $lastCustomer->customer_id)
+        //     ? (int) str_replace('CUST-', '', $lastCustomer->customer_id)
+        //     : 0;
+        // $customerCode = 'CUST-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
 
         // Pull data from estimation (lead_id undo linked lead details also check)
         $name    = $estimation->client_name;
@@ -1098,7 +1098,7 @@ class AccountsController extends Controller
         }
 
         Customer::create([
-            'customer_id'    => $customerCode,
+            // 'customer_id'    => $customerCode,
             'name'           => $name,
             'email'          => $estimation->client_email,
             'contact_no'     => $phone,

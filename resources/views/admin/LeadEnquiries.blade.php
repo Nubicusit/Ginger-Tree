@@ -24,14 +24,14 @@
                 {{ $totalLeads }}
             </span>
         </div>
-        <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-gray-600">
+        <!-- <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-gray-600">
             <div>Website: 59</div>
             <div>Referral: 0</div>
             <div>BNI: 0</div>
             <div>Meta: 812</div>
             <div>Walk In: 0</div>
             <div>Ads: 0</div>
-        </div>
+        </div> -->
     </div>
 
     <!-- Failed Leads Card -->
@@ -49,14 +49,14 @@
                 {{ $failedLeads }}
             </span>
         </div>
-        <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-gray-600">
+        <!-- <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-gray-600">
             <div>Website: 10</div>
             <div>Referral: 0</div>
             <div>BNI: 0</div>
             <div>Meta: 120</div>
             <div>Walk In: 0</div>
             <div>Ads: 0</div>
-        </div>
+        </div> -->
     </div>
 
     <!-- Converted Leads Card -->
@@ -74,14 +74,14 @@
                 {{ $convertedLeads }}
             </span>
         </div>
-        <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-gray-600">
+        <!-- <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-gray-600">
             <div>Website: 10</div>
             <div>Referral: 0</div>
             <div>BNI: 0</div>
             <div>Meta: 120</div>
             <div>Walk In: 0</div>
             <div>Ads: 0</div>
-        </div>
+        </div> -->
     </div>
 
     <!-- Action Buttons Column -->
@@ -101,43 +101,43 @@
         <!-- Left Section -->
         <!-- <div class="flex flex-wrap gap-3 items-center"> -->
 
-            <!-- Search by Name -->
-            <input
-                type="text"
-                name="search"
-                value="{{ request('search') }}"
-                placeholder="Search by client name..."
-                class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+        <!-- Search by Name -->
+        <input
+            type="text"
+            name="search"
+            value="{{ request('search') }}"
+            placeholder="Search by client name..."
+            class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
 
-            <!-- Filter by Status -->
-            <select
-                name="status"
-                class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+        <!-- Filter by Status -->
+        <select
+            name="status"
+            class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
 
-                <option value="">All Status</option>
-                <option value="New" {{ request('status')=='New' ? 'selected' : '' }}>New</option>
-                <option value="Contacted" {{ request('status')=='Contacted' ? 'selected' : '' }}>Contacted</option>
-                <option value="Site Visit" {{ request('status')=='Site Visit' ? 'selected' : '' }}>Site Visit</option>
-                <option value="Won" {{ request('status')=='Won' ? 'selected' : '' }}>Won</option>
-                <option value="Lost" {{ request('status')=='Lost' ? 'selected' : '' }}>Lost</option>
-            </select>
+            <option value="">All Status</option>
+            <option value="New" {{ request('status')=='New' ? 'selected' : '' }}>New</option>
+            <option value="Contacted" {{ request('status')=='Contacted' ? 'selected' : '' }}>Contacted</option>
+            <option value="Site Visit" {{ request('status')=='Site Visit' ? 'selected' : '' }}>Site Visit</option>
+            <option value="Won" {{ request('status')=='Won' ? 'selected' : '' }}>Won</option>
+            <option value="Lost" {{ request('status')=='Lost' ? 'selected' : '' }}>Lost</option>
+        </select>
 
-            <input
-                type="date"
-                name="date"
-                value="{{ request('date') }}"
-                class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
+        <input
+            type="date"
+            name="date"
+            value="{{ request('date') }}"
+            class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500">
 
-            <button
-                type="submit"
-                class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-                Filter
-            </button>
+        <button
+            type="submit"
+            class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
+            Filter
+        </button>
 
-            <a href="{{ route('leads') }}"
-                class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded">
-                Reset
-            </a>
+        <a href="{{ route('leads') }}"
+            class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded">
+            Reset
+        </a>
         <!-- </div> -->
     </form>
     <!-- Right Section -->
@@ -359,7 +359,6 @@
                 <label class="label">Assigned Marketing Executive</label>
                 <select class="input" id="assigned_sales" name="sales_executive_id">
                     <option value="">Assign Sales Executive</option>
-
                     @foreach($salesExecutives as $sales)
                     <option value="{{ $sales->id }}">
                         {{ $sales->name }}
@@ -428,9 +427,9 @@
 
 <!-- Scrollable Content Area -->
 <!-- <div class="p-6 overflow-y-auto custom-scrollbar flex-grow">
-            <form id="marketingForm">
-                @csrf
-                <input type="hidden" name="sales_executive_id"> -->
+                                <form id="marketingForm">
+                                    @csrf
+                                    <input type="hidden" name="sales_executive_id"> -->
 
 <!-- TAB 1: Customer Information -->
 <!-- <div id="marketing-info" class="tab-content space-y-4 fade-in"> -->
@@ -512,8 +511,8 @@
                focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
                     </div> -->
 
-<!-- Address -->
-<!-- <div>
+                <!-- Address -->
+                <!-- <div>
                         <label class="block text-gray-700 font-medium mb-1 text-sm">Address</label>
                         <input type="text" name="address"
                             class="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500" />
