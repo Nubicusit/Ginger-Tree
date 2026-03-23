@@ -17,10 +17,10 @@ class Attendance extends Model
         'status',
         'check_in',
         'check_out',
-        'late_minutes',   // ← keep this name
+        'late_minutes',
         'notes',
-        'leave_type',     // ← add
-        'leave_status',   // ← add
+        'leave_type',
+        'leave_status',
     ];
 
     protected $casts = [

@@ -362,22 +362,22 @@ class AccountsController extends Controller
             'rejection_reason' => null,
         ]);
 
-        if ($quotation->lead) {
-            $existingCustomer = Customer::where('email', $quotation->lead->email)->first();
+        // if ($quotation->lead) {
+        //     $existingCustomer = Customer::where('email', $quotation->lead->email)->first();
 
-            if (!$existingCustomer) {
-                Customer::create([
-                    'name'           => $quotation->lead->client_name,
-                    'email'          => $quotation->lead->email,
-                    'contact_no'     => $quotation->lead->phone ?? '0000000000',
-                    'address'        => $quotation->lead->location ?? null,
-                    'payment_status' => 'pending',
-                    'project_type'   => $quotation->lead->project_type ?? null,
-                ]);
-            }
-        }
+        //     if (!$existingCustomer) {
+        //         Customer::create([
+        //             'name'           => $quotation->lead->client_name,
+        //             'email'          => $quotation->lead->email,
+        //             'contact_no'     => $quotation->lead->phone ?? '0000000000',
+        //             'address'        => $quotation->lead->location ?? null,
+        //             'payment_status' => 'pending',
+        //             'project_type'   => $quotation->lead->project_type ?? null,
+        //         ]);
+        //     }
+        // }
 
-        return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been approved and customer created.');
+        return back()->with('success', 'Quotation ' . $quotation->quotation_no . ' has been approved.');
     }
 
     public function invoicesReject(Request $request, $id)
@@ -724,6 +724,10 @@ class AccountsController extends Controller
         return redirect()->back()->with('success', 'Payment rejected.');
     }
 
+// ============================================================
+// REPLACE THE ENTIRE ESTIMATIONS SECTION IN AccountsController
+// ============================================================
+
     /*
     |--------------------------------------------------------------------------
     | Estimations
@@ -732,73 +736,6 @@ class AccountsController extends Controller
 
     public function estimations()
     {
-        // ── Quotations → Estimations sync ──
-        $quotations = Quotation::with('lead')->get();
-
-        foreach ($quotations as $quotation) {
-            if (!$quotation->lead_id) continue;
-
-            $items = is_array($quotation->items)
-                ? $quotation->items
-                : json_decode($quotation->items, true) ?? [];
-
-            if (empty($items)) continue;
-
-            $statusMap = [
-                'Submitted'   => 'Sent',
-                'Negotiation' => 'Revised',
-                'Approved'    => 'Approved',
-                'Rejected'    => 'Rejected',
-            ];
-
-            // QT-001 → EST-001
-            $estimationNo = preg_replace('/^QT-?/i', 'EST-', $quotation->quotation_no);
-
-            $estimation = Estimation::updateOrCreate(
-                ['lead_id' => $quotation->lead_id, 'estimation_no' => $estimationNo],
-                [
-                    'client_name' => $quotation->lead->client_name ?? 'N/A',
-                    'title'       => 'Quotation ' . $quotation->quotation_no,
-                    'status'      => $statusMap[$quotation->status] ?? 'Sent',
-                ]
-            );
-
-            // ── Items sync with correct field mapping ──
-            EstimationItem::where('estimation_id', $estimation->id)->delete();
-
-            $subtotal = 0;
-            foreach ($items as $index => $item) {
-                $qty       = floatval($item['quantity']  ?? $item['qty']   ?? 1);
-                $unitPrice = floatval($item['unit_price'] ?? $item['price'] ?? 0);
-                $amount    = floatval($item['amount']     ?? ($qty * $unitPrice));
-                $subtotal += $amount;
-
-                EstimationItem::create([
-                    'estimation_id' => $estimation->id,
-                    'section'       => $item['section']                                      ?? null,
-                    'description'   => $item['description'] ?? $item['item_name']
-                                       ?? $item['custom_name']                               ?? null,
-                    'category'      => $item['category']                                     ?? null,
-                    'unit'          => $item['unit']                                         ?? 'Nos',
-                    'qty'           => $qty,
-                    'unit_price'    => $unitPrice,
-                    'amount'        => $amount,
-                    'sort_order'    => $item['sort_order'] ?? $index,
-                ]);
-            }
-
-            // ── Recalculate totals ──
-            $gstPct    = $estimation->gst_pct  ?? 18;
-            $discount  = $estimation->discount ?? 0;
-            $gstAmount = round($subtotal * ($gstPct / 100), 2);
-
-            $estimation->update([
-                'subtotal'    => $subtotal,
-                'gst_amount'  => $gstAmount,
-                'grand_total' => round($subtotal - $discount + $gstAmount, 2),
-            ]);
-        }
-
         $estimations = Estimation::latest()->get();
         return view('accounts.estimations', compact('estimations'));
     }
@@ -828,14 +765,13 @@ class AccountsController extends Controller
             'notes'         => $request->notes,
             'subtotal'      => $request->subtotal   ?? 0,
             'discount'      => $request->discount   ?? 0,
-            'gst_pct'       => $request->gst_pct    ?? 18,
+            'gst_pct'       => $request->gst_pct    ?? 0,   // 0 — per-item GST is the source of truth
             'gst_amount'    => $request->gst_amount  ?? 0,
             'grand_total'   => $request->grand_total ?? 0,
             'created_by'    => auth()->id(),
         ]);
 
-        $items = $this->saveEstimationItems($estimation->id, $request->sections ?? []);
-        $this->syncEstimationToQuotation($estimation, $items);
+        $this->saveEstimationItems($estimation->id, $request->sections ?? []);
 
         return redirect()->route('accounts.estimations')
             ->with('success', 'Estimation created successfully!');
@@ -852,6 +788,7 @@ class AccountsController extends Controller
             'discount'      => 'nullable|numeric|min:0',
             'status'        => 'nullable|in:Draft,Sent,Approved,Rejected,Revised',
         ]);
+
         $oldStatus = $estimation->status;
 
         $estimation->update([
@@ -869,18 +806,38 @@ class AccountsController extends Controller
             'notes'         => $request->notes,
             'subtotal'      => $request->subtotal   ?? 0,
             'discount'      => $request->discount   ?? 0,
-            'gst_pct'       => $request->gst_pct    ?? 18,
+            'gst_pct'       => $request->gst_pct    ?? 0,   // 0 — per-item GST is the source of truth
             'gst_amount'    => $request->gst_amount  ?? 0,
             'grand_total'   => $request->grand_total ?? 0,
         ]);
 
         if ($request->status === 'Approved' && $oldStatus !== 'Approved') {
-            $this->createCustomerFromEstimation($estimation);
+            $this->createCustomerFromEstimation($estimation->fresh());
         }
 
-        EstimationItem::where('estimation_id', $id)->delete();
-        $items = $this->saveEstimationItems($id, $request->sections ?? []);
-        $this->syncEstimationToQuotation($estimation->fresh(), $items);
+        // Only touch items when sections are explicitly posted with content.
+        // This prevents wiping estimator-added items when only header fields
+        // (e.g. status → Approved) are changed from the accounts edit modal.
+        $postedSections = $request->sections ?? [];
+        $hasRealItems   = false;
+        foreach ($postedSections as $sec) {
+            if (!empty($sec['items'])) {
+                foreach ($sec['items'] as $it) {
+                    if (!empty($it['description']) || !empty($it['name'])) {
+                        $hasRealItems = true;
+                        break 2;
+                    }
+                }
+            }
+        }
+
+        if ($request->has('sections') && $hasRealItems) {
+            $existingById   = EstimationItem::where('estimation_id', $id)->get()->keyBy('id');
+            $existingByDesc = EstimationItem::where('estimation_id', $id)->get()->keyBy('description');
+
+            EstimationItem::where('estimation_id', $id)->delete();
+            $this->saveEstimationItems($id, $postedSections, $existingById, $existingByDesc);
+        }
 
         return redirect()->route('accounts.estimations')
             ->with('success', 'Estimation updated successfully!');
@@ -890,14 +847,6 @@ class AccountsController extends Controller
     {
         $estimation = Estimation::findOrFail($id);
         EstimationItem::where('estimation_id', $id)->delete();
-
-        if ($estimation->lead_id) {
-            $quotationNo = preg_replace('/^EST-?/i', 'QT-', $estimation->estimation_no);
-            Quotation::where('lead_id', $estimation->lead_id)
-                ->where('quotation_no', $quotationNo)
-                ->delete();
-        }
-
         $estimation->delete();
 
         return redirect()->route('accounts.estimations')
@@ -966,64 +915,128 @@ class AccountsController extends Controller
     |--------------------------------------------------------------------------
     */
 
-    private function syncEstimationToQuotation(Estimation $estimation, array $items): void
-    {
-        if (!$estimation->lead_id) return;
-
-        $statusMap = [
-            'Draft'    => 'Submitted',
-            'Sent'     => 'Submitted',
-            'Approved' => 'Approved',
-            'Rejected' => 'Rejected',
-            'Revised'  => 'Negotiation',
-        ];
-
-        $quotationNo = preg_replace('/^EST-?/i', 'QT-', $estimation->estimation_no);
-
-        Quotation::updateOrCreate(
-            ['lead_id' => $estimation->lead_id, 'quotation_no' => $quotationNo],
-            [
-                'items'  => json_encode($items),
-                'status' => $statusMap[$estimation->status] ?? 'Submitted',
-            ]
-        );
-    }
-
-    private function saveEstimationItems(int $estimationId, array $sections): array
-    {
+    /**
+     * Save estimation items.
+     * Preserves estimator-set fields (item_id, name, gst, gst_amount, service_id, service_tax).
+     * Also saves length, breadth, area when provided.
+     * Uses dual-key snapshot: by row id first, then by description.
+     */
+    private function saveEstimationItems(
+        int $estimationId,
+        array $sections,
+        $existingById   = null,
+        $existingByDesc = null
+    ): array {
         $sortOrder = 0;
         $flatItems = [];
 
         foreach ($sections as $section) {
             $sectionName = $section['name'] ?? '';
+
             foreach (($section['items'] ?? []) as $item) {
-                if (empty($item['description'])) continue;
+                // Skip only if BOTH description and name are empty
+                $descVal = trim($item['description'] ?? '');
+                $nameVal = trim($item['name']        ?? '');
+                if ($descVal === '' && $nameVal === '') continue;
+
+                // Use name as description fallback so nothing gets silently dropped
+                if ($descVal === '') {
+                    $item['description'] = $nameVal;
+                }
 
                 $sortOrder++;
-                $qty       = floatval($item['qty']        ?? 1);
-                $unitPrice = floatval($item['unit_price']  ?? 0);
-                $amount    = floatval($item['amount']      ?? ($qty * $unitPrice));
+                $qty       = floatval($item['qty']       ?? 1);
+                $unitPrice = floatval($item['unit_price'] ?? 0);
+                $amount    = floatval($item['amount']     ?? ($qty * $unitPrice));
+
+                // ── Dimension fields (from accounts form) ──
+                $length  = isset($item['length'])  && $item['length']  !== '' ? floatval($item['length'])  : null;
+                $breadth = isset($item['breadth']) && $item['breadth'] !== '' ? floatval($item['breadth']) : null;
+                $area    = isset($item['area'])    && $item['area']    !== '' ? floatval($item['area'])    : null;
+
+                // Auto-calculate area if missing but L and B are present
+                if ($length !== null && $breadth !== null && $area === null) {
+                    $area = round($length * $breadth, 4);
+                }
+
+                // ── Values coming from the form (hidden inputs) ──
+                $rowId      = !empty($item['id'])         ? (int) $item['id']   : null;
+                $itemId     = !empty($item['item_id'])    ? $item['item_id']    : null;
+                $itemName   = !empty($item['name'])       ? $item['name']       : null;
+                $serviceId  = !empty($item['service_id']) ? $item['service_id'] : null;
+                $serviceTax = isset($item['service_tax']) ? $item['service_tax'] : null;
+
+                $gstFromForm    = isset($item['gst'])        ? floatval($item['gst'])        : null;
+                $gstAmtFromForm = isset($item['gst_amount']) ? floatval($item['gst_amount']) : null;
+
+                // ── Find prior DB row: id first, description fallback ──
+                $prior = null;
+                if ($existingById && $rowId) {
+                    $prior = $existingById->get($rowId);
+                }
+                if (!$prior && $existingByDesc && !empty($item['description'])) {
+                    $prior = $existingByDesc->get($item['description']);
+                }
+
+                // ── Merge: form value wins; fall back to prior DB value ──
+                if ($prior) {
+                    $itemId     = $itemId     ?? $prior->item_id;
+                    $itemName   = $itemName   ?: ($prior->name ?? null);
+                    $serviceId  = $serviceId  ?? $prior->service_id;
+                    $serviceTax = $serviceTax ?? $prior->service_tax;
+
+                    // Preserve prior dimension data if form sent nothing
+                    $length  = $length  ?? $prior->length;
+                    $breadth = $breadth ?? $prior->breadth;
+                    $area    = $area    ?? $prior->area;
+
+                    $finalGst    = ($gstFromForm    !== null && $gstFromForm    > 0)
+                                    ? $gstFromForm
+                                    : floatval($prior->gst        ?? 0);
+                    $finalGstAmt = ($gstAmtFromForm !== null && $gstAmtFromForm > 0)
+                                    ? $gstAmtFromForm
+                                    : floatval($prior->gst_amount ?? 0);
+                } else {
+                    $finalGst    = $gstFromForm    ?? 0;
+                    $finalGstAmt = $gstAmtFromForm ?? 0;
+                }
 
                 EstimationItem::create([
                     'estimation_id' => $estimationId,
+                    'item_id'       => $itemId,
+                    'name'          => $itemName,
                     'section'       => $sectionName,
                     'description'   => $item['description'],
-                    'category'      => $item['category'] ?? null,
-                    'unit'          => $item['unit']      ?? 'nos',
+                    'category'      => $item['category']  ?? null,
+                    'unit'          => $item['unit']       ?? 'Nos',
                     'qty'           => $qty,
                     'unit_price'    => $unitPrice,
                     'amount'        => $amount,
+                    'gst'           => $finalGst,
+                    'gst_amount'    => $finalGstAmt,
+                    'service_id'    => $serviceId,
+                    'service_tax'   => $serviceTax,
+                    'length'        => $length,   // ← saved
+                    'breadth'       => $breadth,  // ← saved
+                    'area'          => $area,     // ← saved
                     'sort_order'    => $sortOrder,
                 ]);
 
                 $flatItems[] = [
                     'section'     => $sectionName,
+                    'item_id'     => $itemId,
+                    'name'        => $itemName,
                     'description' => $item['description'],
-                    'category'    => $item['category'] ?? null,
-                    'unit'        => $item['unit']      ?? 'nos',
+                    'category'    => $item['category']  ?? null,
+                    'unit'        => $item['unit']       ?? 'Nos',
                     'qty'         => $qty,
                     'unit_price'  => $unitPrice,
                     'amount'      => $amount,
+                    'gst'         => $finalGst,
+                    'gst_amount'  => $finalGstAmt,
+                    'length'      => $length,
+                    'breadth'     => $breadth,
+                    'area'        => $area,
                     'sort_order'  => $sortOrder,
                 ];
             }
@@ -1045,17 +1058,24 @@ class AccountsController extends Controller
 
             $sections[$secName]['items'][] = $asObjects ? $item : [
                 'id'          => $item->id,
+                'item_id'     => $item->item_id,
+                'name'        => $item->name,
                 'description' => $item->description,
                 'category'    => $item->category,
                 'unit'        => $item->unit,
                 'qty'         => $item->qty,
                 'unit_price'  => $item->unit_price,
                 'amount'      => $item->amount,
+                'gst'         => $item->gst         ?? 0,
+                'gst_amount'  => $item->gst_amount   ?? 0,
+                'service_id'  => $item->service_id   ?? null,
+                'service_tax' => $item->service_tax  ?? null,
                 'sort_order'  => $item->sort_order,
-                'length'      => $item->length  ?? null,
-                'breadth'     => $item->breadth ?? null,
-                'area'        => $item->area    ?? null,
-                'item_name'   => $item->description,
+                'length'      => $item->length       ?? null,
+                'breadth'     => $item->breadth      ?? null,
+                'area'        => $item->area         ?? null,
+                // JS aliases
+                'item_name'   => $item->name ?? $item->description,
                 'price'       => $item->unit_price,
                 'quantity'    => $item->qty,
             ];
@@ -1063,42 +1083,30 @@ class AccountsController extends Controller
 
         return $sections;
     }
+
     private function createCustomerFromEstimation(Estimation $estimation): void
     {
-        // Already a customer with this email? Skip
         if (Customer::where('email', $estimation->client_email)->exists()) {
             return;
         }
-
-        // Need at least an email to create customer
         if (empty($estimation->client_email)) {
             return;
         }
 
-        // Generate CUST-XXXX code
-        // $lastCustomer = Customer::orderBy('id', 'desc')->first();
-        // $lastNumber   = ($lastCustomer && $lastCustomer->customer_id)
-        //     ? (int) str_replace('CUST-', '', $lastCustomer->customer_id)
-        //     : 0;
-        // $customerCode = 'CUST-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-
-        // Pull data from estimation (lead_id undo linked lead details also check)
         $name    = $estimation->client_name;
         $phone   = $estimation->client_phone ?? '0000000000';
         $address = $estimation->site_address ?? null;
         $project = $estimation->title        ?? null;
 
         $lead = Lead::find($estimation->lead_id);
-
         if ($lead) {
-            $name    = $lead->client_name ?? $name;
-            $phone   = $lead->phone ?? $phone;
-            $address = $lead->location ?? $address;
+            $name    = $lead->client_name  ?? $name;
+            $phone   = $lead->phone        ?? $phone;
+            $address = $lead->location     ?? $address;
             $project = $lead->project_type ?? $project;
         }
 
         Customer::create([
-            // 'customer_id'    => $customerCode,
             'name'           => $name,
             'email'          => $estimation->client_email,
             'contact_no'     => $phone,

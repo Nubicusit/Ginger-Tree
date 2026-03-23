@@ -67,6 +67,10 @@ public function lead()
 {
     return $this->belongsTo(Lead::class, 'lead_id');
 }
+public function items()
+{
+    return $this->hasMany(EstimationItem::class);
+}
 }
 
 

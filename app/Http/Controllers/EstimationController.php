@@ -21,80 +21,60 @@ class EstimationController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'admin') {
-            // Admin sees all estimations
             $leads = Lead::with(['siteVisit', 'latestQuotation'])
-                ->whereHas('siteVisit', function ($query) {
-                    $query->where('approval_status', 'Yes');
-                })
-                ->latest()
-                ->get();
+                ->whereHas('siteVisit', fn($q) => $q->where('approval_status', 'Yes'))
+                ->latest()->get();
         } else {
-            // Estimator sees only their assigned leads
             $userId = $user->id;
             $leads = Lead::with(['siteVisit', 'latestQuotation'])
-                ->whereHas('siteVisit', function ($query) use ($userId) {
-                    $query->where('assigned_staff', $userId)
-                        ->where('approval_status', 'Yes');
-                })
-                ->latest()
-                ->get();
+                ->whereHas('siteVisit', fn($q) => $q
+                    ->where('assigned_staff', $userId)
+                    ->where('approval_status', 'Yes'))
+                ->latest()->get();
         }
 
-        $totalAssigned = $leads->count();
-        return view('Estimator.estimations', compact('leads', 'totalAssigned'));
+        return view('Estimator.estimations', [
+            'leads'         => $leads,
+            'totalAssigned' => $leads->count(),
+        ]);
     }
 
     public function createQuotation(Lead $lead)
     {
-        $siteVisit = $lead->siteVisit;
+        $siteVisit      = $lead->siteVisit;
         $inventoryItems = InventoryStock::select('id', 'item_name', 'price', 'category', 'gst_percentage')->get();
-
-        $services = \App\Models\Service::all();
-        $estimation = \App\Models\Estimation::where('lead_id', $lead->id)->first();
+        $services       = \App\Models\Service::all();
+        $estimation     = \App\Models\Estimation::where('lead_id', $lead->id)->first();
         $existingQuotation = \App\Models\Quotation::where('lead_id', $lead->id)->first();
 
         if ($estimation) {
             $estimationItems = \App\Models\EstimationItem::where('estimation_id', $estimation->id)
-                ->orderBy('sort_order')
-                ->get();
+                ->orderBy('sort_order')->get();
 
             $quotationNo = preg_replace('/^EST-?/i', 'QT-', $estimation->estimation_no);
 
-            $items = $estimationItems->map(function ($item) {
-                return [
-                    'item_id'        => $item->item_id,
-                    'item_name'      => $item->name ?? '',
-                    'custom_name'    => $item->item_id ? '' : ($item->name ?? ''),
-                    'category'       => $item->category ?? '',
-                    'description'    => $item->description ?? '',
-                    'quantity'       => $item->qty,
-                    'unit'           => $item->unit,
-                    'price'          => $item->unit_price,
-                    'gst_percentage' => $item->gst ?? 0,
-                    'length'         => $item->length ?? '',
-                    'breadth'        => $item->breadth ?? '',
-                    'area'           => $item->area ?? '',
-                ];
-            })->toArray();
+            $items = $estimationItems->map(fn($item) => [
+                'item_id'        => $item->item_id,
+                'item_name'      => $item->name ?? '',
+                'custom_name'    => $item->item_id ? '' : ($item->name ?? ''),
+                'category'       => $item->category   ?? '',
+                'description'    => $item->description ?? '',
+                'quantity'       => $item->qty,
+                'unit'           => $item->unit,
+                'price'          => $item->unit_price,
+                'gst_percentage' => $item->gst ?? 0,
+
+            ])->toArray();
         } else {
-             $lastEstimation = \App\Models\Estimation::latest()->first();
-    $nextNumber = $lastEstimation
-        ? (intval(substr($lastEstimation->estimation_no, -4)) + 1)
-        : 1;
-    // Use 4-digit year (Y not y) to match EST-2026-XXXX format
-    $quotationNo = 'QT-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
-    $items = [];
+            $last = \App\Models\Estimation::latest()->first();
+            $next = $last ? (intval(substr($last->estimation_no, -4)) + 1) : 1;
+            $quotationNo = 'QT-' . date('Y') . '-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+            $items = [];
         }
 
         return view('Estimator.create-quotation', compact(
-            'lead',
-            'siteVisit',
-            'inventoryItems',
-            'quotationNo',
-            'existingQuotation',
-            'items',
-            'estimation',
-            'services'
+            'lead', 'siteVisit', 'inventoryItems',
+            'quotationNo', 'existingQuotation', 'items', 'estimation', 'services'
         ));
     }
 
@@ -102,63 +82,57 @@ class EstimationController extends Controller
     {
         try {
             $leadId = $request->lead_id;
+            if (!$leadId) return response()->json(['success' => false, 'message' => 'Lead ID missing']);
 
-            if (!$leadId) {
-                return response()->json(['success' => false, 'message' => 'Lead ID missing']);
-            }
+            $items    = $request->items    ?? [];
+            $services = $request->services ?? [];
 
-            $items = $request->items ?? [];
-
-            if ((!$items || count($items) == 0) && (!$request->services || count($request->services) == 0)) {
+            if (empty($items) && empty($services)) {
                 return response()->json(['success' => false, 'message' => 'No items or services added']);
             }
 
-            $lead = \App\Models\Lead::findOrFail($leadId);
-
+            $lead        = \App\Models\Lead::findOrFail($leadId);
             $itemsToSave = [];
             $subtotal    = 0;
             $gstAmount   = 0;
 
+            /* ── Inventory Items ── */
             foreach ($items as $item) {
                 $itemId        = $item['item_id'] ?? null;
                 $itemName      = '';
                 $gstPercentage = 0;
                 $qty           = floatval($item['quantity'] ?? 0);
-                $price         = floatval($item['price'] ?? 0);
-                $serviceId     = $item['service_id'] ?? null;
-                $serviceTax    = $item['service_tax'] ?? 0;
+                $price         = floatval($item['price']    ?? 0);
 
-                // Custom item → InventoryStock create
                 if (!$itemId && !empty($item['custom_name'])) {
-                    $inventory = \App\Models\InventoryStock::create([
+                    $inv    = \App\Models\InventoryStock::create([
                         'item_name' => $item['custom_name'],
                         'category'  => $item['category'] ?? '',
                         'unit'      => $item['unit']      ?? '',
                         'price'     => $price,
                         'quantity'  => 0,
                     ]);
-                    $itemId   = $inventory->id;
-                    $itemName = $inventory->item_name;
+                    $itemId   = $inv->id;
+                    $itemName = $inv->item_name;
                 }
 
-                // Existing inventory item
                 if ($itemId) {
-                    $inventory = \App\Models\InventoryStock::find($itemId);
-                    if ($inventory) {
-                        $itemName      = $inventory->item_name;
-                        $gstPercentage = $item['gst_percentage'] ?? ($inventory->gst_percentage ?? 0);
+                    $inv = \App\Models\InventoryStock::find($itemId);
+                    if ($inv) {
+                        $itemName      = $inv->item_name;
+                        $gstPercentage = $item['gst_percentage'] ?? ($inv->gst_percentage ?? 0);
                     }
                 }
 
                 $itemSubtotal = $qty * $price;
                 $itemGst      = ($itemSubtotal * $gstPercentage) / 100;
-
-                $subtotal  += $itemSubtotal;
-                $gstAmount += $itemGst;
+                $subtotal    += $itemSubtotal;
+                $gstAmount   += $itemGst;
 
                 $itemsToSave[] = [
                     'item_id'     => $itemId,
                     'name'        => !empty($item['custom_name']) ? $item['custom_name'] : $itemName,
+                    'section'     => 'General',
                     'description' => $item['description'] ?? '',
                     'category'    => $item['category']    ?? '',
                     'unit'        => $item['unit'],
@@ -168,58 +142,98 @@ class EstimationController extends Controller
                     'length'      => $item['length']         ?? null,
                     'breadth'     => $item['breadth']        ?? null,
                     'area'        => $item['area']           ?? null,
-                    'gst'         => $item['gst_percentage'] ?? $gstPercentage,
+                    'gst'         => $gstPercentage,
                     'gst_amount'  => $itemGst,
-                    'service_id'  => $serviceId,
-                    'service_tax' => $serviceTax,
+                    'service_id'  => null,
+                    'service_tax' => 0,
+                    'sub_items'   => [],
                 ];
             }
 
-            $gstPct     = 18;
-            $grandTotal = $subtotal + $gstAmount;
+            /* ── Service Items ── */
+            $servicesToSave = [];
+            foreach ($services as $svc) {
+                $service = \App\Models\Service::find($svc['service_id'] ?? null);
+                if (!$service) continue;
 
-            // ── Estimation number generate ──
-            $lastEstimation = \App\Models\Estimation::latest()->first();
-            $nextNumber     = $lastEstimation
-                ? intval(substr($lastEstimation->estimation_no, -4)) + 1
-                : 1;
-            $estimationNo = 'EST-' . date('Y') . '-' . str_pad($nextNumber, 4, '0', STR_PAD_LEFT);
+                $svcPrice  = floatval($svc['price']      ?? 0);
+                $svcGst    = floatval($svc['gst']        ?? 0);
+                $svcGstAmt = floatval($svc['gst_amount'] ?? 0);
+                $svcTax    = floatval($svc['tax']        ?? 0);
+                $svcTotal  = floatval($svc['total']      ?? 0);
+                $svcNote   = $svc['note'] ?? '';
 
-            // ── Estimation create or update ──
-            $estimation = \App\Models\Estimation::where('lead_id', $leadId)->first();
+                $subtotal  += $svcTotal;
+                $gstAmount += $svcGstAmt;
 
-            if ($estimation) {
-                $estimation->update([
-                    'subtotal'    => $subtotal,
-                    'gst_pct'     => $gstPct,
-                    'gst_amount'  => $gstAmount,
-                    'grand_total' => $grandTotal,
-                    'title'       => 'Quotation ' . $request->quotation_no,
-                    'status'      => 'Sent',
-                ]);
-            } else {
-                $estimation = \App\Models\Estimation::create([
-                    'lead_id'       => $leadId,
-                    'estimation_no' => $estimationNo,
-                    'client_name'   => $lead->client_name ?? '',
-                    'client_email'  => $lead->email        ?? '',
-                    'client_phone'  => $lead->phone        ?? '',
-                    'site_address'  => $lead->site_address ?? '',
-                    'title'         => 'Quotation ' . $request->quotation_no,
-                    'status'        => 'Sent',
-                    'subtotal'      => $subtotal,
-                    'discount'      => 0,
-                    'gst_pct'       => $gstPct,
-                    'gst_amount'    => $gstAmount,
-                    'grand_total'   => $grandTotal,
-                    'created_by'    => Auth::id(),
-                ]);
+                // Collect sub-items
+                $subItems = [];
+                foreach (($svc['sub_items'] ?? []) as $si) {
+                    if (empty($si['name'])) continue;
+                    $subItems[] = [
+                        'name'        => $si['name'],
+                        'material'    => $si['material']    ?? '',
+                        'unit'        => $si['unit']        ?? '',
+                        'size'        => $si['size']        ?? '',
+                        'mrp'         => floatval($si['mrp'] ?? 0),
+                        'offer_price' => floatval($si['offer_price'] ?? 0),
+                    ];
+                }
+
+                $servicesToSave[] = [
+                    'service_id'   => $service->id,
+                    'service_name' => $service->service_name,
+                    'section'      => 'Service',
+                    'note'         => $svcNote,
+                    'price'        => $svcPrice,
+                    'gst'          => $svcGst,
+                    'gst_amount'   => $svcGstAmt,
+                    'service_tax'  => $svcTax,
+                    'total'        => $svcTotal,
+                    'sub_items'    => $subItems,
+                ];
             }
 
-            // ── EstimationItems save ──
-            \App\Models\EstimationItem::where('estimation_id', $estimation->id)->delete();
+            $grandTotal = $subtotal;
 
-            foreach ($itemsToSave as $index => $item) {
+            /* ── Estimation number ── */
+            $lastEst = \App\Models\Estimation::latest()->first();
+            $next    = $lastEst ? intval(substr($lastEst->estimation_no, -4)) + 1 : 1;
+            $estNo   = 'EST-' . date('Y') . '-' . str_pad($next, 4, '0', STR_PAD_LEFT);
+
+            /* ── Create / Update Estimation ── */
+            $estimation = \App\Models\Estimation::where('lead_id', $leadId)->first();
+
+            $estData = [
+                'subtotal'    => $subtotal,
+                'gst_pct'     => 18,
+                'gst_amount'  => $gstAmount,
+                'grand_total' => $grandTotal,
+                'title'       => 'Quotation ' . $request->quotation_no,
+                'status'      => 'Sent',
+            ];
+
+            if ($estimation) {
+                $estimation->update($estData);
+            } else {
+                $estimation = \App\Models\Estimation::create(array_merge($estData, [
+                    'lead_id'       => $leadId,
+                    'estimation_no' => $estNo,
+                    'client_name'   => $lead->client_name ?? '',
+                    'client_email'  => $lead->email       ?? '',
+                    'client_phone'  => $lead->phone       ?? '',
+                    'site_address'  => $lead->site_address ?? '',
+                    'discount'      => 0,
+                    'created_by'    => Auth::id(),
+                ]));
+            }
+
+            /* ── Save Estimation Items ── */
+            \App\Models\EstimationItem::where('estimation_id', $estimation->id)->delete();
+            $sortOrder = 1;
+
+            // General items
+            foreach ($itemsToSave as $item) {
                 \App\Models\EstimationItem::create([
                     'estimation_id' => $estimation->id,
                     'item_id'       => $item['item_id']    ?? null,
@@ -231,64 +245,68 @@ class EstimationController extends Controller
                     'qty'           => $item['qty'],
                     'unit_price'    => $item['unit_price'],
                     'amount'        => $item['amount'],
-                    'sort_order'    => $index + 1,
-                    'length'        => $item['length']      ?? null,
-                    'breadth'       => $item['breadth']     ?? null,
-                    'area'          => $item['area']        ?? null,
-                    'gst'           => $item['gst']         ?? null,
-                    'gst_amount'    => $item['gst_amount']  ?? null,
-                    'service_id'    => $item['service_id']  ?? null,
-                    'service_tax'   => $item['service_tax'] ?? 0,
+                    'sort_order'    => $sortOrder++,
+                    'length'        => $item['length']     ?? null,
+                    'breadth'       => $item['breadth']    ?? null,
+                    'area'          => $item['area']       ?? null,
+                    'gst'           => $item['gst']        ?? null,
+                    'gst_amount'    => $item['gst_amount'] ?? null,
+                    'service_id'    => null,
+                    'service_tax'   => 0,
                 ]);
             }
 
-            // ════════════════════════════════════════════════════
-            // SERVICES SAVE — NEW ADDITION
-            // ════════════════════════════════════════════════════
-            if ($request->services && count($request->services) > 0) {
-                $sortOffset = count($itemsToSave) + 1;
+            // Service items — one estimation_item per service (section header row)
+            // sub_items stored as JSON in description field
+            foreach ($servicesToSave as $svc) {
+                \App\Models\EstimationItem::create([
+                    'estimation_id' => $estimation->id,
+                    'item_id'       => null,
+                    'name'          => $svc['service_name'],
+                    'section'       => 'Service',
+                    'description'   => $svc['note'],
+                    'category'      => \App\Models\Service::find($svc['service_id'])?->category_service ?? '',
+                    'unit'          => 'Nos',
+                    'qty'           => 1,
+                    'unit_price'    => $svc['price'],
+                    'amount'        => $svc['total'],
+                    'sort_order'    => $sortOrder++,
 
-                foreach ($request->services as $index => $svc) {
-                    $service = \App\Models\Service::find($svc['service_id'] ?? null);
-                    if (!$service) continue;
+                    'gst'           => $svc['gst'],
+                    'gst_amount'    => $svc['gst_amount'],
+                    'service_id'    => $svc['service_id'],
+                    'service_tax'   => $svc['service_tax'],
+                    // sub_items stored as JSON in a new meta column OR we use description
+                    // Using sub_items_json column — add migration if needed,
+                    // or fallback to encoding in description:
+                    // 'sub_items_json' => json_encode($svc['sub_items']),
+                ]);
 
-                    $svcPrice   = floatval($svc['price']      ?? 0);
-                    $svcGstAmt  = floatval($svc['gst_amount'] ?? 0);
-                    $svcTax     = floatval($svc['tax']        ?? 0);
-                    $svcTotal   = floatval($svc['total']      ?? 0);
-                    $svcGstPct  = floatval($svc['gst']        ?? 0);
-
-                    // Add service totals into grand total
-                    $grandTotal += $svcTotal;
-
+                // Save each sub-item as its own estimation_item row with section = 'ServiceItem'
+                foreach ($svc['sub_items'] as $si) {
                     \App\Models\EstimationItem::create([
                         'estimation_id' => $estimation->id,
                         'item_id'       => null,
-                        'name'          => $service->service_name,
-                        'section'       => 'Service',
-                        'description'   => '',
-                        'category'      => $service->category_service ?? '',
-                        'unit'          => 'Nos',
+                        'name'          => $si['name'],
+                        'section'       => 'ServiceItem',
+                        'description'   => ($si['material'] ?? '') . '||' . ($si['size'] ?? ''),
+                        'category'      => $si['material'] ?? '',
+                        'unit'          => $si['unit']     ?? '',
                         'qty'           => 1,
-                        'unit_price'    => $svcPrice,
-                        'amount'        => $svcTotal,
-                        'sort_order'    => $sortOffset + $index,
-                        'length'        => null,
-                        'breadth'       => null,
-                        'area'          => null,
-                        'gst'           => $svcGstPct,
-                        'gst_amount'    => $svcGstAmt,
-                        'service_id'    => $service->id,
-                        'service_tax'   => $svcTax,
+                        'unit_price'    => floatval($si['mrp']         ?? 0),
+                        'amount'        => floatval($si['offer_price'] ?? 0),
+                        'offer_price'   => floatval($si['offer_price'] ?? 0),
+                        'sort_order'    => $sortOrder++,
+                        'size'          => $si['size'] ?? null,
+                        'gst'           => 0,
+                        'gst_amount'    => 0,
+                        'service_id'    => $svc['service_id'],
+                        'service_tax'   => 0,
+                        // Store MRP in a notes-style field (using description second part after ||)
+                        // Or add a `mrp` column via migration
                     ]);
                 }
-
-                // Update grand_total to include service amounts
-                $estimation->update(['grand_total' => $grandTotal]);
             }
-            // ════════════════════════════════════════════════════
-            // END SERVICES SAVE
-            // ════════════════════════════════════════════════════
 
             return response()->json([
                 'success'       => true,
@@ -301,78 +319,128 @@ class EstimationController extends Controller
         }
     }
 
-    // public function generatePdf(\App\Models\Quotation $quotation)
-    // {
-    //     $lead = $quotation->lead;
-    //     $quotationNo = $quotation->quotation_no;
-
-    //     // Decode if still a string (old records)
-    //     $items = $quotation->items;
-    //     if (is_string($items)) {
-    //         $items = json_decode($items, true);
-    //     }
-
-    //     $pdf = Pdf::loadView(
-    //         'Estimator.quotationpdf',
-    //         compact('quotation', 'lead', 'quotationNo', 'items')
-    //     )->setPaper('a4', 'portrait');
-
-    //     return $pdf->stream('quotation-' . $quotationNo . '.pdf');
-    // }
-
+    /**
+     * Generate PDF — groups items by section for the new PDF layout
+     */
     public function estimationPdf($id)
     {
         $estimation = \App\Models\Estimation::findOrFail($id);
         $lead       = \App\Models\Lead::find($estimation->lead_id);
-        $items      = \App\Models\EstimationItem::where('estimation_id', $id)
+        $dbItems    = \App\Models\EstimationItem::where('estimation_id', $id)
                         ->orderBy('sort_order')->get();
-
-        // quotationpdf.blade.php-ൽ $items array format expect ചെയ്യുന്നു
-        $itemsArray = $items->map(function ($item) {
-            return [
-                'item_name'      => $item->name ?? $item->description,
-                'category'       => $item->category ?? '',
-                'description'    => $item->description ?? '',
-                'unit'           => $item->unit ?? '',
-                'quantity'       => $item->qty,
-                'price'          => $item->unit_price,
-                'gst_percentage' => $item->gst ?? 0,
-                'length'         => $item->length ?? '',
-                'breadth'        => $item->breadth ?? '',
-                'area'           => $item->area ?? '',
-                'section'        => $item->section ?? 'General',
-                'service_tax'    => $item->service_tax ?? 0,
-                'gst_amount'     => $item->gst_amount ?? 0,
-            ];
-        })->toArray();
 
         $quotationNo = preg_replace('/^EST-?/i', 'QT-', $estimation->estimation_no);
 
-        $pdf = Pdf::loadView(
-            'Estimator.quotationpdf',
-            [
-                'quotation'   => $estimation,  // blade-ൽ $quotation use ചെയ്യുന്നിടത്ത്
-                'lead'        => $lead,
-                'quotationNo' => $quotationNo,
-                'items'       => $itemsArray,
-            ]
-        )->setPaper('a4', 'portrait');
+        /*
+         * Build the items array for the PDF blade.
+         *
+         * section = 'General'     → inventory item row
+         * section = 'Service'     → service header row  (carries base_price, gst, tax, note)
+         * section = 'ServiceItem' → sub-item row inside a service
+         */
+        $items = [];
+
+        foreach ($dbItems as $row) {
+            $section = $row->section ?? 'General';
+
+            if ($section === 'General') {
+                $items[] = [
+                    'section'        => 'General',
+                    'item_name'      => $row->name ?? $row->description,
+                    'category'       => $row->category    ?? '',
+                    'description'    => $row->description ?? '',
+                    'unit'           => $row->unit        ?? '',
+                    'quantity'       => $row->qty,
+                    'price'          => $row->unit_price,
+                    'gst_percentage' => $row->gst         ?? 0,
+
+                    'service_tax'    => $row->service_tax ?? 0,
+                    'gst_amount'     => $row->gst_amount  ?? 0,
+                ];
+            } elseif ($section === 'Service') {
+                $items[] = [
+                    'section'           => 'Service',
+                    'item_name'         => $row->name,
+                    'service_name'      => $row->name,
+                    'service_id'        => $row->service_id,
+                    'service_note'      => $row->description ?? '',
+                    'service_base_price'=> $row->unit_price,
+                    'gst_percentage'    => $row->gst         ?? 0,
+                    'service_tax'       => $row->service_tax ?? 0,
+                    'gst_amount'        => $row->gst_amount  ?? 0,
+                    // sub_items will be filled from ServiceItem rows below
+                ];
+            } elseif ($section === 'ServiceItem') {
+                // Parse description: "material||size"
+                $parts    = explode('||', $row->description ?? '');
+                $material = $parts[0] ?? '';
+                $size     = $parts[1] ?? '';
+
+                $items[] = [
+                    'section'     => 'ServiceItem',
+                    'service_id'  => $row->service_id,
+                    'item_name'   => $row->name,
+                    'material'    => $material,
+                    'unit'        => $row->unit        ?? '',
+                    'size'        => $row->size ?? ($parts[1] ?? ''),
+                    'unit_price'  => $row->unit_price,                                           
+                    'offer_price' => $row->offer_price > 0 ? $row->offer_price : $row->amount,
+                    'mrp'         => $row->unit_price,
+                    'description' => '',
+                ];
+            }
+        }
+
+        /*
+         * Re-structure: the PDF blade expects service items to be flat with
+         * 'service_name' set per row. Merge ServiceItem rows into their
+         * parent Service row's context by duplicating service metadata.
+         */
+        $flatItems = [];
+        $currentService = null;
+
+        foreach ($items as $item) {
+            if ($item['section'] === 'Service') {
+                $currentService = $item;
+                $flatItems[] = $item;
+            } elseif ($item['section'] === 'ServiceItem' && $currentService) {
+                // Attach service context so PDF blade can group properly
+                $flatItems[] = array_merge($item, [
+                    'service_name'       => $currentService['service_name'],
+                    'service_note'       => $currentService['service_note'],
+                    'service_base_price' => $currentService['service_base_price'],
+                    'gst_percentage'     => $currentService['gst_percentage'],
+                    'service_tax'        => $currentService['service_tax'],
+                ]);
+            } else {
+                $flatItems[] = $item;
+            }
+        }
+
+        $pdf = Pdf::loadView('Estimator.quotationpdf', [
+            'quotation'   => $estimation,
+            'lead'        => $lead,
+            'quotationNo' => $quotationNo,
+            'items'       => $flatItems,
+        ])->setPaper('a4', 'portrait');
 
         return $pdf->stream('quotation-' . $quotationNo . '.pdf');
     }
 
+    public function getServiceItems($serviceId)
+    {
+        $items = \App\Models\ServiceItem::where('service_id', $serviceId)
+                    ->where('status', 1)
+                    ->orderBy('id')
+                    ->get(['id', 'service_id', 'item_name', 'default_price', 'unit', 'description']);
+
+        return response()->json(['items' => $items]);
+    }
+
     public function getItemDetails(Request $request)
     {
-        $itemName = $request->item_name;
-
-        if (!$itemName) {
-            return response()->json([
-                'success' => false
-            ]);
-        }
-
-        $item = InventoryStock::where('item_name', 'LIKE', '%' . $itemName . '%')->first();
-
+        if (!$request->item_name) return response()->json(['success' => false]);
+        $item = InventoryStock::where('item_name', 'LIKE', '%' . $request->item_name . '%')->first();
         if ($item) {
             return response()->json([
                 'success'        => true,
@@ -380,37 +448,31 @@ class EstimationController extends Controller
                 'category'       => $item->category,
                 'unit'           => $item->unit,
                 'price'          => $item->price,
-                'gst_percentage' => $item->gst_percentage
+                'gst_percentage' => $item->gst_percentage,
             ]);
         }
-
-        return response()->json([
-            'success' => false
-        ]);
+        return response()->json(['success' => false]);
     }
+
     public function updateStatus(Request $request, $id)
-{
-    $estimation = Estimation::findOrFail($id);
+    {
+        $estimation = Estimation::findOrFail($id);
+        $estimation->status = $request->status;
+        $estimation->save();
 
-    $estimation->status = $request->status;
-    $estimation->save();
-
-    // 🔹 Update lead status
-    if ($estimation->lead_id) {
-
-        if ($request->status == 'Approved') {
-            Lead::where('id', $estimation->lead_id)
-                ->update(['status' => 'Won']);
+        if ($estimation->lead_id) {
+            if ($request->status === 'Approved') Lead::where('id', $estimation->lead_id)->update(['status' => 'Won']);
+            if ($request->status === 'Rejected') Lead::where('id', $estimation->lead_id)->update(['status' => 'Lost']);
         }
 
-        if ($request->status == 'Rejected') {
-            Lead::where('id', $estimation->lead_id)
-                ->update(['status' => 'Lost']);
-        }
+        return response()->json(['success' => true]);
     }
 
-    return response()->json([
-        'success' => true
-    ]);
-}
+    public function assignDesigner(Request $request, $id)
+    {
+        $estimation = \App\Models\Estimation::findOrFail($id);
+        $estimation->designer_id = $request->designer_id ?: null;
+        $estimation->save();
+        return response()->json(['success' => true]);
+    }
 }

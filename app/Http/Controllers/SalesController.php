@@ -34,43 +34,53 @@ class SalesController extends Controller
     }
 
     public function leads(Request $request)
-    {
-        $user = Auth::user();
+        {
+            $user = Auth::user();
 
-        if (!$user->department || $user->department->slug !== 'sales_executive') {
-            abort(403);
-        }
+            if (!$user->department || $user->department->slug !== 'sales_executive') {
+                abort(403);
+            }
 
-         $query = Lead::where('sales_executive_id', $user->id);
-         // Search by client name
+            $leads = Lead::where('sales_executive_id', $user->id)
+                ->latest()
+                ->get();
+
+            $totalLeads = Lead::count();
+            $convertedLeads = Lead::where('status', 'Won')->count();
+            $failedLeads = Lead::where('status', 'Lost')->count();
+            $totalarrivedLeads = Lead::where('sales_executive_id', $user->id)->count();
+             $query = Lead::query();
+
+    // 🔍 Name Search
     if ($request->search) {
         $query->where('client_name', 'LIKE', '%' . $request->search . '%');
     }
 
-    // Filter by created date
-    if ($request->created_date) {
-        $query->whereDate('created_at', $request->created_date);
+    // 📅 Date Filter
+    if ($request->from_date) {
+        $query->whereDate('created_at', '>=', $request->from_date);
     }
 
-    // Filter by status
+    if ($request->to_date) {
+        $query->whereDate('created_at', '<=', $request->to_date);
+    }
+
+    // 📊 Status Filter
     if ($request->status) {
         $query->where('status', $request->status);
     }
-     $leads = $query->latest()->get();
 
-        $totalLeads = Lead::count();
-        $convertedLeads = Lead::where('status', 'Won')->count();
-        $failedLeads = Lead::where('status', 'Lost')->count();
-        $totalarrivedLeads = Lead::where('sales_executive_id', $user->id)->count();
+    $leads = $query->latest()->get();
 
-        return view('sales_executive.leads', compact(
-            'leads',
-            'failedLeads',
-            'convertedLeads',
-            'totalLeads',
-            'totalarrivedLeads'
-        ));
-    }
+            return view('sales_executive.leads', compact(
+                'leads',
+                'failedLeads',
+                'convertedLeads',
+                'totalLeads',
+                'totalarrivedLeads',
+                'leads'
+            ));
+        }
 
     public function showJson(Lead $lead)
     {

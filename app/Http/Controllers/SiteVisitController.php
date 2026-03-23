@@ -13,24 +13,59 @@ use Illuminate\Support\Facades\DB;
 class SiteVisitController extends Controller
 {
 
-  public function sitevisit()
-    {
-        $userId = Auth::id();
-        $leads = Lead::with(['siteVisit', 'latestQuotation'])
-    ->where('sales_executive_id', $userId)
-    ->whereHas('siteVisit')
-    ->latest()
-    ->get();
-    $totalSiteVisits = $leads->whereNotNull('siteVisit')->count();
-    $completedSiteVisits = $leads->filter(function($lead){
+    public function sitevisit(Request $request)
+{
+    $userId = Auth::id();
+
+    // Base query
+    $query = Lead::with(['siteVisit', 'latestQuotation'])
+        ->where('sales_executive_id', $userId)
+        ->whereHas('siteVisit');
+
+    // Search
+    if ($request->filled('search')) {
+        $query->where('client_name', 'like', '%' . $request->search . '%');
+    }
+
+    // Date filter
+    if ($request->filled('visit_date')) {
+        $query->whereHas('siteVisit', function ($q) use ($request) {
+            $q->whereDate('visit_datetime', $request->visit_date);
+        });
+    }
+
+    // Budget filter
+    if ($request->filled('budget')) {
+        $query->whereHas('siteVisit', function ($q) use ($request) {
+            $q->where('budget_sensitivity', $request->budget);
+        });
+    }
+
+    // Status filter
+    if ($request->filled('status')) {
+        $query->whereHas('latestQuotation', function ($q) use ($request) {
+            $q->where('status', $request->status);
+        });
+    }
+
+    $leads = $query->latest()->get();
+
+    // Stats (use SAME filtered or separate depending on need)
+    $totalSiteVisits = $leads->count();
+
+    $completedSiteVisits = $leads->filter(function ($lead) {
         return $lead->siteVisit && $lead->siteVisit->approval_status === 'Yes';
     })->count();
-        $assignSiteVisits = Lead::where('sales_executive_id', $userId)
-        ->whereHas('siteVisit')
-        ->count();
 
-        return view('sales_executive.Sitevisit', compact('leads','assignSiteVisits','totalSiteVisits','completedSiteVisits'));
-    }
+    $assignSiteVisits = $leads->count();
+
+    return view('sales_executive.Sitevisit', compact(
+        'leads',
+        'assignSiteVisits',
+        'totalSiteVisits',
+        'completedSiteVisits'
+    ));
+}
 
     public function store(Request $request)
     {
@@ -78,20 +113,20 @@ class SiteVisitController extends Controller
         ]);
     }
 
-public function show(Lead $lead)
-{
-    $estimators = User::where('department_id', 6)
-        ->where('status', 1)
-        ->select('id', 'name')
-        ->get();
+    public function show(Lead $lead)
+    {
+        $estimators = User::where('department_id', 6)
+            ->where('status', 1)
+            ->select('id', 'name')
+            ->get();
 
-    return response()->json([
-        'client_name' => $lead->client_name,
-        'email'       => $lead->email,
-        'site_visit'  => $lead->siteVisit,
-        'estimators'  => $estimators,
-    ]);
-}
+        return response()->json([
+            'client_name' => $lead->client_name,
+            'email'       => $lead->email,
+            'site_visit'  => $lead->siteVisit,
+            'estimators'  => $estimators,
+        ]);
+    }
 
     public function storeOrUpdate(Request $request)
     {

@@ -23,7 +23,7 @@
         class="py-2.5 px-4 text-sm border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-300 bg-white min-w-[160px]">
         <option value="">All Statuses</option>
         <option value="Sent">Sent</option>
-        <option value="Negotiation">Negotiation</option>
+        <option value="Revised">Negotiation</option>
         <option value="Approved">Approved</option>
         <option value="Rejected">Rejected</option>
         <option value="not_created">Not Created</option>
@@ -62,7 +62,6 @@
                 @forelse($leads as $lead)
                 {{-- FIND this line: --}}
 <tr class="hover:bg-gray-50 text-sm">
-
 
 <tr class="hover:bg-gray-50 text-sm lead-row"
     data-name="{{ strtolower($lead->client_name) }}"
@@ -117,49 +116,134 @@ $status = $lead->latestQuotation->status;
 
     @if($estimation)
         @if(Auth::user()->role === 'admin')
-            {{-- Admin can approve/reject --}}
-            <div class="flex items-center gap-2">
-                <span id="admin-status-badge-{{ $estimation->id }}"
-                    class="px-3 py-1 rounded-full text-xs font-semibold
-                    @if($adminStatus == 'Approved') bg-green-100 text-green-700
-                    @elseif($adminStatus == 'Rejected') bg-red-100 text-red-700
-                    @else hidden
+
+            <div class="flex flex-col gap-2">
+
+                {{-- Badge: only shown after a decision --}}
+                <div id="admin-status-badge-{{ $estimation->id }}"
+                    class="{{ $adminStatus ? 'flex' : 'hidden' }} items-center gap-1.5 w-fit px-3 py-1 rounded-full text-xs font-semibold border
+                    @if($adminStatus == 'Approved') bg-green-50 text-green-700 border-green-200
+                    @elseif($adminStatus == 'Rejected') bg-red-50 text-red-600 border-red-200
+                    @else border-transparent
                     @endif">
-                    {{ $adminStatus ?? '' }}
-                </span>
+                    <span id="admin-status-dot-{{ $estimation->id }}"
+                        class="w-1.5 h-1.5 rounded-full flex-shrink-0
+                        @if($adminStatus == 'Approved') bg-green-500
+                        @elseif($adminStatus == 'Rejected') bg-red-500
+                        @endif">
+                    </span>
+                    <span id="admin-status-text-{{ $estimation->id }}">{{ $adminStatus ?? '' }}</span>
+                </div>
 
-                <button
-                    onclick="updateAdminStatus({{ $estimation->id }}, 'Approved')"
-                    id="approve-btn-{{ $estimation->id }}"
-                    {{ $adminStatus === 'Approved' ? 'disabled' : '' }}
-                    class="px-3 py-1.5 rounded text-xs font-bold text-white bg-green-600 hover:bg-green-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
-                    Approve
-                </button>
+                {{-- Approve / Reject buttons --}}
+                <div class="flex items-center gap-1.5">
+                    <button
+                        onclick="updateAdminStatus({{ $estimation->id }}, 'Approved')"
+                        id="approve-btn-{{ $estimation->id }}"
+                        {{ $adminStatus === 'Approved' ? 'disabled' : '' }}
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold
+                               text-white bg-emerald-600 hover:bg-emerald-700
+                               disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Approve
+                    </button>
 
-                <button
-                    onclick="updateAdminStatus({{ $estimation->id }}, 'Rejected')"
-                    id="reject-btn-{{ $estimation->id }}"
-                    {{ $adminStatus === 'Rejected' ? 'disabled' : '' }}
-                    class="px-3 py-1.5 rounded text-xs font-bold text-white bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed transition">
-                    Reject
-                </button>
+                    <button
+                        onclick="updateAdminStatus({{ $estimation->id }}, 'Rejected')"
+                        id="reject-btn-{{ $estimation->id }}"
+                        {{ $adminStatus === 'Rejected' ? 'disabled' : '' }}
+                        class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-xs font-semibold
+                               text-white bg-red-500 hover:bg-red-600
+                               disabled:opacity-40 disabled:cursor-not-allowed transition-all">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+                        </svg>
+                        Reject
+                    </button>
+                </div>
+
             </div>
+
         @else
-            {{-- Estimator/Accounts: read-only badge --}}
-            @if($adminStatus)
-                <span class="px-3 py-1 rounded-full text-xs font-semibold
-                    @if($adminStatus == 'Approved') bg-green-100 text-green-700
-                    @elseif($adminStatus == 'Rejected') bg-red-100 text-red-700
-                    @endif">
-                    {{ $adminStatus }}
+            {{-- Non-admin: read-only --}}
+            @if($adminStatus == 'Approved')
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-green-50 text-green-700 border border-green-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-green-500"></span> Approved
+                </span>
+            @elseif($adminStatus == 'Rejected')
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-50 text-red-600 border border-red-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Rejected
                 </span>
             @else
-                <span class="text-gray-400 text-xs">Pending</span>
+                <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 text-amber-600 border border-amber-200">
+                    <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> Pending
+                </span>
             @endif
         @endif
+
     @else
-        <span class="text-gray-400 text-xs">No Estimation</span>
+        {{-- No estimation created yet --}}
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-slate-100 text-slate-400 border border-slate-200">
+            No Estimation
+        </span>
     @endif
+    @if($adminStatus === 'Approved')
+@php
+    $designerDept = \App\Models\Department::where('slug', 'designer')->first();
+    $designers = $designerDept
+        ? \App\Models\User::where('department_id', $designerDept->id)->get()
+        : collect();
+@endphp
+
+<div class="mt-3 border-t border-gray-100 pt-3">
+    <!-- <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Assign Designer</p> -->
+
+    {{-- Assigned designer chip (shown only if already assigned) --}}
+    @if($estimation->designer_id)
+        @php $assignedDesigner = $designers->firstWhere('id', $estimation->designer_id); @endphp
+        @if($assignedDesigner)
+        <div class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 mb-2">
+            <!-- <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
+                style="background: linear-gradient(135deg, #2563eb, #06b6d4);">
+                {{ strtoupper(substr($assignedDesigner->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', $assignedDesigner->name)[1] ?? 'X', 0, 1)) }}
+            </div> -->
+            <div class="flex-1 min-w-0">
+                <p class="text-xs font-semibold text-gray-800 truncate">{{ $assignedDesigner->name }}</p>
+                <p class="text-[10px] text-gray-400">Interior Designer</p>
+            </div>
+            <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+        </div>
+        @endif
+    @endif
+
+    {{-- Dropdown --}}
+    <div class="relative">
+        <div class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center z-10"
+            style="background: linear-gradient(135deg, #2563eb, #06b6d4);">
+            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+            </svg>
+        </div>
+        <select
+            onchange="assignDesigner({{ $estimation->id }}, this.value)"
+            class="w-full text-xs border border-gray-200 rounded-xl pl-9 pr-7 py-2 bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:outline-none appearance-none cursor-pointer text-gray-600 transition hover:border-blue-300">
+            <option value="">{{ $estimation->designer_id ? 'Change designer...' : 'Select designer...' }}</option>
+            @foreach($designers as $designer)
+                <option value="{{ $designer->id }}" {{ $estimation->designer_id == $designer->id ? 'selected' : '' }}>
+                    {{ $designer->name }}
+                </option>
+            @endforeach
+        </select>
+        <svg class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path d="M6 9l6 6 6-6"/>
+        </svg>
+    </div>
+</div>
+@endif
 </td>
                     <td class="px-6 py-4">
                         <button onclick="openDetailModal({{ $lead->id }})"
@@ -221,7 +305,7 @@ $status = $lead->latestQuotation->status;
                     <p class="font-bold text-gray-900 text-base truncate" id="modal_client_name">-</p>
                     <p class="text-sm text-gray-500 truncate" id="modal_email">-</p>
                 </div>
-                <span class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">{{ $lead->latestQuotation?->status ?? 'Pending' }}</span>
+                <!-- <span class="flex-shrink-0 px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-700 border border-green-200">{{ $lead->latestQuotation?->status ?? 'Pending' }}</span> -->
             </div>
             <!-- Key Info Grid -->
             <div class="grid grid-cols-3 gap-3">
@@ -488,7 +572,7 @@ function updateAdminStatus(id, status) {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
-            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
         },
         body: JSON.stringify({ admin_status: status })
     })
@@ -497,11 +581,21 @@ function updateAdminStatus(id, status) {
         if (!data.success) return alert('Something went wrong.');
 
         const badge = document.getElementById(`admin-status-badge-${id}`);
-        badge.className = `px-3 py-1 rounded-full text-xs font-semibold ${
-            status === 'Approved' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
-        }`;
-        badge.textContent = status;
+
+        const dotColor = status === 'Approved' ? 'bg-green-500' : 'bg-red-500';
+        const bgColor  = status === 'Approved'
+            ? 'bg-green-50 text-green-700 border-green-200'
+            : 'bg-red-50 text-red-600 border-red-200';
+
+        badge.className = `inline-flex items-center gap-1.5 w-fit px-3 py-1 rounded-full text-xs font-semibold border ${bgColor}`;
+        badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${dotColor} flex-shrink-0"></span>${status}`;
         badge.classList.remove('hidden');
+
+        // Subtle pop animation
+        badge.style.opacity = '0';
+        badge.style.transform = 'scale(0.9)';
+        badge.style.transition = 'opacity .2s ease, transform .2s ease';
+        setTimeout(() => { badge.style.opacity = '1'; badge.style.transform = 'scale(1)'; }, 10);
 
         document.getElementById(`approve-btn-${id}`).disabled = (status === 'Approved');
         document.getElementById(`reject-btn-${id}`).disabled  = (status === 'Rejected');
@@ -544,6 +638,41 @@ function clearFilters() {
     document.getElementById('filter_status').value = '';
     document.getElementById('filter_budget').value = '';
     applyFilters();
+}
+function assignDesigner(estimationId, designerId) {
+    if (!designerId) return;
+
+    fetch(`/admin/estimations/${estimationId}/assign-designer`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        },
+        body: JSON.stringify({ designer_id: designerId })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (!data.success) return alert('Something went wrong.');
+
+        // Toast notification
+        const toast = document.createElement('div');
+        toast.className = 'fixed bottom-5 right-5 z-[9999] flex items-center gap-3 px-4 py-3 rounded-xl shadow-lg text-sm font-semibold text-white';
+        toast.style.cssText = 'background: linear-gradient(135deg, #059669, #0d9488); opacity:0; transform:translateY(8px); transition: opacity .3s ease, transform .3s ease;';
+        toast.innerHTML = `
+            <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+            </svg>
+            Designer assigned successfully!
+        `;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.style.opacity = '1'; toast.style.transform = 'translateY(0)'; }, 10);
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            toast.style.transform = 'translateY(8px)';
+            setTimeout(() => toast.remove(), 300);
+        }, 3000);
+    })
+    .catch(() => alert('Network error. Please try again.'));
 }
 </script>
 @endsection

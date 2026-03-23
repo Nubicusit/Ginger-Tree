@@ -6,7 +6,8 @@
 
 <div class="p-6">
     <!-- Top Stats Section -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-8">
+
         <!-- Total Leads Card -->
         <div class="bg-purple-500 p-4 rounded-lg shadow-sm border border-purple-500">
             <div class="flex justify-between items-center mb-4">
@@ -28,14 +29,14 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">
-                <div>Website: 59</div>
-                <div>Referral: 0</div>
-                <div>BNI: 0</div>
-                <div>Meta: 812</div>
-                <div>Walk In: 0</div>
-                <div>Ads: 0</div>
-            </div>
+            <!--<div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">-->
+            <!--    <div>Website: 59</div>-->
+            <!--    <div>Referral: 0</div>-->
+            <!--    <div>BNI: 0</div>-->
+            <!--    <div>Meta: 812</div>-->
+            <!--    <div>Walk In: 0</div>-->
+            <!--    <div>Ads: 0</div>-->
+            <!--</div>-->
         </div>
 
         <!-- Failed Leads Card -->
@@ -59,14 +60,14 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">
-                <div>Website: 10</div>
-                <div>Referral: 0</div>
-                <div>BNI: 0</div>
-                <div>Meta: 120</div>
-                <div>Walk In: 0</div>
-                <div>Ads: 0</div>
-            </div>
+            <!--<div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">-->
+            <!--    <div>Website: 10</div>-->
+            <!--    <div>Referral: 0</div>-->
+            <!--    <div>BNI: 0</div>-->
+            <!--    <div>Meta: 120</div>-->
+            <!--    <div>Walk In: 0</div>-->
+            <!--    <div>Ads: 0</div>-->
+            <!--</div>-->
         </div>
 
         <!-- Converted Leads Card -->
@@ -89,14 +90,15 @@
                     {{ $convertedLeads }}
                 </span>
             </div>
-            <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">
-                <div>Website: 10</div>
-                <div>Referral: 0</div>
-                <div>BNI: 0</div>
-                <div>Meta: 120</div>
-                <div>Walk In: 0</div>
-                <div>Ads: 0</div>
-            </div>
+
+            <!--<div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">-->
+            <!--    <div>Website: 10</div>-->
+            <!--    <div>Referral: 0</div>-->
+            <!--    <div>BNI: 0</div>-->
+            <!--    <div>Meta: 120</div>-->
+            <!--    <div>Walk In: 0</div>-->
+            <!--    <div>Ads: 0</div>-->
+            <!--</div>-->
         </div>
 
         <!-- Arrived Leads Card -->
@@ -109,6 +111,7 @@
                                 d="M18 9a3 3 0 11-6 0 3 3 0 016 0zM21 21v-2a4 4 0 00-4-4H7a4 4 0 00-4 4v2M16 11h6m-3-3v6" />
                         </svg>
                     </div>
+
                     <span class="text-xs font-bold text-white uppercase tracking-wider">
                         Arrived Leads
                     </span>
@@ -119,72 +122,123 @@
                 </span>
             </div>
 
-            <div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">
-                <div>Website: 10</div>
-                <div>Referral: 0</div>
-                <div>BNI: 0</div>
-                <div>Meta: 120</div>
-                <div>Walk In: 0</div>
-                <div>Ads: 0</div>
-            </div>
+            <!--<div class="grid grid-cols-3 gap-y-1 text-[10px] font-bold text-white/90">-->
+            <!--    <div>Website: 10</div>-->
+            <!--    <div>Referral: 0</div>-->
+            <!--    <div>BNI: 0</div>-->
+            <!--    <div>Meta: 120</div>-->
+            <!--    <div>Walk In: 0</div>-->
+            <!--    <div>Ads: 0</div>-->
+            <!--</div>-->
         </div>
     </div>
-    <!-- FILTER SECTION -->
-<div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-4 flex flex-wrap items-center justify-between gap-3">
-<form method="GET" action="{{ route('sales.leads') }}" class="flex flex-wrap gap-3 items-center justify-between">
+    <div class="bg-white border border-slate-200 rounded-2xl px-5 py-4 mb-4" style="box-shadow:0 2px 12px rgba(0,0,0,.05);">
 
-    <!-- Search Name -->
-    <input
-        type="text"
-        name="search"
-        value="{{ request('search') }}"
-        placeholder="Search Name..."
-        class="border border-gray-300 rounded px-3 py-2 text-sm w-64 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-    >
+    <div class="grid grid-cols-4 gap-3 items-end">
 
-    <!-- Created Date -->
-    <input
-        type="date"
-        name="created_date"
-        value="{{ request('created_date') }}"
-        class="border border-gray-300 rounded px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
-    >
+        <!-- Search -->
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Search</label>
+            <div class="relative">
+                <svg class="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/>
+                </svg>
+                <input type="text" name="search" value="{{ request('search') }}"
+                    placeholder="Search name…"
+                    class="w-full pl-8 pr-3 h-9 text-sm border border-slate-200 rounded-lg bg-slate-50 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 focus:bg-white transition">
+            </div>
+        </div>
 
-    <!-- Status -->
-    <select name="status" class="border px-3 py-2 rounded text-sm">
-        <option value="">All Status</option>
-        <option value="New" {{ request('status')=='New'?'selected':'' }}>New</option>
-        <option value="Contacted" {{ request('status')=='Contacted'?'selected':'' }}>Contacted</option>
-        <option value="Proposal" {{ request('status')=='Proposal'?'selected':'' }}>Proposal</option>
-        <option value="Negotiation" {{ request('status')=='Negotiation'?'selected':'' }}>Negotiation</option>
-        <option value="Site Visit" {{ request('status')=='Site Visit'?'selected':'' }}>Site Visit</option>
-        <option value="Won" {{ request('status')=='Won'?'selected':'' }}>Won</option>
-        <option value="Lost" {{ request('status')=='Lost'?'selected':'' }}>Lost</option>
-    </select>
+        <!-- From Date -->
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">From date</label>
+            <input type="date" name="from_date" value="{{ request('from_date') }}"
+                class="w-full h-9 text-sm border border-slate-200 rounded-lg bg-slate-50 px-3 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 focus:bg-white transition">
+        </div>
 
-    <button class="bg-blue-600 hover:bg-blue-700 text-white text-sm px-4 py-2 rounded">
-        Filter
-    </button>
+        <!-- To Date -->
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">To date</label>
+            <input type="date" name="to_date" value="{{ request('to_date') }}"
+                class="w-full h-9 text-sm border border-slate-200 rounded-lg bg-slate-50 px-3 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 focus:bg-white transition">
+        </div>
 
-    <a href="{{ route('sales.leads') }}"
-       class="bg-gray-200 hover:bg-gray-300 text-gray-700 text-sm px-4 py-2 rounded">
-        Reset
-    </a>
+        <!-- Status -->
+        <div>
+            <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-1.5">Status</label>
+            <select name="status"
+                class="w-full h-9 text-sm border border-slate-200 rounded-lg bg-slate-50 px-3 focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-400 focus:bg-white transition appearance-none">
+                <option value="">All statuses</option>
+                @foreach(['Won','Lost','Negotiation','Proposal','Contacted','Site Visit'] as $s)
+                    <option value="{{ $s }}" {{ request('status')==$s ? 'selected' : '' }}>{{ $s }}</option>
+                @endforeach
+            </select>
+        </div>
 
-</form>
+    </div>
+
+    <!-- bottom bar: active filters + actions -->
+    <div class="flex items-center justify-between mt-4 pt-4 border-t border-slate-100 flex-wrap gap-2">
+
+        <!-- active filter chips -->
+        <div class="flex items-center gap-2 flex-wrap">
+            @if(request('search') || request('from_date') || request('to_date') || request('status'))
+                <span class="text-xs text-slate-400">Active filters:</span>
+                @if(request('search'))
+                <span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 text-blue-700">
+                "{{ request('search') }}"
+                </span>
+                @endif
+                @if(request('status'))
+                <span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1 text-blue-700">
+                       {{ request('status') }}
+                   </span>
+                @endif
+                @if(request('from_date') || request('to_date'))
+                    <span class="inline-flex items-center gap-1 text-xs font-medium px-2.5 py-1  text-blue-700">
+                        {{ request('from_date','…') }} → {{ request('to_date','…') }}
+                    </span>
+                @endif
+            @else
+                <span class="text-xs text-slate-300 italic">No filters applied</span>
+            @endif
+        </div>
+
+       <!-- buttons -->
+        <div class="flex items-center gap-2">
+            @if(request()->anyFilled(['search','from_date','to_date','status']))
+            <a href="{{ url()->current() }}"
+                class="inline-flex items-center gap-1.5 h-9 px-4 text-sm font-medium text-slate-600 border border-slate-200 rounded-lg hover:bg-slate-50 transition">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+                </svg>
+                Reset
+            </a>
+            @endif
+            <button onclick="applyFilters()"
+                class="inline-flex items-center gap-1.5 h-9 px-5 text-sm font-semibold text-white rounded-lg transition"
+                style="background:#2563eb;">
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z"/>
+                </svg>
+                Apply filters
+            </button>
+        </div>
+    </div>
+
 </div>
     <!-- Table Section -->
     <div class="bg-white rounded-lg shadow-sm overflow-hidden border border-gray-100">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="text-sm font-semibold bg-gray-50 border-b border-gray-200" style="background-color: #9b9b9b; color:beige;">
+                    <tr class="text-gray-500 text-sm font-semibold bg-gray-50 border-b border-gray-200">
                         <th class="px-6 py-4">Name</th>
                         <th class="px-6 py-4">Inquiry Type</th>
                         <th class="px-6 py-4">Date Created</th>
                         <th class="px-6 py-4">Source</th>
                         <th class="px-6 py-4">Location</th>
-                        <th class="px-6 py-4">Mobile Phone Number</th>
+                        <th class="">Mobile Phone Number</th>
                         <th class="px-6 py-4">Lead Status</th>
                         <th class="px-6 py-4">View Details</th>
                     </tr>
@@ -222,7 +276,7 @@
                                     bg-green-500 text-white
                                 @elseif($lead->status == 'Lost')
                                     bg-red-500 text-white
-                                    @elseif($lead->status == 'Negotiation')
+                                     @elseif($lead->status == 'Negotiation')
                                     bg-indigo-500 text-white
                                 @elseif($lead->status == 'Proposal')
                                     bg-gray-500 text-white
@@ -254,6 +308,7 @@
             </table>
         </div>
     </div>
+
 </div>
 <div id="leadDrawer"
     class="fixed inset-0 bg-black/40 hidden z-50 flex items-center justify-center">
@@ -728,5 +783,22 @@
                 }
             });
     }
+</script>
+<script>
+function applyFilters() {
+    let search = document.querySelector('[name="search"]').value;
+    let from = document.querySelector('[name="from_date"]').value;
+    let to = document.querySelector('[name="to_date"]').value;
+    let status = document.querySelector('[name="status"]').value;
+
+    let url = new URL(window.location.href);
+
+    url.searchParams.set('search', search);
+    url.searchParams.set('from_date', from);
+    url.searchParams.set('to_date', to);
+    url.searchParams.set('status', status);
+
+    window.location.href = url.toString();
+}
 </script>
 @endsection

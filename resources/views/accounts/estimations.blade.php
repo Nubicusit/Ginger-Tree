@@ -35,7 +35,6 @@
     display: flex; align-items: center; justify-content: space-between;
 }
 .est-card-head h5 { margin: 0; font-size: .95rem; font-weight: 600; }
-.est-card-body { padding: 20px 24px; }
 
 .est-table { width: 100%; border-collapse: collapse; font-size: .88rem; }
 .est-table thead tr { background: #f8fafc; }
@@ -90,8 +89,8 @@
     gap: 14px; margin-bottom: 16px;
 }
 .est-form-grid.cols2 { grid-template-columns: repeat(2,1fr); }
+.est-form-grid.cols3 { grid-template-columns: repeat(3,1fr); }
 .est-form-grid.cols4 { grid-template-columns: repeat(4,1fr); }
-.est-form-grid.cols1 { grid-template-columns: 1fr; }
 
 .fg label {
     display: block; font-size: .8rem; font-weight: 600;
@@ -119,19 +118,20 @@
 .items-table th {
     background: #f8fafc; padding: 8px 10px; text-align: left;
     font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0;
-    font-size: .78rem;
+    font-size: .78rem; white-space: nowrap;
 }
-.items-table td { padding: 6px 6px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+.items-table td { padding: 5px 5px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
 .items-table input, .items-table select {
     width: 100%; padding: 6px 8px; border: 1px solid #cbd5e1;
     border-radius: 5px; font-size: .82rem; font-family: inherit;
     box-sizing: border-box; background: #fff;
 }
-.items-table input:focus, .items-table select:focus {
-    outline: none; border-color: #3b82f6;
-}
-.items-table .amt-cell { font-weight: 600; color: #16a34a; text-align: right; min-width: 80px; padding-right: 10px; }
-.items-table .del-cell { text-align: center; width: 36px; }
+.items-table input:focus, .items-table select:focus { outline: none; border-color: #3b82f6; }
+.items-table input[readonly] { background: #f8fafc; color: #64748b; cursor: default; }
+.items-table .amt-cell  { font-weight: 600; color: #16a34a; text-align: right; min-width: 80px; padding-right: 8px; }
+.items-table .gst-cell  { font-weight: 600; color: #7c3aed; text-align: center; min-width: 55px; }
+.items-table .dim-cell  { text-align: center; min-width: 62px; }
+.items-table .del-cell  { text-align: center; width: 32px; }
 .del-row-btn {
     background: #fee2e2; border: none; border-radius: 4px;
     color: #dc2626; cursor: pointer; padding: 3px 7px; font-size: .8rem;
@@ -147,8 +147,7 @@
 
 .add-section-btn {
     background: none; border: 1px dashed #3b82f6; border-radius: 6px;
-    color: #3b82f6; padding: 7px 16px; font-size: .82rem; cursor: pointer;
-    transition: all .15s;
+    color: #3b82f6; padding: 7px 16px; font-size: .82rem; cursor: pointer; transition: all .15s;
 }
 .add-section-btn:hover { background: #eff6ff; }
 
@@ -183,7 +182,7 @@
 .est-modal-overlay.show { display: flex; }
 .est-modal {
     background: #fff; border-radius: 14px; padding: 26px;
-    width: 100%; max-width: 980px; margin: auto;
+    width: 100%; max-width: 1350px; margin: auto;
     box-shadow: 0 24px 60px rgba(0,0,0,.22);
     position: relative; animation: estIn .18s ease;
 }
@@ -218,21 +217,21 @@
     background: #1e293b; color: #fff; padding: 8px 14px;
     border-radius: 6px; font-weight: 700; font-size: .88rem; margin: 14px 0 6px;
 }
-
 .view-items-table { width: 100%; border-collapse: collapse; font-size: .84rem; margin-bottom: 12px; }
 .view-items-table th {
     background: #f1f5f9; padding: 8px 10px; text-align: left;
     font-weight: 600; color: #475569; border-bottom: 2px solid #e2e8f0;
     font-size: .77rem; white-space: nowrap;
 }
-.view-items-table td {
-    padding: 8px 10px; border-bottom: 1px solid #f1f5f9;
-    color: #334155; vertical-align: middle;
-}
+.view-items-table td { padding: 8px 10px; border-bottom: 1px solid #f1f5f9; color: #334155; vertical-align: middle; }
 .view-items-table tbody tr:hover { background: #f8fafc; }
-.view-items-table .price-cell { color: #2563eb; font-weight: 600; }
+.view-items-table .price-cell { color: #2563eb; font-weight: 600; text-align: right; }
 .view-items-table .amt-cell   { color: #16a34a; font-weight: 700; text-align: right; }
-.view-items-table .meas-cell  { color: #7c3aed; font-size: .78rem; line-height: 1.5; }
+.view-items-table .dim-cell   { color: #0369a1; font-weight: 600; text-align: center; }
+.view-items-table .gst-badge  {
+    display: inline-block; background: #f3e8ff; color: #7c3aed;
+    font-size: .72rem; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+}
 
 .view-info-grid {
     display: grid; grid-template-columns: repeat(4,1fr);
@@ -241,29 +240,20 @@
 }
 .view-info-grid .info-item span.label {
     color: #64748b; font-size: .72rem; font-weight: 700;
-    text-transform: uppercase; letter-spacing: .04em;
-    display: block; margin-bottom: 3px;
+    text-transform: uppercase; letter-spacing: .04em; display: block; margin-bottom: 3px;
 }
 .view-info-grid .info-item span.value {
-    color: #1e293b; font-weight: 600; display: block;
-    word-break: break-word;
+    color: #1e293b; font-weight: 600; display: block; word-break: break-word;
 }
 
-/* Site Visit accordion styles */
-.sv-accordion {
-    border: 1px solid #e2e8f0; border-radius: 10px;
-    margin-bottom: 6px; overflow: hidden;
-}
+.sv-accordion { border: 1px solid #e2e8f0; border-radius: 10px; margin-bottom: 6px; overflow: hidden; }
 .sv-accordion summary {
-    padding: 10px 14px; cursor: pointer; font-size: .84rem;
-    font-weight: 600; color: #334155; background: #f8fafc;
-    list-style: none; display: flex; justify-content: space-between;
-    align-items: center; user-select: none;
+    padding: 10px 14px; cursor: pointer; font-size: .84rem; font-weight: 600;
+    color: #334155; background: #f8fafc; list-style: none;
+    display: flex; justify-content: space-between; align-items: center; user-select: none;
 }
 .sv-accordion summary::-webkit-details-marker { display: none; }
-.sv-accordion summary .sv-arrow {
-    color: #94a3b8; font-size: .7rem; transition: transform .2s;
-}
+.sv-accordion summary .sv-arrow { color: #94a3b8; font-size: .7rem; transition: transform .2s; }
 .sv-accordion[open] summary .sv-arrow { transform: rotate(180deg); }
 .sv-accordion .sv-body {
     padding: 10px 14px; font-size: .83rem; color: #475569;
@@ -310,22 +300,10 @@
 </div>
 
 <div class="est-stats">
-    <div class="est-stat">
-        <small>Total</small>
-        <h4>{{ $estimations->count() }}</h4>
-    </div>
-    <div class="est-stat">
-        <small>Draft</small>
-        <h4 class="amber">{{ $estimations->whereIn('status',['draft','Draft'])->count() }}</h4>
-    </div>
-    <div class="est-stat">
-        <small>Approved</small>
-        <h4 class="green">{{ $estimations->whereIn('status',['approved','Approved'])->count() }}</h4>
-    </div>
-    <div class="est-stat">
-        <small>Total Value</small>
-        <h4 class="blue">₹{{ number_format($estimations->sum('grand_total')) }}</h4>
-    </div>
+    <div class="est-stat"><small>Total</small><h4>{{ $estimations->count() }}</h4></div>
+    <div class="est-stat"><small>Draft</small><h4 class="amber">{{ $estimations->whereIn('status',['draft','Draft'])->count() }}</h4></div>
+    <div class="est-stat"><small>Approved</small><h4 class="green">{{ $estimations->whereIn('status',['approved','Approved'])->count() }}</h4></div>
+    <div class="est-stat"><small>Total Value</small><h4 class="blue">₹{{ number_format($estimations->sum('grand_total')) }}</h4></div>
 </div>
 
 <div class="est-card">
@@ -337,17 +315,10 @@
         <table class="est-table">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Est. No</th>
-                    <th>Client</th>
-                    <th>Title</th>
-                    <th>Lead / Project</th>
-                    <th>Valid Till</th>
-                    <th>Subtotal</th>
-                    <th>GST</th>
-                    <th>Grand Total</th>
-                    <th>Status</th>
-                    <th class="center">Actions</th>
+                    <th>#</th><th>Est. No</th><th>Client</th><th>Title</th>
+                    <th>Lead / Project</th><th>Valid Till</th>
+                    <th>Subtotal</th><th>GST</th><th>Grand Total</th>
+                    <th>Status</th><th class="center">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -357,9 +328,7 @@
                 <td><strong>{{ $est->estimation_no }}</strong></td>
                 <td>
                     {{ $est->client_name }}
-                    @if($est->client_email)
-                        <div class="muted">{{ $est->client_email }}</div>
-                    @endif
+                    @if($est->client_email)<div class="muted">{{ $est->client_email }}</div>@endif
                 </td>
                 <td>{{ $est->title ?? '—' }}</td>
                 <td>
@@ -369,7 +338,7 @@
                 </td>
                 <td>{{ $est->valid_till ? \Carbon\Carbon::parse($est->valid_till)->format('d M Y') : '—' }}</td>
                 <td>₹{{ number_format($est->subtotal) }}</td>
-                <td>{{ $est->gst_pct ?? 0 }}% = ₹{{ number_format($est->gst_amount) }}</td>
+                <td>₹{{ number_format($est->gst_amount) }}</td>
                 <td><strong>₹{{ number_format($est->grand_total) }}</strong></td>
                 <td>
                     @php $st = strtolower($est->status ?? 'draft'); @endphp
@@ -379,10 +348,8 @@
                     <button class="btn-sm btn-view" onclick="openViewModal({{ $est->id }})">👁 View</button>
                     <button class="btn-sm btn-edit" onclick="openEditModal({{ $est->id }})">✏️ Edit</button>
                     <a href="{{ route('accounts.estimations.pdf', $est->id) }}" target="_blank" class="btn-sm btn-pdf">📄 PDF</a>
-                    <form method="POST"
-                          action="{{ route('accounts.estimations.destroy', $est->id) }}"
-                          style="display:inline;"
-                          onsubmit="return confirm('Delete this estimation?')">
+                    <form method="POST" action="{{ route('accounts.estimations.destroy', $est->id) }}"
+                          style="display:inline;" onsubmit="return confirm('Delete this estimation?')">
                         @csrf @method('DELETE')
                         <button type="submit" class="btn-sm btn-del">🗑</button>
                     </form>
@@ -399,7 +366,6 @@
         </table>
     </div>
 </div>
-
 </div>
 
 {{-- ═══ MODAL: Create / Edit ═══ --}}
@@ -414,9 +380,10 @@
         <input type="hidden" id="h-subtotal"    name="subtotal"    value="0">
         <input type="hidden" id="h-gst-amount"  name="gst_amount"  value="0">
         <input type="hidden" id="h-grand-total" name="grand_total" value="0">
+        <input type="hidden" id="h-gst-pct"     name="gst_pct"     value="0">
 
-        {{-- Row 1: Est No, Status, Valid Till, GST --}}
-        <div class="est-form-grid cols4">
+        {{-- Row 1: Est No / Status / Valid Till --}}
+        <div class="est-form-grid cols3">
             <div class="fg">
                 <label>Estimation No <span style="color:red">*</span></label>
                 <input type="text" name="estimation_no" id="f-est-no" required placeholder="EST-001">
@@ -435,13 +402,9 @@
                 <label>Valid Till</label>
                 <input type="date" name="valid_till" id="f-valid-till">
             </div>
-            <div class="fg">
-                <label>GST %</label>
-                <input type="number" name="gst_pct" id="f-gst-pct" value="18" min="0" max="100" step="0.01" oninput="recalcTotals()">
-            </div>
         </div>
 
-        {{-- Row 2: Client fields --}}
+        {{-- Row 2: Client details --}}
         <div class="est-form-grid cols4">
             <div class="fg">
                 <label>Client Name <span style="color:red">*</span></label>
@@ -461,7 +424,7 @@
             </div>
         </div>
 
-        {{-- Row 3: Lead, Project, Title, Discount --}}
+        {{-- Row 3: IDs / Title / Discount --}}
         <div class="est-form-grid cols4">
             <div class="fg">
                 <label>Lead ID</label>
@@ -481,7 +444,6 @@
             </div>
         </div>
 
-        {{-- Row 4: Scope, Notes --}}
         <div class="est-form-grid cols2">
             <div class="fg">
                 <label>Scope of Work</label>
@@ -493,7 +455,6 @@
             </div>
         </div>
 
-        {{-- Items Section --}}
         <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
             <strong style="font-size:.95rem;color:#1e293b;">📦 Items by Section</strong>
             <button type="button" class="add-section-btn" onclick="addSection()">+ Add Section</button>
@@ -501,12 +462,10 @@
 
         <div id="sections-container"></div>
 
-        {{-- Totals --}}
         <div class="est-totals">
             <div class="est-totals-box">
                 <div class="trow"><span>Subtotal</span><span id="t-subtotal">₹0</span></div>
                 <div class="trow"><span>Discount</span><span id="t-discount">−₹0</span></div>
-                <div class="trow"><span id="t-gst-label">GST (18%)</span><span id="t-gst">₹0</span></div>
                 <div class="trow total"><span>Grand Total</span><span id="t-grand">₹0</span></div>
             </div>
         </div>
@@ -521,7 +480,7 @@
 
 {{-- ═══ MODAL: View ═══ --}}
 <div class="est-modal-overlay" id="modal-est-view">
-<div class="est-modal" style="max-width:1100px;">
+<div class="est-modal" style="max-width:1350px;">
     <button class="est-modal-close" onclick="closeModal('modal-est-view')">✕</button>
     <div id="view-content">
         <p style="text-align:center;padding:40px;color:#94a3b8;">Loading...</p>
@@ -530,9 +489,7 @@
 </div>
 
 <script>
-/* ════════════════════════════════════
-   Modal helpers
-   ════════════════════════════════════ */
+/* ── Modal helpers ── */
 function openModal(id)  { document.getElementById(id).classList.add('show'); }
 function closeModal(id) { document.getElementById(id).classList.remove('show'); }
 document.querySelectorAll('.est-modal-overlay').forEach(el => {
@@ -542,19 +499,61 @@ document.querySelectorAll('.est-modal-overlay').forEach(el => {
 let sectionCount = 0;
 let rowCount     = 0;
 
-/* ════════════════════════════════════
-   Create / Edit form helpers
-   ════════════════════════════════════ */
+/* ── Unit select builder ── */
+const UNIT_GROUPS = [
+    { label: 'Area',   options: ['Sqft','Sqm'] },
+    { label: 'Length', options: ['Rft','Rmt'] },
+    { label: 'Count',  options: ['Nos','Sets','Lots','Pairs'] },
+    { label: 'Volume', options: ['Cft','Cum'] },
+    { label: 'Time',   options: ['Hours','Days'] },
+    { label: 'Weight', options: ['Kg','Ltr'] },
+];
+
+function buildUnitSelect(name, selectedUnit) {
+    const cur = (selectedUnit || 'Nos').toLowerCase();
+    let html = `<select name="${name}">`;
+    UNIT_GROUPS.forEach(g => {
+        html += `<optgroup label="${g.label}">`;
+        g.options.forEach(u => {
+            html += `<option value="${u}" ${cur === u.toLowerCase() ? 'selected' : ''}>${u}</option>`;
+        });
+        html += `</optgroup>`;
+    });
+    html += `</select>`;
+    return html;
+}
+
+/* ────────────────────────────────────────────────
+   Add Section
+   hasDims = true  → show L / B / Area columns
+   hasDims = false → hide them (estimator-only items)
+──────────────────────────────────────────────── */
 function addSection(name, items) {
     name  = name  || '';
     items = items || [];
     sectionCount++;
     const sid = 'sec-' + sectionCount;
     const sc  = sectionCount;
+
+    // Detect if ANY item in this section has dimension data
+    const hasDims = items.some(it =>
+        (it.length  != null && it.length  !== '' && parseFloat(it.length)  > 0) ||
+        (it.breadth != null && it.breadth !== '' && parseFloat(it.breadth) > 0) ||
+        (it.area    != null && it.area    !== '' && parseFloat(it.area)    > 0)
+    );
+
     const container = document.getElementById('sections-container');
     const div = document.createElement('div');
     div.id = sid;
+    div.dataset.hasDims = hasDims ? '1' : '0';
     div.style.marginBottom = '16px';
+
+    const dimHeaders = hasDims
+        ? `<th style="min-width:65px;" class="dim-cell">L (ft)</th>
+           <th style="min-width:65px;" class="dim-cell">B (ft)</th>
+           <th style="min-width:70px;" class="dim-cell">Area</th>`
+        : '';
+
     div.innerHTML = `
         <div class="section-divider">
             <input type="text" name="sections[${sc}][name]"
@@ -566,25 +565,31 @@ function addSection(name, items) {
                     style="background:#ef4444;border:none;color:#fff;border-radius:4px;
                            padding:3px 10px;font-size:.75rem;cursor:pointer;">✕ Remove</button>
         </div>
+        <div style="overflow-x:auto;">
         <table class="items-table">
             <thead><tr>
-                <th style="width:25%">Description</th>
-                <th style="width:14%">Category</th>
-                <th style="width:9%">Unit</th>
-                <th style="width:8%">Qty</th>
-                <th style="width:13%">Unit Price (₹)</th>
-                <th style="width:11%;text-align:right;">Amount</th>
-                <th style="width:4%"></th>
+                <th style="min-width:110px;">Item Name</th>
+                <th style="min-width:140px;">Description</th>
+                <th style="min-width:90px;">Category</th>
+                <th style="min-width:75px;">Unit</th>
+                ${dimHeaders}
+                <th style="min-width:55px;">Qty</th>
+                <th style="min-width:105px;">Unit Price (₹)</th>
+                <th style="min-width:55px;" class="gst-cell">GST %</th>
+                <th style="min-width:85px;text-align:right;">Amount</th>
+                <th style="min-width:30px;"></th>
             </tr></thead>
             <tbody id="${sid}-tbody"></tbody>
         </table>
+        </div>
         <button type="button" class="add-row-btn" onclick="addRow('${sid}', ${sc})">+ Add Row</button>
     `;
     container.appendChild(div);
+
     if (items.length > 0) {
-        items.forEach(item => addRow(sid, sc, item));
+        items.forEach(item => addRow(sid, sc, item, hasDims));
     } else {
-        addRow(sid, sc);
+        addRow(sid, sc, {}, hasDims);
     }
 }
 
@@ -592,32 +597,133 @@ function removeSection(sid) {
     document.getElementById(sid)?.remove();
     recalcTotals();
 }
-function addRow(sid, sc, data) {
-    data = data || {};
+
+/* ────────────────────────────────────────────────
+   Add Row
+   hasDims controls whether L/B/Area inputs render
+──────────────────────────────────────────────── */
+function addRow(sid, sc, data, hasDims) {
+    data    = data    || {};
+    hasDims = hasDims !== undefined ? hasDims : (document.getElementById(sid)?.dataset.hasDims === '1');
     rowCount++;
-    const rid = 'row-' + rowCount;
+    const rid   = 'row-' + rowCount;
     const tbody = document.getElementById(sid + '-tbody');
     if (!tbody) return;
-    const units = ['nos','sqft','rft','kg','m','m2','m3','ltr','set','lot'];
-    const unitOpts = units.map(u =>
-        `<option value="${u}" ${(data.unit||'nos')===u?'selected':''}>${u}</option>`
-    ).join('');
+
+    const unitSel = buildUnitSelect(`sections[${sc}][items][${rowCount}][unit]`, data.unit || 'Nos');
+    const gstVal  = data.gst || data.gst_percentage || 0;
+    const gstAmtV = data.gst_amount || 0;
+    const lenVal  = (data.length  != null && data.length  !== 'null') ? data.length  : '';
+    const breVal  = (data.breadth != null && data.breadth !== 'null') ? data.breadth : '';
+    const areaVal = (data.area    != null && data.area    !== 'null') ? data.area    : '';
+
+    // Dimension cells (only rendered when section has dim data)
+    const dimCells = hasDims ? `
+        <td class="dim-cell">
+            <input type="number"
+                   name="sections[${sc}][items][${rowCount}][length]"
+                   id="${rid}-len"
+                   value="${escHtml(String(lenVal))}"
+                   min="0" step="0.01" placeholder="0"
+                   style="text-align:center;"
+                   oninput="calcArea('${rid}')">
+        </td>
+        <td class="dim-cell">
+            <input type="number"
+                   name="sections[${sc}][items][${rowCount}][breadth]"
+                   id="${rid}-bre"
+                   value="${escHtml(String(breVal))}"
+                   min="0" step="0.01" placeholder="0"
+                   style="text-align:center;"
+                   oninput="calcArea('${rid}')">
+        </td>
+        <td class="dim-cell">
+            <input type="number"
+                   name="sections[${sc}][items][${rowCount}][area]"
+                   id="${rid}-area"
+                   value="${escHtml(String(areaVal))}"
+                   min="0" step="0.01" readonly
+                   style="background:#eff6ff;color:#0369a1;font-weight:700;
+                          border-color:#bfdbfe;text-align:center;"
+                   title="Auto-calculated: L × B">
+        </td>
+    ` : `
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][length]"  value="">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][breadth]" value="">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][area]"    value="">
+    `;
+
     const tr = document.createElement('tr');
     tr.id = rid;
     tr.innerHTML = `
-       
-        <td><input type="text"   name="sections[${sc}][items][${rowCount}][description]" value="${escHtml(data.description||data.item_name||'')}" placeholder="Description"></td>
-        <td><input type="text"   name="sections[${sc}][items][${rowCount}][category]"    value="${escHtml(data.category||'')}" placeholder="Category"></td>
-        <td><select name="sections[${sc}][items][${rowCount}][unit]">${unitOpts}</select></td>
-        <td><input type="number" name="sections[${sc}][items][${rowCount}][qty]"        value="${data.qty||data.quantity||1}" min="0" step="0.01" oninput="calcRowAmt('${rid}',${sc})"></td>
-        <td><input type="number" name="sections[${sc}][items][${rowCount}][unit_price]" value="${data.unit_price||data.price||0}" min="0" step="0.01" oninput="calcRowAmt('${rid}',${sc})"></td>
+        <td>
+            <input type="text"
+                   name="sections[${sc}][items][${rowCount}][name]"
+                   value="${escHtml(data.name || data.item_name || '')}"
+                   placeholder="Item name">
+        </td>
+        <td>
+            <input type="text"
+                   name="sections[${sc}][items][${rowCount}][description]"
+                   value="${escHtml(data.description || '')}"
+                   placeholder="Description">
+        </td>
+        <td>
+            <input type="text"
+                   name="sections[${sc}][items][${rowCount}][category]"
+                   value="${escHtml(data.category || '')}"
+                   placeholder="Category">
+        </td>
+        <td>${unitSel}</td>
+        ${dimCells}
+        <td>
+            <input type="number"
+                   name="sections[${sc}][items][${rowCount}][qty]"
+                   id="${rid}-qty"
+                   value="${data.qty || data.quantity || 1}"
+                   min="0" step="0.01"
+                   oninput="calcRowAmt('${rid}')">
+        </td>
+        <td>
+            <input type="number"
+                   name="sections[${sc}][items][${rowCount}][unit_price]"
+                   value="${data.unit_price || data.price || 0}"
+                   min="0" step="0.01"
+                   oninput="calcRowAmt('${rid}')">
+        </td>
+        <td class="gst-cell">
+            <input type="number"
+                   id="${rid}-gst-display"
+                   value="${gstVal}"
+                   readonly
+                   style="text-align:center;color:#7c3aed;font-weight:700;
+                          background:#f5f3ff;border-color:#e9d5ff;width:60px;"
+                   title="GST % set by estimator">
+        </td>
         <td class="amt-cell" id="${rid}-amt">₹0</td>
-        <input type="hidden" name="sections[${sc}][items][${rowCount}][amount]"     id="${rid}-amount" value="0">
-        <input type="hidden" name="sections[${sc}][items][${rowCount}][sort_order]" value="${rowCount}">
-        <td class="del-cell"><button type="button" class="del-row-btn" onclick="removeRow('${rid}')">✕</button></td>
+
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][id]"          value="${data.id          || ''}">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][item_id]"     value="${data.item_id     || ''}">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][gst]"         id="${rid}-gst"        value="${gstVal}">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][gst_amount]"  id="${rid}-gst_amount" value="${gstAmtV}">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][service_id]"  value="${data.service_id  || ''}">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][service_tax]" value="${data.service_tax || ''}">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][amount]"      id="${rid}-amount"     value="0">
+        <input type="hidden" name="sections[${sc}][items][${rowCount}][sort_order]"  value="${rowCount}">
+
+        <td class="del-cell">
+            <button type="button" class="del-row-btn" onclick="removeRow('${rid}')">✕</button>
+        </td>
     `;
     tbody.appendChild(tr);
-    calcRowAmt(rid, sc, data.amount);
+
+    // Edit mode: if area already set, push into qty
+    if (hasDims && areaVal !== '' && parseFloat(areaVal) > 0) {
+        const qtyEl = document.getElementById(rid + '-qty');
+        if (qtyEl) qtyEl.value = parseFloat(areaVal).toFixed(4);
+    }
+
+    calcRowAmt(rid, data.amount);
 }
 
 function removeRow(rid) {
@@ -625,55 +731,77 @@ function removeRow(rid) {
     recalcTotals();
 }
 
-function calcRowAmt(rid, sc, preset) {
+/* ── Auto-calculate Area from L × B → push into Qty ── */
+function calcArea(rid) {
+    const lenEl  = document.getElementById(rid + '-len');
+    const breEl  = document.getElementById(rid + '-bre');
+    const areaEl = document.getElementById(rid + '-area');
+    const qtyEl  = document.getElementById(rid + '-qty');
+    if (!lenEl || !breEl || !areaEl) return;
+
+    const l = parseFloat(lenEl.value) || 0;
+    const b = parseFloat(breEl.value) || 0;
+
+    if (l > 0 && b > 0) {
+        const area = parseFloat((l * b).toFixed(4));
+        areaEl.value = area;
+        if (qtyEl) qtyEl.value = area;
+    } else {
+        areaEl.value = '';
+        if (l === 0 && b === 0 && qtyEl) qtyEl.value = 1;
+    }
+    calcRowAmt(rid);
+}
+
+/* ── Row amount calculation ── */
+function calcRowAmt(rid, preset) {
     const row = document.getElementById(rid);
     if (!row) return;
-    const qty   = parseFloat(row.querySelector(`input[name*="[qty]"]`)?.value)        || 0;
-    const price = parseFloat(row.querySelector(`input[name*="[unit_price]"]`)?.value) || 0;
+
+    const qty   = parseFloat(row.querySelector('input[name*="[qty]"]')?.value)        || 0;
+    const price = parseFloat(row.querySelector('input[name*="[unit_price]"]')?.value) || 0;
     const amt   = (preset !== undefined && preset !== null && preset !== '')
                   ? parseFloat(preset) : (qty * price);
+
     const amtEl = document.getElementById(rid + '-amt');
     const hidEl = document.getElementById(rid + '-amount');
     if (amtEl) amtEl.textContent = '₹' + fmt(amt);
-    if (hidEl) hidEl.value = amt;
+    if (hidEl) hidEl.value = amt.toFixed(2);
+
+    const gstPct    = parseFloat(document.getElementById(rid + '-gst')?.value) || 0;
+    const gstAmt    = amt * gstPct / 100;
+    const gstAmtHid = document.getElementById(rid + '-gst_amount');
+    if (gstAmtHid) gstAmtHid.value = gstAmt.toFixed(2);
+
     recalcTotals();
 }
 
+/* ── Totals ── */
 function recalcTotals() {
     let subtotal = 0;
     document.querySelectorAll('input[name*="[amount]"]').forEach(el => {
         subtotal += parseFloat(el.value) || 0;
     });
+
     const discount = parseFloat(document.getElementById('f-discount')?.value) || 0;
-    const gstPct   = parseFloat(document.getElementById('f-gst-pct')?.value)  || 0;
-    const taxable  = Math.max(0, subtotal - discount);
-    const gstAmt   = taxable * gstPct / 100;
-    const grand    = taxable + gstAmt;
+    const grand    = Math.max(0, subtotal - discount);
 
-    setText('t-subtotal',  '₹'  + fmt(subtotal));
-    setText('t-discount',  '−₹' + fmt(discount));
-    setText('t-gst-label', 'GST (' + gstPct + '%)');
-    setText('t-gst',       '₹'  + fmt(gstAmt));
-    setText('t-grand',     '₹'  + fmt(grand));
+    setText('t-subtotal', '₹'  + fmt(subtotal));
+    setText('t-discount', '−₹' + fmt(discount));
+    setText('t-grand',    '₹'  + fmt(grand));
 
-    document.getElementById('h-subtotal').value    = subtotal;
-    document.getElementById('h-gst-amount').value  = gstAmt;
-    document.getElementById('h-grand-total').value = grand;
+    document.getElementById('h-subtotal').value    = subtotal.toFixed(2);
+    document.getElementById('h-gst-amount').value  = '0';
+    document.getElementById('h-grand-total').value = grand.toFixed(2);
+    document.getElementById('h-gst-pct').value     = '0';
 }
 
-function setText(id, val) {
-    const el = document.getElementById(id);
-    if (el) el.textContent = val;
-}
-function fmt(n) {
-    return parseFloat(n || 0).toLocaleString('en-IN', { maximumFractionDigits: 2 });
-}
+/* ── Helpers ── */
+function setText(id, val) { const el = document.getElementById(id); if (el) el.textContent = val; }
+function fmt(n) { return parseFloat(n||0).toLocaleString('en-IN',{maximumFractionDigits:2}); }
 function escHtml(s) {
-    return String(s || '')
-        .replace(/&/g,'&amp;')
-        .replace(/"/g,'&quot;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;');
+    return String(s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;')
+                        .replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 function setVal(id, val) {
     const el = document.getElementById(id);
@@ -685,9 +813,7 @@ function setVal(id, val) {
     }
 }
 
-/* ════════════════════════════════════
-   Open Create Modal
-   ════════════════════════════════════ */
+/* ── Open Create ── */
 function openCreateModal() {
     document.getElementById('modal-form-title').textContent = '➕ New Estimation';
     document.getElementById('est-form').action = "{{ route('accounts.estimations.store') }}";
@@ -701,19 +827,15 @@ function resetForm() {
      'f-site-address','f-lead-id','f-project-id','f-title','f-scope','f-notes']
         .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
     setVal('f-status', 'Draft');
-    document.getElementById('f-gst-pct').value    = '18';
     document.getElementById('f-discount').value   = '0';
     document.getElementById('f-valid-till').value = '';
     document.getElementById('sections-container').innerHTML = '';
-    sectionCount = 0;
-    rowCount     = 0;
+    sectionCount = 0; rowCount = 0;
     addSection('Section 1');
     recalcTotals();
 }
 
-/* ════════════════════════════════════
-   Open Edit Modal
-   ════════════════════════════════════ */
+/* ── Open Edit ── */
 function openEditModal(id) {
     fetch('/accounts/estimations/' + id + '/edit-data')
         .then(r => r.json())
@@ -726,7 +848,6 @@ function openEditModal(id) {
             setVal('f-est-no',       data.estimation_no);
             setVal('f-status',       data.status       || 'Draft');
             setVal('f-valid-till',   data.valid_till   || '');
-            setVal('f-gst-pct',      data.gst_pct      || 18);
             setVal('f-client-name',  data.client_name);
             setVal('f-client-email', data.client_email || '');
             setVal('f-client-phone', data.client_phone || '');
@@ -739,8 +860,7 @@ function openEditModal(id) {
             setVal('f-discount',     data.discount     || 0);
 
             document.getElementById('sections-container').innerHTML = '';
-            sectionCount = 0;
-            rowCount     = 0;
+            sectionCount = 0; rowCount = 0;
 
             if (data.sections && data.sections.length > 0) {
                 data.sections.forEach(sec => addSection(sec.name, sec.items || []));
@@ -753,9 +873,7 @@ function openEditModal(id) {
         .catch(err => alert('Error loading estimation: ' + err.message));
 }
 
-/* ════════════════════════════════════
-   Open View Modal
-   ════════════════════════════════════ */
+/* ── Open View ── */
 function openViewModal(id) {
     document.getElementById('view-content').innerHTML =
         '<p style="text-align:center;padding:40px;color:#94a3b8;">⏳ Loading...</p>';
@@ -767,22 +885,15 @@ function openViewModal(id) {
             const st      = (data.status || 'draft').toLowerCase();
             const stLabel = st.charAt(0).toUpperCase() + st.slice(1);
 
-            /* ── Header ── */
             let html = '<div style="display:flex;justify-content:space-between;align-items:flex-start;'
                 + 'flex-wrap:wrap;gap:10px;margin-bottom:16px;">'
-                + '<div>'
-                + '<h4 style="margin:0 0 4px;font-size:1.1rem;color:#1e293b;">'
+                + '<div><h4 style="margin:0 0 4px;font-size:1.1rem;color:#1e293b;">'
                 + escHtml(data.title || data.estimation_no) + '</h4>'
-                + '<div style="font-size:.82rem;color:#64748b;">'
-                + escHtml(data.estimation_no)
-                + ' &nbsp;|&nbsp; <span class="badge badge-' + st + '">' + stLabel + '</span>'
-                + '</div>'
-                + '</div>'
-                + '<a href="/accounts/estimations/' + data.id + '/pdf" target="_blank" '
-                + 'class="btn-sm btn-pdf">📄 Download PDF</a>'
+                + '<div style="font-size:.82rem;color:#64748b;">' + escHtml(data.estimation_no)
+                + ' &nbsp;|&nbsp; <span class="badge badge-' + st + '">' + stLabel + '</span></div></div>'
+                + '<a href="/accounts/estimations/' + data.id + '/pdf" target="_blank" class="btn-sm btn-pdf">📄 Download PDF</a>'
                 + '</div>';
 
-            /* ── Client Info Grid ── */
             html += '<div class="view-info-grid">'
                 + infoCell('CLIENT',     escHtml(data.client_name  || '—'))
                 + infoCell('PHONE',      escHtml(data.client_phone || '—'))
@@ -794,111 +905,112 @@ function openViewModal(id) {
                 + infoCell('TITLE',      escHtml(data.title        || '—'))
                 + infoCell('SCOPE',      escHtml(data.scope        || '—'))
                 + infoCell('NOTES',      escHtml(data.notes        || '—'))
-                + infoCell('GST %',      (data.gst_pct || 0) + '%')
                 + infoCell('DISCOUNT',   '₹' + fmt(data.discount   || 0))
                 + '</div>';
 
-            /* ── Sections & Items ── */
             const sections = data.sections || [];
             if (sections.length === 0) {
-                html += '<p style="text-align:center;color:#94a3b8;padding:24px;">'
-                      + 'No items found for this estimation.</p>';
+                html += '<p style="text-align:center;color:#94a3b8;padding:24px;">No items found.</p>';
             }
 
             sections.forEach(function(sec) {
+                // Detect if this section has any dimension data
+                const secHasDims = (sec.items || []).some(function(it) {
+                    return (it.length  != null && it.length  !== '' && parseFloat(it.length)  > 0)
+                        || (it.breadth != null && it.breadth !== '' && parseFloat(it.breadth) > 0)
+                        || (it.area    != null && it.area    !== '' && parseFloat(it.area)    > 0);
+                });
+
                 html += '<div class="view-section-title">📦 ' + escHtml(sec.name || 'Items') + '</div>';
-                html += '<table class="view-items-table"><thead><tr>'
-                    + '<th style="width:30px">#</th>'
+                html += '<div style="overflow-x:auto;"><table class="view-items-table"><thead><tr>'
+                    + '<th>#</th>'
+                    + '<th>Item Name</th>'
                     + '<th>Description</th>'
                     + '<th>Category</th>'
-                    + '<th>Unit</th>'
-                    + '<th style="text-align:right;">Qty</th>'
+                    + '<th>Unit</th>';
+
+                if (secHasDims) {
+                    html += '<th style="text-align:center;">L (ft)</th>'
+                          + '<th style="text-align:center;">B (ft)</th>'
+                          + '<th style="text-align:center;">Area</th>';
+                }
+
+                html += '<th style="text-align:right;">Qty</th>'
                     + '<th style="text-align:right;">Unit Price</th>'
-                    + '<th>Measurements</th>'
+                    + '<th style="text-align:center;">GST %</th>'
+                    + '<th style="text-align:right;">GST Amt</th>'
                     + '<th style="text-align:right;">Amount</th>'
                     + '</tr></thead><tbody>';
 
-                const items = sec.items || [];
-                if (items.length === 0) {
-                    html += '<tr><td colspan="8" style="text-align:center;color:#94a3b8;padding:12px;">'
-                          + 'No items in this section</td></tr>';
-                }
-
-                items.forEach(function(item, idx) {
-                    const desc      = item.description || item.item_name   || '—';
+                (sec.items || []).forEach(function(item, idx) {
+                    const iName     = item.name        || item.item_name || '—';
+                    const desc      = item.description || '—';
                     const cat       = item.category    || '—';
                     const unit      = item.unit        || '—';
                     const qty       = parseFloat(item.qty        || item.quantity || 0);
                     const unitPrice = parseFloat(item.unit_price || item.price    || 0);
                     const amount    = parseFloat(item.amount     || (qty * unitPrice) || 0);
-
-                    const length  = item.length  || '';
-                    const breadth = item.breadth || '';
-                    const area    = item.area    || '';
-                    let measHtml  = '<span style="color:#94a3b8;">—</span>';
-                    if (length && breadth) {
-                        const calcArea = area || (parseFloat(length) * parseFloat(breadth)).toFixed(2);
-                        measHtml = '<span class="meas-cell">'
-                            + length + ' × ' + breadth + ' ft'
-                            + '<br>= ' + calcArea + ' sqft'
-                            + '</span>';
-                    }
+                    const gstPct    = parseFloat(item.gst        || 0);
+                    const gstAmt    = parseFloat(item.gst_amount || 0);
 
                     html += '<tr>'
-                        + '<td style="color:#94a3b8;font-size:.76rem;">' + (idx + 1) + '</td>'
-                        + '<td><strong>' + escHtml(desc) + '</strong></td>'
-                        + '<td><span style="background:#f1f5f9;padding:2px 8px;border-radius:4px;'
-                        + 'font-size:.76rem;">' + escHtml(cat) + '</span></td>'
-                        + '<td>' + escHtml(unit) + '</td>'
-                        + '<td style="text-align:right;font-weight:600;">' + qty + '</td>'
-                        + '<td class="price-cell" style="text-align:right;">₹' + fmt(unitPrice) + '</td>'
-                        + '<td>' + measHtml + '</td>'
+                        + '<td style="color:#94a3b8;font-size:.76rem;">' + (idx+1) + '</td>'
+                        + '<td><strong>' + escHtml(iName) + '</strong></td>'
+                        + '<td style="color:#64748b;">' + escHtml(desc) + '</td>'
+                        + '<td><span style="background:#f1f5f9;padding:2px 8px;border-radius:4px;font-size:.76rem;">'
+                        +   escHtml(cat) + '</span></td>'
+                        + '<td>' + escHtml(unit) + '</td>';
+
+                    if (secHasDims) {
+                        const lenV  = (item.length  != null && item.length  !== '') ? parseFloat(item.length)  : null;
+                        const breV  = (item.breadth != null && item.breadth !== '') ? parseFloat(item.breadth) : null;
+                        const areaV = (item.area    != null && item.area    !== '') ? parseFloat(item.area)    : null;
+                        function dimTd(v) {
+                            return v != null && v > 0
+                                ? '<td class="dim-cell">' + v + '</td>'
+                                : '<td style="text-align:center;color:#94a3b8;">—</td>';
+                        }
+                        html += dimTd(lenV) + dimTd(breV) + dimTd(areaV);
+                    }
+
+                    html += '<td style="text-align:right;font-weight:600;">' + qty + '</td>'
+                        + '<td class="price-cell">₹' + fmt(unitPrice) + '</td>'
+                        + '<td style="text-align:center;">'
+                        +   (gstPct > 0 ? '<span class="gst-badge">' + gstPct + '%</span>' : '<span style="color:#94a3b8;">—</span>')
+                        + '</td>'
+                        + '<td style="text-align:right;color:#7c3aed;font-weight:600;">'
+                        +   (gstAmt > 0 ? '₹' + fmt(gstAmt) : '—')
+                        + '</td>'
                         + '<td class="amt-cell">₹' + fmt(amount) + '</td>'
                         + '</tr>';
                 });
 
-                html += '</tbody></table>';
+                html += '</tbody></table></div>';
             });
 
-            /* ════════════════════════════════════
-               Site Visit Details Section
-               — always shown; empty msg if no data
-               ════════════════════════════════════ */
+            /* ── Site Visit ── */
             const sv = data.site_visit || {};
-
-            html += '<p style="font-size:.72rem;font-weight:700;color:#64748b;'
-                  + 'text-transform:uppercase;letter-spacing:.06em;margin:22px 0 10px;">'
-                  + '🏠 Site Visit Details</p>';
-
-            /* Labour & Transport charges as a small info row */
             const labourCharge    = parseFloat(sv.labour_charge    || 0);
             const transportCharge = parseFloat(sv.transport_charge || 0);
 
+            html += '<p style="font-size:.72rem;font-weight:700;color:#64748b;'
+                  + 'text-transform:uppercase;letter-spacing:.06em;margin:22px 0 10px;">🏠 Site Visit Details</p>';
+
             if (labourCharge > 0 || transportCharge > 0) {
-                html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;'
-                      + 'margin-bottom:12px;">';
+                html += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;">';
                 if (labourCharge > 0) {
-                    html += '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;'
-                          + 'padding:10px 14px;">'
-                          + '<span style="font-size:.72rem;font-weight:700;color:#2563eb;'
-                          + 'text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px;">'
-                          + 'Labour Charge</span>'
-                          + '<span style="font-size:.95rem;font-weight:700;color:#1e40af;">₹'
-                          + fmt(labourCharge) + '</span></div>';
+                    html += '<div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:8px;padding:10px 14px;">'
+                          + '<span style="font-size:.72rem;font-weight:700;color:#2563eb;display:block;margin-bottom:3px;">Labour Charge</span>'
+                          + '<span style="font-size:.95rem;font-weight:700;color:#1e40af;">₹' + fmt(labourCharge) + '</span></div>';
                 }
                 if (transportCharge > 0) {
-                    html += '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;'
-                          + 'padding:10px 14px;">'
-                          + '<span style="font-size:.72rem;font-weight:700;color:#16a34a;'
-                          + 'text-transform:uppercase;letter-spacing:.04em;display:block;margin-bottom:3px;">'
-                          + 'Transport Charge</span>'
-                          + '<span style="font-size:.95rem;font-weight:700;color:#15803d;">₹'
-                          + fmt(transportCharge) + '</span></div>';
+                    html += '<div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:10px 14px;">'
+                          + '<span style="font-size:.72rem;font-weight:700;color:#16a34a;display:block;margin-bottom:3px;">Transport Charge</span>'
+                          + '<span style="font-size:.95rem;font-weight:700;color:#15803d;">₹' + fmt(transportCharge) + '</span></div>';
                 }
                 html += '</div>';
             }
 
-            /* Accordion fields */
             const svFields = [
                 ['Space Details',            sv.space_details],
                 ['Materials & Finishes',     sv.materials_finishes],
@@ -908,62 +1020,47 @@ function openViewModal(id) {
                 ['Finish Preferences',       sv.finish_preferences],
                 ['Site Condition Notes',     sv.site_condition_notes],
             ];
-
-            const hasAny = svFields.some(function(f) { return f[1]; });
-
+            const hasAny = svFields.some(f => f[1]);
             if (!hasAny && labourCharge === 0 && transportCharge === 0) {
                 html += '<div style="background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;'
-                      + 'padding:14px 18px;font-size:.84rem;color:#94a3b8;">'
-                      + 'No site visit data linked to this estimation.</div>';
+                      + 'padding:14px 18px;font-size:.84rem;color:#94a3b8;">No site visit data linked.</div>';
             } else {
-                svFields.forEach(function(fieldPair) {
-                    const label = fieldPair[0];
-                    const value = fieldPair[1];
+                svFields.forEach(([label, value]) => {
                     if (!value) return;
-                    html += '<details class="sv-accordion">'
-                          + '<summary>'
-                          + escHtml(label)
-                          + '<span class="sv-arrow">▾</span>'
-                          + '</summary>'
-                          + '<div class="sv-body">' + escHtml(value) + '</div>'
-                          + '</details>';
+                    html += '<details class="sv-accordion"><summary>' + escHtml(label)
+                          + '<span class="sv-arrow">▾</span></summary>'
+                          + '<div class="sv-body">' + escHtml(value) + '</div></details>';
                 });
             }
 
             /* ── Totals ── */
             html += '<div style="display:flex;justify-content:flex-end;margin-top:20px;">'
                 + '<div class="est-totals-box">'
-                + '<div class="trow"><span>Subtotal</span>'
-                +   '<span>₹' + fmt(data.subtotal || 0) + '</span></div>'
-                + '<div class="trow"><span>Discount</span>'
-                +   '<span style="color:#dc2626;">−₹' + fmt(data.discount || 0) + '</span></div>'
-                + '<div class="trow"><span>Labour Charge</span>'
-                +   '<span style="color:#2563eb;">+₹' + fmt(labourCharge) + '</span></div>'
-                + '<div class="trow"><span>Transport Charge</span>'
-                +   '<span style="color:#16a34a;">+₹' + fmt(transportCharge) + '</span></div>'
-                + '<div class="trow"><span>GST (' + (data.gst_pct || 0) + '%)</span>'
-                +   '<span>₹' + fmt(data.gst_amount || 0) + '</span></div>'
-                + '<div class="trow total"><span>Grand Total</span>'
-                +   '<span style="color:#16a34a;font-size:1.05rem;">₹'
-                +   fmt(data.grand_total || 0) + '</span></div>'
-                + '</div>'
-                + '</div>';
+                + '<div class="trow"><span>Subtotal</span><span>₹' + fmt(data.subtotal || 0) + '</span></div>'
+                + '<div class="trow"><span>Discount</span><span style="color:#dc2626;">−₹' + fmt(data.discount || 0) + '</span></div>';
+
+            if (labourCharge > 0) {
+                html += '<div class="trow"><span>Labour Charge</span><span style="color:#2563eb;">+₹' + fmt(labourCharge) + '</span></div>';
+            }
+            if (transportCharge > 0) {
+                html += '<div class="trow"><span>Transport Charge</span><span style="color:#16a34a;">+₹' + fmt(transportCharge) + '</span></div>';
+            }
+
+            html += '<div class="trow total"><span>Grand Total</span>'
+                + '<span style="color:#16a34a;font-size:1.05rem;">₹' + fmt(data.grand_total || 0) + '</span></div>'
+                + '</div></div>';
 
             document.getElementById('view-content').innerHTML = html;
         })
-        .catch(function(err) {
+        .catch(err => {
             document.getElementById('view-content').innerHTML =
-                '<p style="text-align:center;padding:40px;color:#dc2626;">'
-                + '❌ Error loading data: ' + escHtml(err.message) + '</p>';
+                '<p style="text-align:center;padding:40px;color:#dc2626;">❌ Error: ' + escHtml(err.message) + '</p>';
         });
 }
 
-/* Helper: single info cell */
 function infoCell(label, value) {
-    return '<div class="info-item">'
-        + '<span class="label">' + label + '</span>'
-        + '<span class="value">' + value + '</span>'
-        + '</div>';
+    return '<div class="info-item"><span class="label">' + label + '</span>'
+         + '<span class="value">' + value + '</span></div>';
 }
 </script>
 

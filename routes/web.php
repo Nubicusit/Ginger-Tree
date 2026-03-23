@@ -12,6 +12,7 @@ use App\Http\Controllers\HRController;
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\ThreeDesignerController;
 use App\Http\Controllers\EstimationController;
+use App\Http\Controllers\ServiceItemController;
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login']);
@@ -486,3 +487,12 @@ Route::patch('/accounts/projects/{project}/payments/{payment}/reject', [Accounts
 
 Route::patch('accounts/projects/{project}/total', [AccountsController::class, 'projectUpdateTotal'])
      ->name('accounts.projects.update-total');
+
+
+Route::post('/service-items/store', [ServiceItemController::class, 'store'])
+    ->name('service-items.store');
+Route::delete('/service-items/{id}', [ServiceItemController::class, 'destroy'])->name('service-items.destroy');
+Route::put('/service-items/{id}', [ServiceItemController::class, 'update'])->name('service-items.update');
+
+Route::post('/admin/estimations/{id}/assign-designer', [EstimationController::class, 'assignDesigner'])->name('admin.estimations.assignDesigner');
+Route::get('/estimator/service/{serviceId}/items', [EstimationController::class, 'getServiceItems']);

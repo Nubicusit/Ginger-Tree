@@ -280,7 +280,7 @@ class AdminController extends Controller
             $query->where('item_name', 'like', '%' . $request->search . '%');
         }
 
-        $stocks = $query->latest()->get();
+        $stocks = $query->latest()->paginate(10);
 
         return view('admin.Masters.inventory', compact('stocks'));
     }
@@ -340,7 +340,7 @@ class AdminController extends Controller
     public function services()
     {
 
-        $stocks = Service::latest()->get();
+        $stocks = Service::with('items')->latest()->get();
         return view('admin.Masters.services', compact('stocks'));
     }
 
@@ -466,4 +466,5 @@ public function updateEstimationStatus(Request $request, $id)
 
     return response()->json(['success' => true]);
 }
+
 }

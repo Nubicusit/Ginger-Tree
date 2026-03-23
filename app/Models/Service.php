@@ -18,6 +18,10 @@ class Service extends Model
         'gst_percentage',
         'service_tax',
     ];
+    public function items()
+{
+    return $this->hasMany(ServiceItem::class);
+}
     /**
      * Accessor: GST amount
      */
