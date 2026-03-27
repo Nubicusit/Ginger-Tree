@@ -20,6 +20,7 @@ class EstimationItem extends Model
         'offer_price',
         'sort_order',
         'size',
+        'image',
         'gst',
         'gst_amount',
         'service_id',

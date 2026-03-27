@@ -13,6 +13,7 @@ use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\ThreeDesignerController;
 use App\Http\Controllers\EstimationController;
 use App\Http\Controllers\ServiceItemController;
+use Spatie\LaravelPdf\Facades\Pdf;
 
 Route::get('/', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route::post('/login', [AuthController::class, 'login']);
@@ -384,8 +385,16 @@ Route::get('/estimator/quotation/create/{lead}', [EstimationController::class, '
 Route::post('/estimator/quotation/store', [EstimationController::class, 'storeQuotation'])->middleware(['auth', 'estimator'])->name('estimator.quotation.store');
 // Inside your estimator auth group
 Route::get('/estimator/estimation/{id}/pdf', [EstimationController::class, 'estimationPdf'])
-    ->middleware(['auth', 'estimator'])
+->middleware(['auth', 'estimator'])
     ->name('estimator.estimation.pdf');
+// Route::get('/estimator/estimation/{id}/pdf', function () {
+//     return Pdf::html('<h1 class="text-5xl text-blue-600 font-bold">Tailwind is Working!</h1>')
+//         ->withBrowsershot(function ($browsershot) {
+//             $browsershot->setRemoteInstance('https://production-sfo.browserless.io/chrome/pdf?blockAds=false&timeout=60000&token=2UDGxFl1BOHvAkqbcc76980aac5e8c642eace3c5761a4f445');
+//         })
+//         ->name('estimator.estimation.pdf');
+// });
+// Route::get('/estimator/estimation/{id}/view', [EstimationController::class, 'estimationView'])->name('estimator.estimation.view');
 // Route::get('/estimator/quotation/{quotation}/pdf', [EstimationController::class, 'generatePdf'])->middleware(['auth', 'estimator'])->name('estimator.quotation.pdf');
 Route::get('/estimator/estimations', [EstimationController::class, 'estimation'])->middleware(['auth', 'estimator'])->name('estimator.estimation');
 Route::get('/estimator/item-details', [EstimationController::class, 'getItemDetails'])
@@ -496,3 +505,10 @@ Route::put('/service-items/{id}', [ServiceItemController::class, 'update'])->nam
 
 Route::post('/admin/estimations/{id}/assign-designer', [EstimationController::class, 'assignDesigner'])->name('admin.estimations.assignDesigner');
 Route::get('/estimator/service/{serviceId}/items', [EstimationController::class, 'getServiceItems']);
+
+// routes/web.php
+Route::post('/admin/leads/{lead}/assign-designer', [AdminController::class, 'assignDesigner']);
+    Route::post('/admin/estimations/{id}/status', [EstimationController::class, 'updateAdminStatus']);
+Route::get('three-d-design/{threeDDesign}/site-visit',
+    [ThreeDesignerController::class, 'siteVisit']
+)->name('three-d-design.site-visit');

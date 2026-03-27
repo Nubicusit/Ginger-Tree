@@ -163,7 +163,7 @@
 
     {{-- ── Form ── --}}
     <form method="POST"
-          action="{{ isset($record) ? route('three-d-design.update', $record->id) : route('three-d-design.store') }}">
+          action="{{ isset($record) ? route('three-d-design.update', $record->id) : route('three-d-design.store') }}" enctype="multipart/form-data">
         @csrf
         @if(isset($record)) @method('PUT') @endif
 
@@ -206,6 +206,78 @@
                            class="form-input {{ $errors->has('assigned_designer') ? 'is-error' : '' }}">
                     @error('assigned_designer') <p class="error-msg">{{ $message }}</p> @enderror
                 </div>
+                <div style="margin-bottom:20px;">
+    <label style="font-family:'Inter',sans-serif;font-size:11px;font-weight:600;color:#6B7280;text-transform:uppercase;letter-spacing:0.06em;display:block;margin-bottom:8px;">
+        Design Files
+        <span style="font-weight:400;text-transform:none;color:#9CA3AF;">(JPG, PNG, PDF, DWG, ZIP — max 20MB each)</span>
+    </label>
+
+@if(!empty($record->design_files))
+<div style="margin-bottom:10px;">
+    <div style="font-size:11px;font-weight:600;color:#6B7280;margin-bottom:6px;text-transform:uppercase;letter-spacing:0.05em;">
+        Uploaded Files
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+        @foreach($record->design_files as $file)
+        @php
+            $fileName = basename($file);
+            $ext      = strtolower(pathinfo($file, PATHINFO_EXTENSION));
+            $isImage  = in_array($ext, ['jpg','jpeg','png']);
+            $fileUrl  = asset($file);
+        @endphp
+        <div style="display:flex;align-items:center;gap:8px;background:#F5F3FF;border:1px solid #DDD6FE;border-radius:8px;padding:8px 12px;">
+
+            {{-- Preview / Icon --}}
+            @if($isImage)
+                <a href="{{ $fileUrl }}" target="_blank">
+                    <img src="{{ $fileUrl }}" alt="{{ $fileName }}"
+                         style="width:36px;height:36px;object-fit:cover;border-radius:5px;border:1px solid #DDD6FE;">
+                </a>
+            @else
+                <a href="{{ $fileUrl }}" target="_blank" style="font-size:22px;text-decoration:none;">
+                    {{ $ext === 'pdf' ? '📄' : ($ext === 'zip' ? '🗜️' : '📁') }}
+                </a>
+            @endif
+
+            {{-- File name link --}}
+            <a href="{{ $fileUrl }}" target="_blank"
+               style="font-size:12px;color:#6366F1;text-decoration:none;font-weight:500;max-width:150px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;"
+               title="{{ $fileName }}">
+                {{ $fileName }}
+            </a>
+
+            {{-- Delete checkbox --}}
+            <label style="display:flex;align-items:center;gap:4px;cursor:pointer;margin-left:4px;padding:3px 8px;background:#FFF1F2;border:1px solid #FECDD3;border-radius:6px;font-size:11px;color:#EF4444;font-weight:600;white-space:nowrap;"
+                   title="Check to delete this file on save">
+                <input type="checkbox" name="remove_files[]" value="{{ $file }}"
+                       style="width:12px;height:12px;accent-color:#EF4444;"
+                       onchange="this.closest('div[style]').style.opacity = this.checked ? '0.4' : '1'">
+                🗑 Delete
+            </label>
+        </div>
+        @endforeach
+    </div>
+    <div style="font-size:11px;color:#9CA3AF;margin-top:6px;">
+        ☝️ Check "Delete" and click Save to remove a file.
+    </div>
+</div>
+@endif
+
+    {{-- Upload new files --}}
+    <label style="display:flex;align-items:center;justify-content:center;gap:10px;border:2px dashed #DDD6FE;border-radius:10px;padding:20px;cursor:pointer;background:#FAFAFE;transition:all 0.2s;"
+           onmouseover="this.style.borderColor='#6366F1';this.style.background='#F5F3FF'"
+           onmouseout="this.style.borderColor='#DDD6FE';this.style.background='#FAFAFE'">
+        <svg width="20" height="20" fill="none" stroke="#8B5CF6" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M16 8l-4-4-4 4M12 4v12"/>
+        </svg>
+        <span style="font-size:13px;color:#6B7280;font-family:'Inter',sans-serif;">
+            Click to upload or drag files here
+        </span>
+        <input type="file" name="design_files[]" multiple accept=".jpg,.jpeg,.png,.pdf,.dwg,.zip"
+               style="display:none;" onchange="showFileNames(this)">
+    </label>
+    <div id="selected_files" style="margin-top:6px;font-size:11px;color:#8B5CF6;font-family:'Inter',sans-serif;"></div>
+</div>
 
                 {{-- Client Requirements Freeze Date --}}
                 <div>
@@ -333,6 +405,12 @@
         </div>
     </form>
 </div>
+<script>
+function showFileNames(input) {
+    const names = Array.from(input.files).map(f => f.name).join(', ');
+    document.getElementById('selected_files').textContent = names ? '📎 ' + names : '';
+}
+</script>
 <script>
 function syncToggle(checkId, trackId, thumbId, labelId) {
     const checked = document.getElementById(checkId).checked;

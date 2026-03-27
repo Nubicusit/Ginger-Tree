@@ -189,61 +189,7 @@ $status = $lead->latestQuotation->status;
             No Estimation
         </span>
     @endif
-    @if($adminStatus === 'Approved')
-@php
-    $designerDept = \App\Models\Department::where('slug', 'designer')->first();
-    $designers = $designerDept
-        ? \App\Models\User::where('department_id', $designerDept->id)->get()
-        : collect();
-@endphp
 
-<div class="mt-3 border-t border-gray-100 pt-3">
-    <!-- <p class="text-[10px] font-semibold text-gray-400 uppercase tracking-widest mb-2">Assign Designer</p> -->
-
-    {{-- Assigned designer chip (shown only if already assigned) --}}
-    @if($estimation->designer_id)
-        @php $assignedDesigner = $designers->firstWhere('id', $estimation->designer_id); @endphp
-        @if($assignedDesigner)
-        <div class="flex items-center gap-2 bg-gray-50 border border-gray-100 rounded-xl px-3 py-2 mb-2">
-            <!-- <div class="w-7 h-7 rounded-full flex items-center justify-center text-white text-[10px] font-bold flex-shrink-0"
-                style="background: linear-gradient(135deg, #2563eb, #06b6d4);">
-                {{ strtoupper(substr($assignedDesigner->name, 0, 1)) }}{{ strtoupper(substr(explode(' ', $assignedDesigner->name)[1] ?? 'X', 0, 1)) }}
-            </div> -->
-            <div class="flex-1 min-w-0">
-                <p class="text-xs font-semibold text-gray-800 truncate">{{ $assignedDesigner->name }}</p>
-                <p class="text-[10px] text-gray-400">Interior Designer</p>
-            </div>
-            <svg class="w-3.5 h-3.5 text-emerald-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
-            </svg>
-        </div>
-        @endif
-    @endif
-
-    {{-- Dropdown --}}
-    <div class="relative">
-        <div class="pointer-events-none absolute left-2.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full flex items-center justify-center z-10"
-            style="background: linear-gradient(135deg, #2563eb, #06b6d4);">
-            <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
-            </svg>
-        </div>
-        <select
-            onchange="assignDesigner({{ $estimation->id }}, this.value)"
-            class="w-full text-xs border border-gray-200 rounded-xl pl-9 pr-7 py-2 bg-gray-50 focus:ring-2 focus:ring-blue-300 focus:outline-none appearance-none cursor-pointer text-gray-600 transition hover:border-blue-300">
-            <option value="">{{ $estimation->designer_id ? 'Change designer...' : 'Select designer...' }}</option>
-            @foreach($designers as $designer)
-                <option value="{{ $designer->id }}" {{ $estimation->designer_id == $designer->id ? 'selected' : '' }}>
-                    {{ $designer->name }}
-                </option>
-            @endforeach
-        </select>
-        <svg class="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path d="M6 9l6 6 6-6"/>
-        </svg>
-    </div>
-</div>
-@endif
 </td>
                     <td class="px-6 py-4">
                         <button onclick="openDetailModal({{ $lead->id }})"

@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Models\Estimation;
+use App\Models\EstimationItem;
+// use Spatie\LaravelPdf\Facades\Pdf;
 
 class EstimationController extends Controller
 {
@@ -39,12 +41,14 @@ class EstimationController extends Controller
         ]);
     }
 
+
+
     public function createQuotation(Lead $lead)
     {
-        $siteVisit      = $lead->siteVisit;
-        $inventoryItems = InventoryStock::select('id', 'item_name', 'price', 'category', 'gst_percentage')->get();
-        $services       = \App\Models\Service::all();
-        $estimation     = \App\Models\Estimation::where('lead_id', $lead->id)->first();
+        $siteVisit         = $lead->siteVisit;
+        $inventoryItems    = InventoryStock::select('id', 'item_name', 'price', 'category', 'gst_percentage')->get();
+        $services          = \App\Models\Service::all();
+        $estimation        = \App\Models\Estimation::where('lead_id', $lead->id)->first();
         $existingQuotation = \App\Models\Quotation::where('lead_id', $lead->id)->first();
 
         if ($estimation) {
@@ -53,28 +57,92 @@ class EstimationController extends Controller
 
             $quotationNo = preg_replace('/^EST-?/i', 'QT-', $estimation->estimation_no);
 
-            $items = $estimationItems->map(fn($item) => [
-                'item_id'        => $item->item_id,
-                'item_name'      => $item->name ?? '',
-                'custom_name'    => $item->item_id ? '' : ($item->name ?? ''),
-                'category'       => $item->category   ?? '',
-                'description'    => $item->description ?? '',
-                'quantity'       => $item->qty,
-                'unit'           => $item->unit,
-                'price'          => $item->unit_price,
-                'gst_percentage' => $item->gst ?? 0,
+            // General items (unchanged)
+            $items = $estimationItems
+                ->filter(fn($item) => ($item->section ?? 'General') === 'General')
+                ->map(fn($item) => [
+                    'item_id'        => $item->item_id,
+                    'item_name'      => $item->name ?? '',
+                    'custom_name'    => $item->item_id ? '' : ($item->name ?? ''),
+                    'category'       => $item->category   ?? '',
+                    'description'    => $item->description ?? '',
+                    'quantity'       => $item->qty,
+                    'unit'           => $item->unit,
+                    'price'          => $item->unit_price,
+                    'gst_percentage' => $item->gst ?? 0,
+                ])->values()->toArray();
 
-            ])->toArray();
+            /*
+         * ✅ FIX: Build existingServices by walking estimation_items IN ORDER.
+         *
+         * Problem: two service rows can share the same service_id (e.g. two
+         * "living room" services). Filtering accessories by service_id alone
+         * makes BOTH services pick up ALL accessories for that service_id.
+         *
+         * Solution: iterate rows sequentially. When we hit a 'Service' row,
+         * open a new service bucket. Collect 'ServiceItem' and 'Accessory'
+         * rows into whichever bucket is currently open — determined by
+         * sort_order position, not service_id.
+         */
+            $existingServices = [];
+            $currentIndex     = null;   // index into $existingServices
+
+            foreach ($estimationItems as $row) {
+                $section = $row->section ?? 'General';
+
+                if ($section === 'Service') {
+                    // Start a new service bucket
+                    $existingServices[] = [
+                        'service_id'   => $row->service_id,
+                        'service_name' => $row->name,
+                        'note'         => $row->description ?? '',
+                        'sub_items'    => [],
+                        'accessories'  => [],
+                    ];
+                    $currentIndex = count($existingServices) - 1;
+                } elseif ($section === 'ServiceItem' && $currentIndex !== null) {
+                    $parts = explode('||', $row->description ?? '');
+                    $existingServices[$currentIndex]['sub_items'][] = [
+                        'name'        => $row->name,
+                        'material'    => $parts[0] ?? '',
+                        'unit'        => $row->unit ?? '',
+                        'size'        => $row->size ?? ($parts[1] ?? ''),
+                        'mrp'         => $row->unit_price ?? 0,
+                        'offer_price' => $row->offer_price ?? 0,
+                        'qty'         => $row->qty,
+                    ];
+                } elseif ($section === 'Accessory' && $currentIndex !== null) {
+                    $existingServices[$currentIndex]['accessories'][] = [
+                        'item_id' => $row->item_id,
+                        'name'    => $row->name ?? '',
+                        'size'    => $row->description ?? '',
+                        'qty'         => $row->qty ?? 1,
+                        'unit'    => $row->unit ?? '',
+                        'price'   => $row->unit_price ?? 0,
+                        'offer_price' => $row->offer_price ?? 0,
+                        'image'   => $row->image ?? null,
+                    ];
+                }
+                // 'General' section rows are handled separately above — skip here
+            }
         } else {
-            $last = \App\Models\Estimation::latest()->first();
-            $next = $last ? (intval(substr($last->estimation_no, -4)) + 1) : 1;
+            $last        = \App\Models\Estimation::latest()->first();
+            $next        = $last ? (intval(substr($last->estimation_no, -4)) + 1) : 1;
             $quotationNo = 'QT-' . date('Y') . '-' . str_pad($next, 4, '0', STR_PAD_LEFT);
-            $items = [];
+            $items            = [];
+            $existingServices = [];
         }
-
+        // dd($existingServices);
         return view('Estimator.create-quotation', compact(
-            'lead', 'siteVisit', 'inventoryItems',
-            'quotationNo', 'existingQuotation', 'items', 'estimation', 'services'
+            'lead',
+            'siteVisit',
+            'inventoryItems',
+            'quotationNo',
+            'existingQuotation',
+            'items',
+            'estimation',
+            'services',
+            'existingServices'
         ));
     }
 
@@ -152,7 +220,9 @@ class EstimationController extends Controller
 
             /* ── Service Items ── */
             $servicesToSave = [];
-            foreach ($services as $svc) {
+
+            // ✅ FIX: Use $i from THIS loop so $request->hasFile("services.$i.accessories.$j.image") works correctly
+            foreach ($services as $i => $svc) {
                 $service = \App\Models\Service::find($svc['service_id'] ?? null);
                 if (!$service) continue;
 
@@ -177,6 +247,41 @@ class EstimationController extends Controller
                         'size'        => $si['size']        ?? '',
                         'mrp'         => floatval($si['mrp'] ?? 0),
                         'offer_price' => floatval($si['offer_price'] ?? 0),
+                        'qty'         => intval($si['qty']),
+                    ];
+                }
+
+                // ✅ FIX: Handle accessory image upload HERE while $i is correct
+                $accessories = [];
+                foreach (($svc['accessories'] ?? []) as $j => $acc) {
+                    if (empty($acc['item_id'])) continue;
+
+                    $imagePath = null;
+
+                    // ✅ $i is the correct service index from the outer loop
+
+
+                    if ($request->hasFile("services.$i.accessories.$j.image")) {
+
+                        $file = $request->file("services.$i.accessories.$j.image");
+
+                        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+                        $file->move(public_path('img/estimation_items'), $filename);
+
+                        $imagePath = 'img/estimation_items/' . $filename; // ✅ store relative path
+                    }
+
+
+                    $accessories[] = [
+                        'item_id' => $acc['item_id'],
+                        'name'    => $acc['name']  ?? '',
+                        'size'    => $acc['size']  ?? '',
+                        'unit'    => $acc['unit']  ?? '',
+                        'qty'   => $acc['qty']  ?? '',
+                        'price'   => floatval($acc['price'] ?? 0),
+                        'offer_price' => floatval($acc['offer_price'] ?? 0),
+                        'image'   => $imagePath,  // ✅ image path resolved here
                     ];
                 }
 
@@ -191,6 +296,7 @@ class EstimationController extends Controller
                     'service_tax'  => $svcTax,
                     'total'        => $svcTotal,
                     'sub_items'    => $subItems,
+                    'accessories'  => $accessories,  // ✅ already has image paths
                 ];
             }
 
@@ -233,7 +339,7 @@ class EstimationController extends Controller
             $sortOrder = 1;
 
             // General items
-            foreach ($itemsToSave as $item) {
+            foreach ($itemsToSave as $index => $item) {
                 \App\Models\EstimationItem::create([
                     'estimation_id' => $estimation->id,
                     'item_id'       => $item['item_id']    ?? null,
@@ -253,11 +359,11 @@ class EstimationController extends Controller
                     'gst_amount'    => $item['gst_amount'] ?? null,
                     'service_id'    => null,
                     'service_tax'   => 0,
+                    'image'         => $imagePaths[$index] ?? null,
                 ]);
             }
 
-            // Service items — one estimation_item per service (section header row)
-            // sub_items stored as JSON in description field
+            // Service items
             foreach ($servicesToSave as $svc) {
                 \App\Models\EstimationItem::create([
                     'estimation_id' => $estimation->id,
@@ -271,18 +377,14 @@ class EstimationController extends Controller
                     'unit_price'    => $svc['price'],
                     'amount'        => $svc['total'],
                     'sort_order'    => $sortOrder++,
-
                     'gst'           => $svc['gst'],
                     'gst_amount'    => $svc['gst_amount'],
                     'service_id'    => $svc['service_id'],
                     'service_tax'   => $svc['service_tax'],
-                    // sub_items stored as JSON in a new meta column OR we use description
-                    // Using sub_items_json column — add migration if needed,
-                    // or fallback to encoding in description:
-                    // 'sub_items_json' => json_encode($svc['sub_items']),
+                    'image'         => null,
                 ]);
 
-                // Save each sub-item as its own estimation_item row with section = 'ServiceItem'
+                // Sub-items
                 foreach ($svc['sub_items'] as $si) {
                     \App\Models\EstimationItem::create([
                         'estimation_id' => $estimation->id,
@@ -292,7 +394,7 @@ class EstimationController extends Controller
                         'description'   => ($si['material'] ?? '') . '||' . ($si['size'] ?? ''),
                         'category'      => $si['material'] ?? '',
                         'unit'          => $si['unit']     ?? '',
-                        'qty'           => 1,
+                        'qty' => intval($si['qty']),
                         'unit_price'    => floatval($si['mrp']         ?? 0),
                         'amount'        => floatval($si['offer_price'] ?? 0),
                         'offer_price'   => floatval($si['offer_price'] ?? 0),
@@ -302,8 +404,32 @@ class EstimationController extends Controller
                         'gst_amount'    => 0,
                         'service_id'    => $svc['service_id'],
                         'service_tax'   => 0,
-                        // Store MRP in a notes-style field (using description second part after ||)
-                        // Or add a `mrp` column via migration
+                        'image'         => null,
+                    ]);
+                }
+
+                // ✅ FIX: Accessories — image path already resolved above, just save it
+                foreach (($svc['accessories'] ?? []) as $acc) {
+                    if (empty($acc['item_id'])) continue;
+
+                    \App\Models\EstimationItem::create([
+                        'estimation_id' => $estimation->id,
+                        'item_id'       => $acc['item_id'],
+                        'name'          => $acc['name'],
+                        'section'       => 'Accessory',
+                        'description'   => $acc['size'] ?? '',
+                        'category'      => 'Accessory',
+                        'unit'          => $acc['unit'] ?? '',
+                        'qty' => intval($acc['qty'] ?? 1),
+                        'unit_price'    => floatval($acc['price'] ?? 0),
+                        'offer_price'   => floatval($acc['offer_price'] ?? 0),
+                        'amount'        => floatval($acc['price'] ?? 0),
+                        'sort_order'    => $sortOrder++,
+                        'gst'           => 0,
+                        'gst_amount'    => 0,
+                        'service_id'    => $svc['service_id'],
+                        'service_tax'   => 0,
+                        'image'         => $acc['image'],  // ✅ already stored above
                     ]);
                 }
             }
@@ -313,7 +439,6 @@ class EstimationController extends Controller
                 'message'       => 'Estimation saved successfully',
                 'estimation_id' => $estimation->id,
             ]);
-
         } catch (\Exception $e) {
             return response()->json(['success' => false, 'message' => $e->getMessage()]);
         }
@@ -322,56 +447,89 @@ class EstimationController extends Controller
     /**
      * Generate PDF — groups items by section for the new PDF layout
      */
+
     public function estimationPdf($id)
     {
-        $estimation = \App\Models\Estimation::findOrFail($id);
-        $lead       = \App\Models\Lead::find($estimation->lead_id);
-        $dbItems    = \App\Models\EstimationItem::where('estimation_id', $id)
-                        ->orderBy('sort_order')->get();
 
+        $estimation = Estimation::findOrFail($id);
+        $lead       = Lead::find($estimation->lead_id);
+
+        $dbItems = EstimationItem::where('estimation_id', $id)
+            ->orderBy('sort_order')
+            ->get();
+
+        // ✅ Convert EST → QT
         $quotationNo = preg_replace('/^EST-?/i', 'QT-', $estimation->estimation_no);
 
-        /*
-         * Build the items array for the PDF blade.
-         *
-         * section = 'General'     → inventory item row
-         * section = 'Service'     → service header row  (carries base_price, gst, tax, note)
-         * section = 'ServiceItem' → sub-item row inside a service
-         */
         $items = [];
 
+        // =========================================================
+        // ✅ STEP 1: COLLECT ACCESSORIES (GROUP BY service_id)
+        // =========================================================
+        $accessoriesByService = [];
+
         foreach ($dbItems as $row) {
+            if ($row->section === 'Accessory') {
+
+                $accessoriesByService[$row->service_id][] = [
+                    'name'  => $row->name,
+                    'size'  => $row->description,
+                    'unit'  => $row->unit,
+                    'qty'  => $row->qty,
+                    'price' => $row->unit_price,
+                    'offer_price' => $row->offer_price > 0 ? $row->offer_price : $row->unit_price,
+                    'image' => $row->image,
+                ];
+            }
+        }
+
+        // =========================================================
+        // ✅ STEP 2: BUILD ITEMS ARRAY
+        // =========================================================
+        foreach ($dbItems as $row) {
+
             $section = $row->section ?? 'General';
 
+            // ---------------- GENERAL ----------------
             if ($section === 'General') {
+
                 $items[] = [
                     'section'        => 'General',
                     'item_name'      => $row->name ?? $row->description,
-                    'category'       => $row->category    ?? '',
+                    'category'       => $row->category ?? '',
                     'description'    => $row->description ?? '',
-                    'unit'           => $row->unit        ?? '',
+                    'unit'           => $row->unit ?? '',
                     'quantity'       => $row->qty,
                     'price'          => $row->unit_price,
-                    'gst_percentage' => $row->gst         ?? 0,
-
+                    'gst_percentage' => $row->gst ?? 0,
                     'service_tax'    => $row->service_tax ?? 0,
-                    'gst_amount'     => $row->gst_amount  ?? 0,
+                    'gst_amount'     => $row->gst_amount ?? 0,
                 ];
-            } elseif ($section === 'Service') {
+            }
+
+            // ---------------- SERVICE HEADER ----------------
+            elseif ($section === 'Service') {
+
                 $items[] = [
-                    'section'           => 'Service',
-                    'item_name'         => $row->name,
-                    'service_name'      => $row->name,
-                    'service_id'        => $row->service_id,
-                    'service_note'      => $row->description ?? '',
-                    'service_base_price'=> $row->unit_price,
-                    'gst_percentage'    => $row->gst         ?? 0,
-                    'service_tax'       => $row->service_tax ?? 0,
-                    'gst_amount'        => $row->gst_amount  ?? 0,
-                    // sub_items will be filled from ServiceItem rows below
+                    'section'            => 'Service',
+                    'item_name'          => $row->name,
+                    'service_name'       => $row->name,
+                    'service_id'         => $row->service_id,
+                    'service_note'       => $row->description ?? '',
+                    'service_base_price' => $row->unit_price,
+                    'gst_percentage'     => $row->gst ?? 0,
+                    'service_tax'        => $row->service_tax ?? 0,
+                    'gst_amount'         => $row->gst_amount ?? 0,
+
+                    // ✅ Attach accessories here
+                    'accessories' => $accessoriesByService[$row->service_id] ?? [],
                 ];
-            } elseif ($section === 'ServiceItem') {
-                // Parse description: "material||size"
+            }
+
+            // ---------------- SERVICE ITEMS ----------------
+            elseif ($section === 'ServiceItem') {
+
+                // description format: material||size
                 $parts    = explode('||', $row->description ?? '');
                 $material = $parts[0] ?? '';
                 $size     = $parts[1] ?? '';
@@ -381,9 +539,10 @@ class EstimationController extends Controller
                     'service_id'  => $row->service_id,
                     'item_name'   => $row->name,
                     'material'    => $material,
-                    'unit'        => $row->unit        ?? '',
-                    'size'        => $row->size ?? ($parts[1] ?? ''),
-                    'unit_price'  => $row->unit_price,                                           
+                    'unit'        => $row->unit ?? '',
+                    'qty'         => $row->qty ?? 1,
+                    'size'        => $row->size ?? $size,
+                    'unit_price'  => $row->unit_price,
                     'offer_price' => $row->offer_price > 0 ? $row->offer_price : $row->amount,
                     'mrp'         => $row->unit_price,
                     'description' => '',
@@ -391,32 +550,39 @@ class EstimationController extends Controller
             }
         }
 
-        /*
-         * Re-structure: the PDF blade expects service items to be flat with
-         * 'service_name' set per row. Merge ServiceItem rows into their
-         * parent Service row's context by duplicating service metadata.
-         */
+        // =========================================================
+        // ✅ STEP 3: FLATTEN ITEMS (VERY IMPORTANT)
+        // =========================================================
         $flatItems = [];
         $currentService = null;
 
         foreach ($items as $item) {
+
             if ($item['section'] === 'Service') {
+
                 $currentService = $item;
                 $flatItems[] = $item;
             } elseif ($item['section'] === 'ServiceItem' && $currentService) {
-                // Attach service context so PDF blade can group properly
+
                 $flatItems[] = array_merge($item, [
                     'service_name'       => $currentService['service_name'],
                     'service_note'       => $currentService['service_note'],
                     'service_base_price' => $currentService['service_base_price'],
                     'gst_percentage'     => $currentService['gst_percentage'],
                     'service_tax'        => $currentService['service_tax'],
+
+                    // ✅ KEEP accessories available in Blade
+                    'accessories'        => $currentService['accessories'],
                 ]);
             } else {
+
                 $flatItems[] = $item;
             }
         }
 
+        // =========================================================
+        // ✅ STEP 4: LOAD PDF
+        // =========================================================
         $pdf = Pdf::loadView('Estimator.quotationpdf', [
             'quotation'   => $estimation,
             'lead'        => $lead,
@@ -430,9 +596,9 @@ class EstimationController extends Controller
     public function getServiceItems($serviceId)
     {
         $items = \App\Models\ServiceItem::where('service_id', $serviceId)
-                    ->where('status', 1)
-                    ->orderBy('id')
-                    ->get(['id', 'service_id', 'item_name', 'default_price', 'unit', 'description']);
+            ->where('status', 1)
+            ->orderBy('id')
+            ->get(['id', 'service_id', 'item_name', 'default_price', 'unit', 'description']);
 
         return response()->json(['items' => $items]);
     }
@@ -453,19 +619,75 @@ class EstimationController extends Controller
         }
         return response()->json(['success' => false]);
     }
+    public function updateAdminStatus(Request $request, $id)
+    {
+        $estimation = \App\Models\Estimation::findOrFail($id);
+        $adminStatus = $request->admin_status; // 'Approved' | 'Rejected'
+
+        $estimation->admin_status = $adminStatus;
+        $estimation->save();
+
+        // ─────────────────────────────────────────────────────────────────
+        // AUTO-CREATE PROJECT when both status=Approved AND admin_status=Approved
+        // ─────────────────────────────────────────────────────────────────
+        if ($adminStatus === 'Approved' && $estimation->status === 'Approved') {
+            $this->createProjectFromEstimation($estimation);
+        }
+
+        return response()->json(['success' => true]);
+    }
 
     public function updateStatus(Request $request, $id)
     {
-        $estimation = Estimation::findOrFail($id);
+        $estimation = \App\Models\Estimation::findOrFail($id);
         $estimation->status = $request->status;
         $estimation->save();
 
         if ($estimation->lead_id) {
-            if ($request->status === 'Approved') Lead::where('id', $estimation->lead_id)->update(['status' => 'Won']);
-            if ($request->status === 'Rejected') Lead::where('id', $estimation->lead_id)->update(['status' => 'Lost']);
+            if ($request->status === 'Approved') {
+                Lead::where('id', $estimation->lead_id)->update(['status' => 'Won']);
+            }
+            if ($request->status === 'Rejected') {
+                Lead::where('id', $estimation->lead_id)->update(['status' => 'Lost']);
+            }
+        }
+
+        // Auto-create project when BOTH are Approved
+        if ($request->status === 'Approved' && $estimation->admin_status === 'Approved') {
+            $this->createProjectFromEstimation($estimation);
         }
 
         return response()->json(['success' => true]);
+    }
+
+    private function createProjectFromEstimation(\App\Models\Estimation $estimation): void
+    {
+        // Avoid duplicate projects for the same lead
+        $existing = \App\Models\Project::where('lead_id', $estimation->lead_id)->first();
+        if ($existing) return;
+
+        $lead = \App\Models\Lead::find($estimation->lead_id);
+
+        \App\Models\Project::create([
+            'name' => $lead->project_type
+                ?? 'Project - ' . ($lead->client_name ?? $estimation->client_name),
+            'client'        => $estimation->client_name,
+            'company_gst'   => null,
+            'client_gst'    => null,
+            'sales_rep'     => null,
+            'sales_phone'   => $estimation->client_phone ?? null,
+            'scope'         => $estimation->title ?? null,
+            'timeline'      => null,
+            'start_date'    => now()->toDateString(),
+            'end_date'      => null,
+            'total_value'   => $estimation->grand_total,
+            'gst_rate'      => $estimation->gst_pct ?? 18,
+            'po_number'     => null,
+            'payment_terms' => null,
+            'notes'         => 'Auto-created from Estimation #' . $estimation->estimation_no,
+            'status'        => 'Active',
+            'lead_id'       => $estimation->lead_id,
+        ]);
     }
 
     public function assignDesigner(Request $request, $id)

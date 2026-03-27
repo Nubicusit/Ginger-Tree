@@ -10,8 +10,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use App\Models\Department;
 use App\Models\InventoryStock;
-
-
+use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
@@ -462,6 +461,37 @@ public function updateEstimationStatus(Request $request, $id)
         if ($request->admin_status === 'Rejected') {
             \App\Models\Lead::where('id', $estimation->lead_id)->update(['status' => 'Lost']);
         }
+    }
+
+    return response()->json(['success' => true]);
+}
+
+public function assignDesigner(Request $request, $leadId)
+{
+    $lead = \App\Models\Lead::findOrFail($leadId);
+    $lead->designer_id = $request->designer_id ?: null;
+    $lead->save();
+
+    if ($lead->designer_id && $lead->project) {
+        $designer = \App\Models\User::find($lead->designer_id);
+        \App\Models\ThreeDDesign::firstOrCreate(
+            ['project_id' => $lead->project->id],
+            [
+                'client_name'       => $lead->client_name,
+                'design_status'  => 'In Progress',
+                'assigned_designer' => $designer?->name,
+                'revision_count' => 0,
+                'created_by'     => Auth::id(),
+                'updated_by'     => Auth::id(),
+            ]
+        );
+        \App\Models\ThreeDDesign::where('project_id', $lead->project->id)
+            ->whereNull('assigned_designer')
+            ->update([
+                'assigned_designer' => $designer?->name,
+                'client_name'       => $lead->client_name,
+                'updated_by'        => Auth::id(),
+            ]);
     }
 
     return response()->json(['success' => true]);

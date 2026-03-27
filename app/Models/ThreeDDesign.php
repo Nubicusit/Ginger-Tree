@@ -20,6 +20,7 @@ class ThreeDDesign extends Model
         'revision_count',
         'final_3d_approval',
         'approval_date',
+        'design_files',
         'design_freeze_confirmation',
         'additional_cost_flag',
         'change_after_freeze_note',
@@ -35,6 +36,7 @@ class ThreeDDesign extends Model
         'design_freeze_confirmation'  => 'boolean',
         'additional_cost_flag'        => 'boolean',
         'revision_count'              => 'integer',
+        'design_files' => 'array',
     ];
 
     // ── Relationships ────────────────────────────

@@ -15,12 +15,12 @@
         --shadow: 0 1px 3px rgba(15,22,35,0.06), 0 4px 16px rgba(15,22,35,0.04);
     }
     * { box-sizing: border-box; }
-    .q-wrap { font-family: 'DM Sans', sans-serif; max-width: 900px; margin: 0 auto; }
+    .q-wrap { font-family: 'Inter', sans-serif; max-width: 900px; margin: 0 auto; }
     /* page header */
     .page-header { display:flex; align-items:center; gap:14px; margin-bottom:24px; }
     .back-btn { width:36px; height:36px; border-radius:10px; display:flex; align-items:center; justify-content:center; border:1.5px solid var(--border); background:var(--surface); color:var(--ink-muted); text-decoration:none; transition:.2s; }
     .back-btn:hover { background:var(--surface-3); color:var(--ink); }
-    .page-title { font-family:'Syne',sans-serif; font-size:20px; font-weight:800; color:var(--ink); }
+    .page-title { font-family:'Inter',sans-serif; font-size:20px; font-weight:800; color:var(--ink); }
     .page-sub { font-size:13px; color:var(--ink-faint); margin-top:1px; }
     /* grid */
     .q-grid { display:grid; grid-template-columns:1fr 2fr; gap:20px; }
@@ -32,21 +32,21 @@
     .client-avatar { width:44px; height:44px; border-radius:12px; background:linear-gradient(135deg,#6366f1,#0ea5e9); display:flex; align-items:center; justify-content:center; color:#fff; font-family:'Syne',sans-serif; font-weight:800; font-size:14px; flex-shrink:0; }
     .meta-row { display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px; }
     .meta-label { color:var(--ink-faint); } .meta-val { font-weight:600; color:var(--ink-muted); }
-    .quot-no { font-family:'Syne',sans-serif; font-size:22px; font-weight:800; color:var(--accent); letter-spacing:.04em; }
+    .quot-no { font-family:'Inter',sans-serif; font-size:22px; font-weight:800; color:var(--accent); letter-spacing:.04em; }
     .site-note-card { background:#fffbeb; border:1.5px solid #fde68a; border-radius:var(--radius); padding:14px 16px; }
-    .section-label { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-faint); margin-bottom:12px; }
+    .section-label { font-family:'Inter',sans-serif; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.1em; color:var(--ink-faint); margin-bottom:12px; }
     /* items count badge */
     .count-badge { font-size:11.5px; font-weight:700; color:var(--accent); background:var(--accent-light); padding:3px 10px; border-radius:99px; }
     /* quotation item card */
     .quotation-item { background:var(--surface-2); border:1.5px solid var(--border); border-radius:12px; padding:16px; position:relative; margin-bottom:12px; }
     .quotation-item:last-child { margin-bottom:0; }
     .item-row-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-    .item-num { font-family:'Syne',sans-serif; font-size:10px; font-weight:700; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.08em; }
+    .item-num { font-family:'Inter',sans-serif; font-size:10px; font-weight:700; color:var(--ink-faint); text-transform:uppercase; letter-spacing:.08em; }
     .remove-btn { font-size:11.5px; font-weight:700; color:#ef4444; background:#fef2f2; border:1.5px solid #fecaca; padding:4px 12px; border-radius:6px; cursor:pointer; transition:.15s; }
     .remove-btn:hover { background:#fee2e2; }
     .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:10px; }
     .form-grid .span2 { grid-column:span 2; }
-    .form-label { font-family:'Syne',sans-serif; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); display:block; margin-bottom:5px; }
+    .form-label { font-family:'Inter',sans-serif; font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:var(--ink-faint); display:block; margin-bottom:5px; }
     .form-input, .form-select, .form-textarea {
         width:100%; padding:8px 12px; font-size:13px; font-family:'DM Sans',sans-serif;
         color:var(--ink); background:var(--surface); border:1.5px solid var(--border);
@@ -65,7 +65,7 @@
     .measure-box { background:#f0f7ff; border:1.5px solid #bfdbfe; border-radius:10px; padding:12px; margin-top:6px; }
     .measure-grid { display:grid; grid-template-columns:1fr auto 1fr; gap:8px; align-items:end; }
     .measure-x { display:flex; align-items:center; justify-content:center; padding-bottom:2px; color:var(--ink-faint); font-weight:700; font-size:16px; }
-    .area-display { font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:var(--accent); }
+    .area-display { font-family:'Inter',sans-serif; font-size:13px; font-weight:700; color:var(--accent); }
     /* add item btn */
     .add-item-btn { width:100%; margin-top:12px; border:2px dashed var(--border); border-radius:12px; padding:12px; font-size:13px; font-weight:600; color:var(--ink-faint); background:none; cursor:pointer; transition:.2s; }
     .add-item-btn:hover { border-color:#a5b4fc; color:var(--accent); background:var(--accent-light); }
@@ -81,11 +81,11 @@
     .si-card:last-child { margin-bottom:0; }
     .si-card-num { display:inline-flex; align-items:center; justify-content:center; width:20px; height:20px; background:#ede9fe; color:#7c3aed; border-radius:6px; font-size:10px; font-weight:800; flex-shrink:0; }
     .si-card-header { display:flex; align-items:center; gap:8px; margin-bottom:10px; }
-    .si-card-title { font-family:'Syne',sans-serif; font-size:11px; font-weight:700; color:#7c3aed; flex:1; }
+    .si-card-title { font-family:'Inter',sans-serif; font-size:11px; font-weight:700; color:#7c3aed; flex:1; }
     .si-remove-btn { background:none; border:none; color:#ef4444; cursor:pointer; font-size:18px; line-height:1; padding:0 2px; }
     .si-grid { display:grid; grid-template-columns:1fr 1fr; gap:8px; }
     .si-grid .si-span2 { grid-column:span 2; }
-    .si-label { font-family:'Syne',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#a78bfa; display:block; margin-bottom:4px; }
+    .si-label { font-family:'Inter',sans-serif; font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:#a78bfa; display:block; margin-bottom:4px; }
     .si-input { width:100%; padding:7px 10px; font-size:12.5px; font-family:'DM Sans',sans-serif; color:var(--ink); background:#faf8ff; border:1.5px solid #ddd6fe; border-radius:7px; outline:none; transition:.15s; }
     .si-input:focus { border-color:#8b5cf6; background:#fff; box-shadow:0 0 0 3px rgba(139,92,246,.1); }
     .si-input.si-manual { background:#fffbf0; border-color:#fcd34d; }
@@ -97,9 +97,9 @@
     .action-footer { display:flex; justify-content:flex-end; gap:10px; margin-top:20px; padding-top:16px; border-top:1.5px solid var(--border); flex-wrap:wrap; }
     .btn-cancel { padding:9px 20px; font-size:13px; font-weight:600; color:var(--ink-muted); background:var(--surface); border:1.5px solid var(--border); border-radius:10px; text-decoration:none; display:inline-flex; align-items:center; transition:.15s; }
     .btn-cancel:hover { background:var(--surface-3); color:var(--ink); }
-    .btn-save { padding:9px 24px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:#fff; background:linear-gradient(135deg,#6366f1,#4f46e5); border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,.3); transition:.2s; letter-spacing:.02em; }
+    .btn-save { padding:9px 24px; font-family:'Inter',sans-serif; font-size:13px; font-weight:700; color:#fff; background:linear-gradient(135deg,#6366f1,#4f46e5); border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 12px rgba(99,102,241,.3); transition:.2s; letter-spacing:.02em; }
     .btn-save:hover { box-shadow:0 6px 18px rgba(99,102,241,.45); transform:translateY(-1px); }
-    .btn-pdf { padding:9px 20px; font-family:'Syne',sans-serif; font-size:13px; font-weight:700; color:#fff; background:linear-gradient(135deg,#dc2626,#b91c1c); border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 12px rgba(220,38,38,.25); text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:.2s; }
+    .btn-pdf { padding:9px 20px; font-family:'Inter',sans-serif; font-size:13px; font-weight:700; color:#fff; background:linear-gradient(135deg,#dc2626,#b91c1c); border:none; border-radius:10px; cursor:pointer; box-shadow:0 4px 12px rgba(220,38,38,.25); text-decoration:none; display:inline-flex; align-items:center; gap:6px; transition:.2s; }
     .btn-pdf:hover { box-shadow:0 6px 18px rgba(220,38,38,.35); transform:translateY(-1px); }
     /* category row */
     .category-row { margin-top:8px; }
@@ -330,6 +330,7 @@
 const existingItems  = @json($items);
 const allInventoryItems = @json($inventoryItems);
 const allServices    = @json($services);
+const existingServices = @json($existingServices ?? []);
 
 /* ── MEASUREMENT PARSER ── */
 const UNIT_TO_FT = { mm:0.00328084, cm:0.0328084, m:3.28084, ft:1, inch:0.0833333, in:0.0833333 };
@@ -557,7 +558,24 @@ function buildServiceRow(index) {
                 style="margin-top:8px;border-color:#ddd6fe;color:#8b5cf6;font-size:12px;padding:8px;">
                 + Add Custom Sub-Item
             </button>
+            <div style="margin-top:12px;">
+    <label style="display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;color:#7c3aed;">
+        <input type="checkbox" class="acc_toggle"
+            onchange="toggleAccessories(this)"
+            style="accent-color:#8b5cf6;width:14px;height:14px;">
+        + Add Accessories
+    </label>
+</div>
+
+<div class="accessories_wrap hidden" style="margin-top:10px;"></div>
+
+<button type="button" onclick="addAccessoryRow(this)"
+    class="add-item-btn hidden acc_add_btn"
+    style="margin-top:8px;border-color:#ddd6fe;color:#8b5cf6;font-size:12px;padding:8px;">
+    + Add Accessory
+</button>
         </div>`;
+
     return div;
 }
 
@@ -593,6 +611,10 @@ function addServiceItemRow(container, serviceItem) {
                 <label class="si-label">Material / Description</label>
                 <input type="text" class="si-input si_material" value="${material}" placeholder="e.g. WPC 17mm">
             </div>
+              <div>
+                <label class="si-label">Qty</label>
+                <input type="number" class="si-input si_qty" value="1" min="1" placeholder="1">
+            </div>
             <div>
                 <label class="si-label">Unit</label>
                 <input type="text" class="si-input si_unit" value="${unit}">
@@ -610,6 +632,8 @@ function addServiceItemRow(container, serviceItem) {
                 <input type="number" class="si-input si-manual si_offer" placeholder="Enter offer price"
                     style="font-size:13.5px;font-weight:600;color:#92400e;">
             </div>
+
+
         </div>`;
 
     container.appendChild(card);
@@ -712,18 +736,6 @@ function fillServiceDetails(select) {
     const opt   = select.options[select.selectedIndex];
     const svcId = opt.value;
 
-    // Pricing
-    // const price  = parseFloat(opt.dataset.price||0);
-    // const gst    = parseFloat(opt.dataset.gst  ||0);
-    // const tax    = parseFloat(opt.dataset.tax  ||0);
-    // const gstAmt = (price*gst)/100;
-    // const total  = price+gstAmt+tax;
-    // row.querySelector('.s_price').value      = price.toFixed(2);
-    // row.querySelector('.s_gst').value        = gst;
-    // row.querySelector('.s_tax').value        = tax.toFixed(2);
-    // row.querySelector('.s_gst_amount').value = gstAmt.toFixed(2);
-    // row.querySelector('.s_total').value      = total.toFixed(2);
-
     if (!svcId) return;
 
     // Fetch service_items for this service
@@ -741,6 +753,7 @@ function fillServiceDetails(select) {
     fetch(`/estimator/service/${svcId}/items`)
         .then(r => r.json())
         .then(data => {
+
             loading.style.display = 'none';
             const items = data.items ?? data ?? [];
             serviceItemsCache[svcId] = items;
@@ -824,6 +837,7 @@ function submitQuotation() {
     const quotationId = document.getElementById('quotationId').value;
     const validItems  = [];
 
+
     document.querySelectorAll('.quotation-item').forEach(row => {
         const isCustom = row.querySelector('.custom_toggle')?.checked;
         const itemSelect = row.querySelector('.q_item');
@@ -866,6 +880,8 @@ function submitQuotation() {
             const svcId = row.querySelector('.s_service').value;
             if (!svcId) return;
             const subItems = [];
+            const accessories = [];
+
             row.querySelectorAll('.s_sub_tbody .si-card').forEach(tr => {
 
                 // Read item name: prefer hidden .si_name (set by populateItemDropdown / onSubItemSelect)
@@ -885,13 +901,34 @@ function submitQuotation() {
                     size:        tr.querySelector('.si_size')?.value      || '',
                     mrp:         tr.querySelector('.si_mrp')?.value       || 0,
                     offer_price: tr.querySelector('.si_offer')?.value     || 0,
+                    qty:         tr.querySelector('.si_qty')?.value       || 1,
                 });
             });
-            serviceItems.push({
-                service_id: svcId,
-                note:       row.querySelector('.s_note')?.value||'',
 
-                sub_items:  subItems,
+            // ✅ FIX: Accessories collect ചെയ്യുന്നു
+            row.querySelectorAll('.accessories_wrap .si-card').forEach(acc => {
+                const itemSelect = acc.querySelector('.acc_item');
+
+                if (!itemSelect || !itemSelect.value) return;
+                const fileInput = acc.querySelector('.acc_image');
+
+                accessories.push({
+                    item_id: itemSelect.value,
+                    name:    itemSelect.options[itemSelect.selectedIndex]?.text || '',
+                    size:    acc.querySelector('.acc_size')?.value  || '',
+                    unit:    acc.querySelector('.acc_unit')?.value  || '',
+                    qty:    acc.querySelector('.acc_qty')?.value  || '',
+                    price:   acc.querySelector('.acc_price')?.value || 0,
+                     offer_price: acc.querySelector('.acc_offer')?.value || 0,
+                    image: fileInput?.files[0] || null
+                });
+            });
+
+            serviceItems.push({
+                service_id:  svcId,
+                note:        row.querySelector('.s_note')?.value||'',
+                sub_items:   subItems,
+                accessories: accessories,
             });
         });
     }
@@ -908,6 +945,7 @@ function submitQuotation() {
     validItems.forEach((item,i)=>{
         Object.entries(item).forEach(([k,v])=>formData.append(`items[${i}][${k}]`,v));
     });
+
     serviceItems.forEach((s,i)=>{
         formData.append(`services[${i}][service_id]`, s.service_id);
         formData.append(`services[${i}][note]`,       s.note ?? '');
@@ -923,8 +961,23 @@ function submitQuotation() {
         formData.append(`services[${i}][tax]`,        tax.toFixed(2));
         formData.append(`services[${i}][gst_amount]`, gstAmt.toFixed(2));
         formData.append(`services[${i}][total]`,      total.toFixed(2));
+
         s.sub_items.forEach((si,j)=>{
             Object.entries(si).forEach(([k,v])=>formData.append(`services[${i}][sub_items][${j}][${k}]`,v));
+        });
+
+        // ✅ FIX: Accessories FormData-ൽ append ചെയ്യുന്നു
+        s.accessories.forEach((acc, j) => {
+            formData.append(`services[${i}][accessories][${j}][item_id]`, acc.item_id);
+            formData.append(`services[${i}][accessories][${j}][name]`,    acc.name);
+            formData.append(`services[${i}][accessories][${j}][size]`,    acc.size);
+            formData.append(`services[${i}][accessories][${j}][unit]`,    acc.unit);
+            formData.append(`services[${i}][accessories][${j}][qty]`,    acc.qty);
+            formData.append(`services[${i}][accessories][${j}][price]`,   acc.price);
+            formData.append(`services[${i}][accessories][${j}][offer_price]`,   acc.offer_price);
+            if (acc.image) {
+        formData.append(`services[${i}][accessories][${j}][image]`, acc.image);
+    }
         });
     });
 
@@ -945,47 +998,201 @@ function submitQuotation() {
 }
 
 /* ── LOAD EXISTING ITEMS ── */
-window.addEventListener('DOMContentLoaded', function() {
-    // Auto-initialize one service row on load
+// ── REPLACE the entire window.addEventListener('DOMContentLoaded', ...) block with this ──
+
+window.addEventListener('DOMContentLoaded', function () {
+
     if (document.getElementById('services_wrapper').querySelectorAll('.service-item').length === 0) {
         addServiceItem();
     }
 
+    // ── Load existing services ──
+    if (Array.isArray(existingServices) && existingServices.length > 0) {
+        const wrap = document.getElementById('services_wrapper');
+        wrap.innerHTML = ''; // clear default empty row
+
+        existingServices.forEach((svc, idx) => {
+            const row = buildServiceRow(idx + 1);
+            wrap.appendChild(row);
+
+            // Set service dropdown value
+            const sel = row.querySelector('.s_service');
+            if (sel) sel.value = svc.service_id;
+
+            // Set note
+            const noteEl = row.querySelector('.s_note');
+            if (noteEl) noteEl.value = svc.note ?? '';
+
+            // Cache service items & render sub-items
+            const container = row.querySelector('.s_sub_tbody');
+            serviceItemsCache[svc.service_id] = serviceItemsCache[svc.service_id] || [];
+
+            container.innerHTML = '';
+
+            svc.sub_items.forEach((si, j) => {
+                const card = addServiceItemRow(container, {
+                    item_name:     si.name     ?? '',
+                    material:      si.material ?? '',
+                    default_price: si.mrp      ?? 0,
+                });
+
+                populateItemDropdown(card.querySelector('.si_item_select'), svc.service_id, null);
+
+                const nameEl = card.querySelector('.si_name');
+                if (nameEl) nameEl.value = si.name ?? '';
+
+                // Replace select with text input showing saved name
+                const selEl = card.querySelector('.si_item_select');
+                if (selEl && si.name) {
+                    const nameDisplay = document.createElement('input');
+                    nameDisplay.type        = 'text';
+                    nameDisplay.className   = 'si-input si_name';
+                    nameDisplay.value       = si.name;
+                    nameDisplay.placeholder = 'Item name';
+                    selEl.parentNode.replaceChild(nameDisplay, selEl);
+                }
+
+                const matEl = card.querySelector('.si_material');
+                if (matEl) matEl.value = si.material ?? '';
+
+                const qtyEl = card.querySelector('.si_qty');
+if (qtyEl) qtyEl.value = si.qty ?? 1;
+
+                const unitEl = card.querySelector('.si_unit');
+                if (unitEl) unitEl.value = si.unit ?? '';
+
+                const sizeEl = card.querySelector('.si_size');
+                if (sizeEl) sizeEl.value = si.size ?? '';
+
+                const mrpEl = card.querySelector('.si_mrp');
+                if (mrpEl) mrpEl.value = si.mrp ?? '';
+
+                const offerEl = card.querySelector('.si_offer');
+                if (offerEl) offerEl.value = si.offer_price ?? '';
+            });
+
+            renumberSubRows(container);
+
+            // ✅ FIX: Load accessories — INSIDE the forEach, after renumberSubRows
+            if (Array.isArray(svc.accessories) && svc.accessories.length > 0) {
+
+                const accToggle = row.querySelector('.acc_toggle');
+                const accWrap   = row.querySelector('.accessories_wrap');
+                const accBtn    = row.querySelector('.acc_add_btn');
+
+                if (accToggle) accToggle.checked = true;
+                if (accWrap)   accWrap.classList.remove('hidden');
+                if (accBtn)    accBtn.classList.remove('hidden');
+
+                accWrap.innerHTML = '';
+
+                svc.accessories.forEach((acc) => {
+                    const div = document.createElement('div');
+                    div.className = 'si-card';
+
+                    div.innerHTML = `
+                        <div class="si-card-header">
+                            <span class="si-card-title">Accessory</span>
+                            <button type="button" onclick="this.closest('.si-card').remove()" class="si-remove-btn">×</button>
+                        </div>
+                        <div class="si-grid">
+                            <div class="si-span2">
+                                <label class="si-label">Item Name</label>
+                                <select class="si-select acc_item" onchange="setAccessoryPrice(this)">
+                                    <option value="">-- Select Item --</option>
+                                    ${allInventoryItems.map(i => `
+                                        <option value="${i.id}" data-price="${i.price}"
+                                            ${String(i.id) === String(acc.item_id) ? 'selected' : ''}>
+                                            ${i.item_name}
+                                        </option>
+                                    `).join('')}
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="si-label">Size</label>
+                                <input type="text" class="si-input acc_size"
+                                    value="${escHtml(acc.size ?? '')}">
+                            </div>
+
+                            <div>
+                                <label class="si-label">Qty</label>
+                                <input type="number" class="si-input acc_qty"
+                                    value="${escHtml(acc.qty ?? '')}">
+                            </div>
+
+                            <div>
+                                <label class="si-label">Unit</label>
+                                <input type="text" class="si-input acc_unit"
+                                    value="${escHtml(acc.unit ?? '')}">
+                            </div>
+
+                            <div>
+                                <label class="si-label">Unit Price</label>
+                                <input type="number" class="si-input acc_price"
+                                    value="${acc.price ?? ''}" readonly>
+                            </div>
+                            <div>
+                                <label class="si-label">Offer Price</label>
+                            <input type="number" class="si-input acc_offer"
+    value="${acc.offer_price ?? ''}">
+     </div>
+
+                            <div class="si-span2">
+                                <label class="si-label">Upload Image</label>
+                                <input type="file" class="si-input acc_image" accept="image/*">
+                                ${acc.image
+                                    ? `<div style="margin-top:6px;">
+                                        <img src="/${acc.image}"
+                                            style="height:60px;border-radius:6px;border:1px solid #ddd6fe;"
+                                            alt="Accessory image">
+                                       </div>`
+                                    : ''}
+                            </div>
+                        </div>
+                    `;
+
+                    accWrap.appendChild(div);
+                });
+            }
+            // ✅ End of accessories block — still inside existingServices.forEach
+        }); // ← closes existingServices.forEach
+    }
+
+    // ── Load existing general items ──
     let existing = existingItems;
-    if (typeof existing==='string') { try { existing=JSON.parse(existing); } catch(e){ existing=[]; } }
-    if (!Array.isArray(existing)||existing.length===0) return;
+    if (typeof existing === 'string') { try { existing = JSON.parse(existing); } catch(e) { existing = []; } }
+    if (!Array.isArray(existing) || existing.length === 0) return;
 
     const wrapper = document.getElementById('quotation_items_wrapper');
-    wrapper.innerHTML='';
-    existing.forEach((item,index)=>{
+    if (!wrapper) return;
+    wrapper.innerHTML = '';
+    existing.forEach((item, index) => {
         addMoreQuotationItem();
         const row = wrapper.querySelectorAll('.quotation-item')[index];
-        if (item.custom_name&&item.custom_name.trim()!=='') {
-            const t=row.querySelector('.custom_toggle'); t.checked=true; toggleCustomItem(t);
-            row.querySelector('.q_custom_name').value=item.custom_name||'';
-            row.querySelector('.q_custom_price').value=item.price||'';
-            row.querySelector('.q_price').value=item.price||'';
-            const cc=row.querySelector('.q_custom_category'); if(cc) cc.value=item.category||'';
-            const cg=row.querySelector('.q_custom_gst'); if(cg) cg.value=item.gst_percentage||0;
+        if (item.custom_name && item.custom_name.trim() !== '') {
+            const t = row.querySelector('.custom_toggle'); t.checked = true; toggleCustomItem(t);
+            row.querySelector('.q_custom_name').value = item.custom_name || '';
+            row.querySelector('.q_custom_price').value = item.price || '';
+            row.querySelector('.q_price').value = item.price || '';
+            const cc = row.querySelector('.q_custom_category'); if (cc) cc.value = item.category || '';
+            const cg = row.querySelector('.q_custom_gst'); if (cg) cg.value = item.gst_percentage || 0;
         } else if (item.item_id) {
-            const sel=row.querySelector('.q_item'); sel.value=item.item_id;
-            const cd=row.querySelector('.q_category_display');
-            if(cd&&item.category){ cd.value=item.category; row.querySelector('.q_category_row').classList.remove('hidden'); }
-            row.querySelector('.q_price').value=item.price||'';
-            const gi=row.querySelector('.q_gst'); if(gi) gi.value=item.gst_percentage||0;
+            const sel = row.querySelector('.q_item'); sel.value = item.item_id;
+            const cd = row.querySelector('.q_category_display');
+            if (cd && item.category) { cd.value = item.category; row.querySelector('.q_category_row').classList.remove('hidden'); }
+            row.querySelector('.q_price').value = item.price || '';
+            const gi = row.querySelector('.q_gst'); if (gi) gi.value = item.gst_percentage || 0;
         }
-        row.querySelector('.q_description').value=item.description||'';
-        row.querySelector('.q_quantity').value=item.quantity||1;
-        const us=row.querySelector('.q_unit'); if(us) us.value=item.unit||'';
-        if (item.length||item.breadth) {
-            const mt=row.querySelector('.measure_toggle'); mt.checked=true; toggleMeasurement(mt);
-            row.querySelector('.q_length').value=item.length||'';
-            row.querySelector('.q_breadth').value=item.breadth||'';
-            calcArea(row.querySelector('.q_length'));
-        }
+        row.querySelector('.q_description').value = item.description || '';
+        row.querySelector('.q_quantity').value = item.quantity || 1;
+        const us = row.querySelector('.q_unit'); if (us) us.value = item.unit || '';
     });
     updateItemCount();
 });
+
+    // ── Load existing services ──
+
 
 document.addEventListener('input', function(e) {
     if (e.target.classList.contains('q_custom_name')) {
@@ -1003,6 +1210,103 @@ document.addEventListener('input', function(e) {
             });
     }
 });
+
+function toggleAccessories(cb) {
+    const service = cb.closest('.service-item');
+    const wrap = service.querySelector('.accessories_wrap');
+    const btn  = service.querySelector('.acc_add_btn');
+
+    if (cb.checked) {
+        wrap.classList.remove('hidden');
+        btn.classList.remove('hidden');
+
+        if (!wrap.children.length) {
+            addAccessoryRow(btn); // add first row
+        }
+    } else {
+        wrap.innerHTML = '';
+        wrap.classList.add('hidden');
+        btn.classList.add('hidden');
+    }
+}
+
+function addAccessoryRow(btn) {
+    const container = btn.closest('.service-item').querySelector('.accessories_wrap');
+
+    const div = document.createElement('div');
+    div.className = 'si-card';
+
+    div.innerHTML = `
+        <div class="si-card-header">
+            <span class="si-card-title">Accessory</span>
+            <button type="button" onclick="this.closest('.si-card').remove()"
+                class="si-remove-btn">×</button>
+        </div>
+
+        <div class="si-grid">
+
+            <!-- Item Name -->
+            <div class="si-span2">
+                <label class="si-label">Item Name</label>
+                <select class="si-select acc_item" onchange="setAccessoryPrice(this)">
+                    <option value="">-- Select Item --</option>
+                    ${allInventoryItems.map(i => `
+                        <option value="${i.id}" data-price="${i.price}">
+                            ${i.item_name}
+                        </option>
+                    `).join('')}
+                </select>
+            </div>
+
+            <!-- Size -->
+            <div>
+                <label class="si-label">Size</label>
+                <input type="text" class="si-input acc_size" placeholder="e.g. 12x12">
+            </div>
+
+            <!-- qty -->
+            <div>
+                <label class="si-label">Qty</label>
+                <input type="number" class="si-input acc_qty">
+            </div>
+
+            <!-- Unit -->
+            <div>
+                <label class="si-label">Unit</label>
+                <input type="text" class="si-input acc_unit" placeholder="Nos / Set">
+            </div>
+
+            <!-- Price -->
+            <div>
+                <label class="si-label">Unit Price</label>
+                <input type="number" class="si-input acc_price" readonly>
+            </div>
+            <!-- offer -->
+            <div>
+    <label class="si-label">Offer Price</label>
+    <input type="number" class="si-input acc_offer" placeholder="Enter offer price">
+</div>
+
+            <!-- Image -->
+            <div class="si-span2">
+                <label class="si-label">Upload Image</label>
+                <input type="file" class="si-input acc_image" accept="image/*">
+            </div>
+
+        </div>
+    `;
+
+    container.appendChild(div);
+}
+
+function setAccessoryPrice(select) {
+    const opt = select.options[select.selectedIndex];
+    const card = select.closest('.si-card');
+
+    if (opt && opt.dataset.price) {
+        card.querySelector('.acc_price').value = opt.dataset.price;
+    }
+}
 </script>
 
 @endsection
