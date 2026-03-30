@@ -150,7 +150,6 @@
                         </span>
                         @endif
                     </td>
-
                 </tr>
                 @endforeach
             </tbody>
@@ -479,5 +478,4 @@
         }
     });
 </script>
-
 @endsection

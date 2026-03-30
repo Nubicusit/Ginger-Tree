@@ -11,6 +11,7 @@ use App\Http\Controllers\Sales\QuotationController;
 use App\Http\Controllers\HRController;
 use App\Http\Controllers\AccountsController;
 use App\Http\Controllers\ThreeDesignerController;
+use App\Http\Controllers\TwoDDesignController;
 use App\Http\Controllers\EstimationController;
 use App\Http\Controllers\ServiceItemController;
 use Spatie\LaravelPdf\Facades\Pdf;
@@ -512,3 +513,12 @@ Route::post('/admin/leads/{lead}/assign-designer', [AdminController::class, 'ass
 Route::get('three-d-design/{threeDDesign}/site-visit',
     [ThreeDesignerController::class, 'siteVisit']
 )->name('three-d-design.site-visit');
+
+Route::prefix('two-d-design')->name('two-d-design.')->group(function () {
+    Route::get('/',           [TwoDDesignController::class, 'index'])->name('index');
+    Route::get('/create',     [TwoDDesignController::class, 'create'])->name('create');
+    Route::post('/',          [TwoDDesignController::class, 'store'])->name('store');
+    Route::get('/{id}/edit',  [TwoDDesignController::class, 'edit'])->name('edit');
+    Route::put('/{id}',       [TwoDDesignController::class, 'update'])->name('update');
+    Route::delete('/{id}',    [TwoDDesignController::class, 'destroy'])->name('destroy');
+});
